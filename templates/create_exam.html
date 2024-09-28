@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Create Exam</title>
+</head>
+
+
+
+{{ define "create_exam_template"}}
+<body>
+    <div class="main_div">
+        <button 
+        class="create_button"
+        hx-get = "/programdetails/acams"
+        hx-target = "#maincontaint">
+        
+        Details
+    </button>
+
+    <h3 class="h3_heading">Cource Name Out: {{ .Cource_Name}}</h3>
+    <div class="questions">
+        
+        <div class="section_a">
+            <div id="question_list" class="section_a_question">
+
+            </div>
+            
+        
+            <div>
+            <form hx-post="/addexam?uuid={{.UUID}}"
+                    hx-target="#question_list"
+                    hx-swap="beforeend">
+                <label for="question" class="compose">Compose Question</label><br>
+
+                <input type="text" class="question_b" name="question" id="" placeholder="Compose Question"><br>
+        
+                <label for="answer" style="text-decoration: underline;">Enter Answer</label>
+
+                <label for="answer">True</label>
+                <input type="radio" name="answer" value="true">
+                <label for="answer">False</label>
+                <input type="radio" name="answer" value="false">
+
+                
+
+
+                <textarea name="text_answer"  class="question_b"></textarea>
+
+                <label for="section" style="text-decoration: underline;">Choose question section</label><br>
+                <select name="section_choice" id="">
+                    <option value="a">Section A</option>
+                    <option value="b">Section B</option>
+
+                </select><br>
+                <button type="submit" class="create_button">Create</button>
+            </form>
+        </div>
+        </div>
+    </div>
+    </div>
+</body>
+
+{{ end }}
+
+</html>
+
+
+
+
+{{ define "question_section_a"}}
+    
+    <div class="question_out">
+        <div class="edit_question">
+            <button class="create_button">Update</button>
+            <button class="delete_button">Delete</button>
+        </div>
+        <div>
+            <p>{{.Section}}</p>
+            <p>{{.Question}}</p>
+            <p>{{.Answer}}</p>          
+        </div>
+    </div>
+    
+  
+{{ end }}
+
+{{ define "question_section_b"}}
+    
+    <div class="question">
+        <div class="edit_question">
+            <button class="update">Update</button>
+            <button class="delete">Delete</button>
+        </div>
+        <div>
+            <p>{{ .Section}}</p>
+            <p>{{.Question}}</p>
+        </div>
+        </div>
+    
+  
+{{ end }}

@@ -1,0 +1,95 @@
+
+
+
+<h2 class="dashboard_name">
+    Students
+</h2>
+<hr>
+<div class="tochange">
+  <div class="tableheader">
+    <p class="programname">Award of Certificate of Attendance in Metaphysical Sciences</p>
+    <select class="programnamelist" id="">
+      <option value="">ALL</option>
+      <option value="">ACAMS</option>
+      <option value="">ACMS</option>
+      <option value="">ADMS</option>
+      <option value="">ABDMS</option>
+      <option value="">AMDMS</option>
+      <option value="">Ph.DMS</option>
+      
+  
+    </select>
+  </div> 
+  <div class="programdiv">
+     
+    <div class="table_div">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Applied</th>
+            <th scope="col">Paid</th>
+            <th scope="col">Payment Method</th>
+            <th scope="col">Completed</th>
+            <th scope="col">Details</th>
+          
+    
+          </tr>
+        </thead>
+
+        
+        <tbody>
+          {{ range .}}
+            {{ if .Approved }}
+            <tr>
+              <th scope="row"></th>
+              <td>{{ .First_Name}}</td>
+              <td>{{ .Last_Name}}</td>
+              <td>{{ .Email}}</td>
+              <td>{{ .Approved}}</td>
+              <td>{{ .Paid}}</td>
+              <td>{{ .Payment_Method}}</td>
+              <td>{{ .Completed}}</td>
+            
+      
+              <td>
+                <div hx-post ="studentedataadmin/{{ .Student_UUID}}" 
+                hx-target = "#maincontaint" class="studentdetailsbtn">
+                Details
+              </div>
+              </td>
+              </tr>
+          
+            {{ else }}
+            <tr>
+              <th scope="row"></th>
+              <td>{{ .First_Name}}</td>
+              <td>{{ .Last_Name}}</td>
+              <td>{{ .Email}}</td>
+              <td>{{ .Approved}}</td>
+              <td>{{ .Paid}}</td>
+              <td>{{ .Payment_Method}}</td>
+              <td>{{ .Payment_Method}}</td>
+
+            
+      
+              <td>
+                <div hx-post ="studentedataadmin/{{ .Student_UUID}}" 
+                hx-target = "#maincontaint" class="studentdetailsbtnapprove">
+                Details
+              </div>
+              </td>
+              </tr>
+            
+          {{ end }}
+          {{end}}
+        </tbody>
+      </table>
+    </div>    
+      
+  </div>
+</div>
+

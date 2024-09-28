@@ -1,0 +1,147 @@
+
+
+
+
+{{ define "admin_cource_assesment"}}
+
+
+
+<div class="assesment_div" id="admin_assesment_div">
+    <div class="header_assesment">
+        <button class="close_assesment"
+        hx-post="/close_admin_div"
+        hx-target="admin_assesment_div"
+        hx-swap="outerHTML">X</button>
+    </div>
+    <div class="assesment_results">
+        <table class="assesment_table">
+            <thead>
+                <tr>
+                    <th>Assigment</th>
+                    <th>Grade</th>
+                    <th>Passed</th>
+                    <th>Comment</th>
+                    <th>Select</th>
+                    
+                </tr>
+            </thead>
+           
+            <tbody>
+                <tr>
+                <td>Assesment</td>
+                <td>Pendding</td>
+                <td>Pendding</td>
+                <td>Pendding</td>
+                <td>
+                    <ul class="outer">
+                        <li class="dropdown">
+                            Select
+                            <ul class="inner">
+                                <li><button class="download">Download</button></li>
+                                <li><button class="download">Grade</button></li>
+                                <li><button class="download">Update</button></li>
+                                <li><button class="delete">Delete</button></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
+                </tr> 
+
+
+                <tr>
+                    <td>Assigment</td>
+                    <td>Pendding</td>
+                    <td>Pendding</td>
+                    <td>Pendding</td>
+                    <td>
+                        <ul class="outer">
+                            <li class="dropdown">
+                                Select
+                                <ul class="inner">
+                                    <li><button class="download">Download</button></li>
+                                    <li><button class="download">Grade</button></li>
+                                    <li><button class="download">Update</button></li>
+                                    <li><button class="delete">Delete</button></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                
+            </tbody>
+            
+        </table>
+    </div>
+    
+    
+</div> 
+
+{{ end }}
+
+{{ define "grade_assingment"}}
+
+<div class="grade_div">
+    <div class="assingment_name">Assesment</div>
+    
+    <div class="assingment_form_in">
+        <form action="/grade_assingment">
+            <input class="assesment_input" type="text" name="grade" placeholder="Enter Grade">
+            <input class="assesment_input" type="text" placeholder="Enter Remarks">
+            
+            <select class="select_input" name="passed" id="">
+                <option value="passed">
+                    Passed
+                </option>
+                <option value="rewrite">Rewrite</option>
+            </select>
+            <button type="submit">Save</button>
+        </form>
+    </div>
+</div>
+
+{{ end }}
+
+
+{{ define "student_cource_assesment"}}
+<div class="assesment_div" id="assesment_div">
+    <div class="header_assesment">
+        <button class="close_assesment"
+            hx-post="/close_assesment_div"
+            hx-target="assesment_div"
+            hx-swap="outerHTML">X</button>
+    </div>
+    <div class="assesment_results">
+        <table class="assesment_table">
+            <thead>
+                <tr>
+                    <th>Assigment Number</th>
+                    <th>Grade</th>
+                    <th>Comment</th>
+                    
+                </tr>
+            </thead>
+           
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>45</td>
+                    <td>Pass</td>
+                </tr>
+            
+                
+            </tbody>
+            
+        </table>
+    </div>
+    <div class="assesment_hand_in">
+        <form action="/assesmenthandin?cource_name={{.Cource_Name}}&studen_uuid={{.Stinfo_UUID}}">
+            <input class="upload_file" type="file" placeholder="Submit assignment">
+            <button class="submit_assignment" type="submit">Submit</button>
+        </form>
+    </div>
+
+</div> 
+
+{{ end }}
+
+

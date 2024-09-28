@@ -1,0 +1,102 @@
+
+
+
+<script src="/assets/htmx.js"></script>
+{{ define "tablestructure"}}
+
+
+        <div style="color: rgb(31, 0, 62);">
+            <h2 style="color: rgb(31, 0, 62); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: lighter; text-align: center;">{{ .Program_Name}}</h2>
+        </div>
+        <hr>
+        <div class="program_table">
+        <table>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Course Name</th>
+                <th>Download Book</th>
+                <th>Download Module</th>
+                <th>Video</th>
+                <th>Cources Assesment</th>
+                <th>Take Exam</th>
+                <th>Result</th>
+                <th>Approval</th>
+            </tr>
+            </thead>
+            <tbody>
+                {{range .Cource_Struct }}
+
+                {{ if .Approved }}
+                    <tr>
+                        <td></td>
+                        <td>{{ .Cource_Name}}</td>
+                        <td>Book</td>
+                        <td>Modul</td>
+                        <td> <a class = "watch_video_link" href="/watchvideo/1">Watch</a></td>
+                        <td><a hx-post="/handinassesment?cource_name={{ .Cource_Name}}&student_uuid={{ .Student_UUID}}"
+                                hx-target="#hidden"
+                                hx-swap="outerHTML">Send</a></td>
+                        <td><a href="#">Write</a></td>
+                        <td>Pedding</td>
+                        
+                        <td id="approval">
+                        {{ template "cource_approved"}}
+                        </td>
+                        
+                        </tr>
+
+                    </tr>
+                    {{else}}
+                        <tr>
+                        <td></td>
+                        <td>{{ .Cource_Name  }}</td>
+                        <td>Book</td>
+                        <td>Modul</td>
+                        <td> <a>Watch</a></td>
+                        <td><a href="#">Write</a></td>
+                        <td>Pedding</td>
+                        <td>Pedding</td>
+                        
+                        <td id="approval">
+                        {{ if .Approved }}
+                            {{ template "cource_approved" .}}
+                        {{else }}
+                            {{ if .Applied }}
+                                {{ template "cource_applied_btn" .}}
+                            {{ else }}
+                                {{template "cource_apply_btn" .}}
+                            {{ end }}
+
+                        {{ end }}
+
+                        </td>
+                        
+                        </tr>
+                    {{ end }}
+                {{end}}
+
+                
+            </tbody>
+        </table>
+        </div>
+{{end}}
+    
+
+{{define "cource_apply_btn"}}
+    <buttton
+
+    hx-post = "/approvecource?uuid={{ .UUID}}&cource_name={{ .Cource_Name}}"
+    hx-swap = "outerHTML"
+    class="cource_apply_btn">Apply</button>
+{{ end }}
+
+{{ define "cource_applied_btn"}}
+    <button  class="cource_approved">Applied</button>
+{{ end }}
+
+{{ define "cource_approved"}}
+   <button  class="cource_approved">Approved</button>
+{{end}}
+
+

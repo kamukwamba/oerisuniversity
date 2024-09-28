@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/assets/css/studentportal.css?v=3.5">
+    <link rel="stylesheet" href="/assets/css/video.css?v=1.6">
+    <link rel="stylesheet" href="/assets/css/messages.css?v=2.8">
+    <link rel="stylesheet" href="/assets/css/cource_assesment.css?v=1.1">
+
+    <title>Student Dash Board</title>
+    <script src="/assets/htmx.js"></script>
+</head>
+<body>
+    {{template "HeaderStudent" .}}
+    
+    <main id="mainpage" class="main_div">
+        {{ if .Available}}
+            {{ template "programs" .}}
+        {{else}}
+            {{ template "oops" .}}
+        {{ end}}
+        
+
+        <div class="hidden" id="hidden">
+
+    </main>
+  
+
+    <script>
+        // jQuery
+        $(window).on('popstate', function (e) {
+            var state = e.originalEvent.state;
+            if (state !== null) {
+                console.log("Working")
+            }
+        });
+        
+        // Vanilla javascript
+        window.addEventListener('popstate', function (e) {
+            var state = e.state;
+            if (state !== null) {
+                //load content with ajax
+            }
+        });
+        </script>
+   
+</body>
+
+<footer>
+    {{ template "footer"}}
+</footer>
+</div>
+</html>
+
+{{ define "working" }}
+    {{ .AllStudentCources}}
+{{ end }}
+
+{{ define "programs"}}
+ 
+    <div class="programs">
+
+
+        {{ range .AllCourceDataOut}}
+        
+            {{ template "tablestructure" .}}
+
+        {{end}}
+
+
+    </div>
+    <div class="proceed_div" style="margin-top: 40px;">
+        
+        <a class="proceed_btn" href="/proceed/{{.StInfo.UUID}}">Proceed</a>
+    </div>
+{{end}}
+
+{{ define "oops"}}
+    <div class="confirmregistration">
+        <h1 class="oops_header">Oops!!</h1>
+        <h2 >
+            Sorry none of the courses you have applied for have been approved please contact the instituon for futher help
+        </h2>
+        <div class="proceed_div btnbottom">
+            <button hx-post = "/messages/{{.StInfo.UUID}}"  
+                    hx-target = "#mainpage" 
+                    hx-swap = "innerHTML"
+                    class="proceed_btn procced_bottom">
+                Contact Institution
+            </button>
+        </div>
+    </div>
+    
+{{end}}
+
+
+{{define "HeaderStudent"}}
+
+<header class="header_nav">
+    <div class="user_infor">
+
+        <div class="image_div">
+            <img  class="user_image" src="/assets/Images/user_logo.png" alt="">
+        </div>
+        <div  class="student_name">
+            <p>
+                <a href="/studentprofileportal/{{.StInfo.UUID}}">{{.StInfo.First_Name}} {{.StInfo.Last_Name}}</a>
+            </p>
+
+        </div>
+    </div>
+
+    <div class="accountfunctions">
+        <p class="student_nav"><a  data-hx-post="/messages/{{.StInfo.UUID}}"
+            hx-target="#mainpage"
+            hx-swap="innerHTML">Messages</a></p>
+        <p class="student_nav"><a href="/studentsettings/{{.StInfo.UUID}}">Settings</a></p>
+        <p class="student_nav"><a href="/studentlogout/{{.StInfo.UUID}}">Log out</a></p>
+    </div>
+    
+</header>
+
+
+{{end}}
+
+
+
+{{ define "videopage"}}
+
+    <div class="videoplayer">
+
+        <div class="videodiv">
+            <video controls>
+                <source src="/assets/videos/mindfulness.mp4" type="video/mp4">
+
+            </video> 
+        </div>
+        <div class="videolist">
+
+            <h3>Course Name</h3>
+            <div class="coursevideos">
+
+                <div class="coursevideo">
+                    <video src="/assets/videos/mindfulness.mp4" type="video/mp4"></video>
+                </div>
+
+                <div class="videoname">
+                    <p>Cource video discription</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+{{end}}

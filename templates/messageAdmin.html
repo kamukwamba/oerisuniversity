@@ -1,0 +1,144 @@
+
+
+
+
+<script src="/assets/htmx.js"></script>
+{{define "messageAdmin"}} 
+    <h2 class="dashboard_name">
+        Messages
+    </h2>
+    <hr>
+    <div class="messagedivadmin">
+
+        
+        <div class="adminleft">
+            <div id="readmessagesdiv">
+
+            </div>
+           
+        </div>
+
+
+        <div class="adminright">
+            <div class="search">
+                <form action="/getstudent">
+                    <input class="input_st" type="text" placeholder="Student Name">
+                    <button class="btn_st">
+                        Search
+                    </button>
+                </form>
+            </div>
+            <div>
+                {{ template "messageslog" .}}
+            </div>
+        </div>
+
+    </div>
+{{end}}
+
+
+{{ define "messageslog"}}
+
+    {{ range .}}
+
+        {{ if .Seen_Admin}}
+        <div class="messagelogseen"
+                    hx-get="/readmessageadmin?student_uuid={{.Student_UUID}}&message_seen=seen"
+                    hx-target="#readmessagesdiv"
+                    hx-swap="innerHTML">
+            <div class="senderdetails"> 
+                <p>{{ .Sender_Name }}</p>
+            </div>
+            <div class="message">
+                <p class="messagetext">
+                    {{ .Message}}
+                </p>
+                <div class="datecreated">
+                    <p>{{.Date}}</p>
+                </div>
+            </div>
+        </div>
+        {{ else }}
+                <div class="messagelognotseen"
+                    hx-get="/readmessageadmin?student_uuid={{.Student_UUID}}&message_seen=not"
+                    hx-target="#readmessagesdiv"
+                    hx-swap="innerHTML">
+                    <div class="senderdetails"> 
+                        <P>{{.Sender_Name}}</P>
+                    </div>
+                    <div class="message">
+                        <p class="messagetext">
+                            {{ .Message}}
+                        </p>
+                    </div>
+                    <div class="datecreated">
+                        <p>{{ .Date }}</p>
+                    </div>
+
+                </div>
+
+        {{ end }}
+
+    {{ end }}
+{{end}}
+
+
+{{ define "composemessage"}} 
+<div class="message_box">
+    <div class="messages" id="messageslist">
+        
+       
+    </div>
+ 
+    <div class="message_writer">
+        <form hx-post="/composemessage"
+            hx-target="#messageslist"
+            hx-swap="beforeend"
+            hx-on::after-request="this.reset()">
+            
+            <input type="text" name="studentdetails" class="composemessage" placeholder="Student number">
+
+            <input type="text" placeholder="Message" name="message_content" class="writemessage">
+            <div class="btnend">
+                <button type="submit" class="sendmessagebtn">Send</button>
+            </div>
+            
+        </form>
+    </div>
+  
+</div>
+
+{{end}}
+
+
+{{ define "readMessagesAdmin"}}
+    <div class="message_box_admin">
+        <h5><a href="/studentedataadmin/{{ .StInfo.UUID }}"></a>{{ .StInfo.First_Name}} {{ .StInfo.Last_Name}} </h5>
+        <div class="messages" id="messageslist">
+            
+           {{ range .Messages }}
+                {{ if .Sender}}
+                    {{template "left" .}}
+
+                {{else}}
+                    {{ template "right" .}}
+
+                {{end}}
+                
+           {{end}}
+
+        </div>
+     
+        <div class="message_writer">
+            <form hx-post="/sendmessage?student_uuid={{.StInfo.UUID}}&from=admin"
+                hx-target="#messageslist"
+                hx-swap="beforeend"
+                hx-on::after-request="this.reset()">
+                <input type="text" placeholder="Message" name="message_content" class="write_message">
+                <button type="submit" class="send_message_btn">Submit</button>
+            </form>
+        </div>
+      
+    </div>
+
+{{end}}

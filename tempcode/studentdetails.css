@@ -1,0 +1,59 @@
+.student_personal_information{
+    padding-left: 10px;
+}
+
+.program_name{
+    text-decoration: underline;
+    font-weight: bold;
+    color: rgb(32, 0, 67);
+    text-align: center;
+}
+
+.update_div{
+    display: flex;
+    justify-content: end;
+    width: 67vw;
+    height: 40px;
+    margin: 10px;
+    
+}
+
+.update_btn{
+    width: 175px;
+    height: 40px;
+    background-color: rgb(32, 0, 62);
+    color: white;
+    border: 1px solid rgb(32, 0, 62);
+    border-radius: 3px;
+    text-align: center;
+    padding: 7px;
+    font-size: .9em;
+    margin: 5px;
+
+}
+
+
+.update_btn:hover{
+    background-color: white;
+    color: rgb(32, 0, 62);
+}
+
+.delete_btn{
+    width: 175px;
+    height: 40px;
+    color: rgb(32, 0, 62);
+    background-color: white;
+    border: 1px solid rgb(32, 0, 62);
+    border-radius: 3px;
+    text-align: center;
+    padding: 7px;
+    font-size: .9em;
+    margin: 5px;
+
+}
+
+
+.delete_btn:hover{
+    color: white;
+    background-color: rgb(32, 0, 62);
+}

@@ -1,0 +1,121 @@
+
+
+
+
+
+<h2 class="dashboard_name">
+        News
+    </h2>
+    <hr>
+<div class="mainnewsdiv">
+
+   
+    <div class="leftside">
+        <div class="navbar">
+            <div class="navitem">
+                Write
+            </div>
+        </div>
+        
+        <div id="changer">
+           {{template "writearticle"}}
+        </div>
+    
+    </div>
+
+    <div class="rightside">
+        <h3 class="News">
+            News Articles
+        </h3>
+        {{template "newssamples"}}
+    </div>
+
+
+    
+</div>
+
+
+
+
+
+
+{{define "newssamples"}}
+
+    <div class="newssample" style="background-image: url(/assets/Images/home_page_three.jpg); 
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;">
+        <div class="spacefiller">
+            
+        </div>
+        <div class="newssummary">
+
+            <p class="summarytext">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Modi asperiores excepturi commodi, sequi facilis corporis amet doloribus impedit necessitatibus ab. Amet quos et, possimus placeat neque explicabo mollitia illo! Autem!</p>
+            <div class="viewupdatedelete">
+                <button class="summarybtn view">view</button>
+                
+                <button class="summarybtn update">update</button>
+
+                <button class="summarybtndelete">delete</button>
+
+            </div>
+        </div>
+    </div>
+
+{{end}}
+
+{{define "writearticle"}}
+
+    <div class="writearticle">
+        <div class="writer">
+            <form >
+                <input type="textarea" placeholder="Enter image link" name="image" class="articleinagelink">
+                <textarea name="purpose_of_enrolling" class="writerarea" placeholder="Compose article"></textarea>
+                <div class="savearticlediv">
+                    <button type="submit" class="savearticle">Save Article</button>
+                </div>
+                
+            </form>
+        </div>
+        
+    </div>
+{{end}}
+
+
+{{define "updatearticle"}}
+<div class="writearticle">
+    <div class="preview">
+
+    </div>
+    <div class="writer">
+        <form >
+            <input type="textarea" placeholder="Enter image link" name="image" class="articleinagelink">
+            <textarea name="purpose_of_enrolling" class="writerarea" placeholder="Compose article"></textarea>
+
+            <div class="savearticlediv">
+                <button type="submit" class="savearticle">Update Article</button>
+                <button type="submit" class="deletearticle">Delete Article</button>
+            </div>
+            
+        </form>
+    </div>
+    
+</div>
+{{end}}
+
+{{ define "readarticle"}}
+    <div class="newsarticle">
+        <div class="newsheader">
+            <h2 class="newsheadertext">The New Story</h2>
+            <h5 class="authername">By:"Name of Author"</h5>
+        </div>
+
+        <div class="newscontent">
+            <p class="newsparagraphs">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Laboriosam reprehenderit aspernatur repellat alias. Reiciendis labore quo dicta maiores. Quasi rem magnam recusandae nobis deleniti illo, quo nemo repellendus culpa placeat!</p>
+
+            <p class="newsparagraphs">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Laboriosam reprehenderit aspernatur repellat alias. Reiciendis labore quo dicta maiores. Quasi rem magnam recusandae nobis deleniti illo, quo nemo repellendus culpa placeat!</p>
+
+           
+        </div>
+    </div>
+{{end}}

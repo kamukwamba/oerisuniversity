@@ -1,0 +1,287 @@
+package routes
+
+import (
+	"fmt"
+	"html/template"
+	"log"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+	"ucmps/dbcode"
+	"ucmps/encription"
+)
+
+type MessageBody struct {
+	UUID         string
+	Message      string
+	Sender_UUID  string
+	Sender_Name  string
+	Sender       bool
+	Seen_Student bool
+	Seen_Admin   bool
+	Date         string
+}
+
+type MessageLading struct {
+	StudentUUID string
+	MsgBody     []MessageBody
+	StInfo      StudentInfo
+}
+
+func GetMessages(uuid string) []MessageBody {
+	var messages_out_list []MessageBody
+
+	dbread := dbcode.SqlRead()
+	stmt, err := dbread.DB.Query("select uuid, sender_uuid,sender_name, sender,message,seen_student,seen_admin,date from messages")
+
+	uuidout := uuid
+	if err != nil {
+
+		fmt.Println("No messages")
+
+	}
+	defer stmt.Close()
+	var message_out MessageBody
+
+	for stmt.Next() {
+		err = stmt.Scan(&message_out.UUID, &message_out.Sender_UUID, &message_out.Sender_Name, &message_out.Sender, &message_out.Message, &message_out.Seen_Student, &message_out.Seen_Admin, &message_out.Date)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if message_out.Sender_UUID == uuidout {
+			messages_out_list = append(messages_out_list, message_out)
+		}
+
+	}
+
+	return messages_out_list
+}
+
+func arrayToString(arr []string) string {
+
+	// seperating string elements with -
+	return strings.Join([]string(arr), ",")
+}
+
+func SendMsg(w http.ResponseWriter, r *http.Request) {
+
+	uuid := encription.Generateuudi()
+	write_msg := r.PostFormValue("message_content")
+
+	student_uuid := r.URL.Query().Get("student_uuid")
+	from := r.URL.Query().Get("from")
+
+	student_name_get := GetStudentAllDetails(student_uuid)
+	sender_name := fmt.Sprintf("%s %s", student_name_get.First_Name, student_name_get.Last_Name)
+
+	fmt.Println(sender_name)
+
+	msgyear := strconv.Itoa(time.Now().Year())
+	msgmonth := time.Now().Month().String()
+	msgday := strconv.Itoa(time.Now().Day())
+	var seen_student bool
+	var seen_admin bool
+	var sender bool
+
+	if from == "student" {
+		sender = true
+		seen_student = true
+		seen_admin = false
+	} else if from == "admin" {
+		sender = false
+		seen_student = false
+		seen_admin = true
+
+	}
+
+	datein := []string{msgyear, msgmonth, msgday}
+	dateout := arrayToString(datein)
+
+	dbcode := dbcode.SqlRead()
+
+	sendmsg, err := dbcode.DB.Begin()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	stmt, err := sendmsg.Prepare("insert into messages (uuid, sender_uuid,sender_name, sender,message,seen_student,seen_admin,date) values(?,?,?,?,?,?,?,?)")
+
+	if err != nil {
+		ErrorPrintOut("studentpersonal", "sendmessage", err.Error())
+	}
+
+	defer stmt.Close()
+	_, err = stmt.Exec(uuid, student_uuid, sender_name, sender, write_msg, seen_student, seen_admin, dateout)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = sendmsg.Commit()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	data := MessageBody{
+		UUID:        uuid,
+		Sender_UUID: student_uuid,
+		Sender:      sender,
+		Message:     write_msg,
+		Date:        dateout,
+	}
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	errtmpl := tpl.ExecuteTemplate(w, "right", data)
+
+	if errtmpl != nil {
+		log.Fatal(errtmpl)
+	}
+
+}
+
+func ProgramCompleted(w http.ResponseWriter, r *http.Request) {
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	user_uuid := r.URL.Query().Get("user_uuid")
+	program := r.URL.Query().Get("program")
+
+	switch program {
+	case "acams":
+		if UpdateProgram(user_uuid, program) {
+			fmt.Println("Update was succesfull")
+
+		}
+
+	case "acms":
+		if UpdateProgram(user_uuid, program) {
+			fmt.Println("Update was succesfull")
+		}
+	case "adms":
+		if UpdateProgram(user_uuid, program) {
+			fmt.Println("Update was succesfull")
+		}
+	case "abdms":
+		if UpdateProgram(user_uuid, program) {
+			fmt.Println("Update was succesfull")
+		}
+
+	}
+
+	// datastring := fmt.Sprintf("The querris are %s ", dataout)
+	// fmt.Fprint(w, datastring)
+
+	// keys, ok := r.URL.Query()["id"]
+
+	// if ok {
+	// 	fmt.Println(keys)
+	// }
+
+	err := tpl.ExecuteTemplate(w, "completed", nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func Messages(w http.ResponseWriter, r *http.Request) {
+
+	student_uuid := r.PathValue("id")
+
+	message_out := GetMessages(student_uuid)
+	studentdata := GetStudentAllDetails(student_uuid)
+
+	data := MessageLading{
+		StudentUUID: student_uuid,
+		MsgBody:     message_out,
+		StInfo:      studentdata,
+	}
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	err := tpl.ExecuteTemplate(w, "messagesstudent", data)
+
+	if err != nil {
+		log.Fatal("ERROR=== ", err, " ===END")
+	}
+
+}
+
+func StudentSettings(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func StudentLogOut(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func ContactInstitution(w http.ResponseWriter, r *http.Request) {
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	videopath := r.PathValue("id")
+	fmt.Println(videopath)
+
+	err := tpl.ExecuteTemplate(w, "messagesstudent", nil)
+
+	if err != nil {
+		log.Fatal(err)
+
+	}
+
+}
+
+func StudentProfilePortal(w http.ResponseWriter, r *http.Request) {
+	studentuuid := r.PathValue("id")
+	var programdataout []AllCourceData
+	var studentinfo StudentInfo
+
+	var present bool
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	studentprogramlist := GetStudentPrograms(studentuuid)
+	fmt.Println("student programs", studentprogramlist)
+	programdataout, present = GetStudentProgramData(studentprogramlist, studentuuid)
+	studentinfo = GetStudentAllDetails(studentuuid)
+
+	students_data := StudentCourse{
+		Available:        present,
+		StInfo:           studentinfo,
+		AllCourceDataOut: programdataout,
+	}
+
+	fmt.Println("WORKING")
+
+	tpl.ExecuteTemplate(w, "studentportal.html", students_data)
+}
+
+func WatcVideo(w http.ResponseWriter, r *http.Request) {
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	videopath := r.PathValue("id")
+	fmt.Println(videopath)
+
+	err := tpl.ExecuteTemplate(w, "videos.html", nil)
+
+	if err != nil {
+		log.Fatal(err)
+
+	}
+
+}
+
+func HandInAssesment(w http.ResponseWriter, r *http.Request) {
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	err := tpl.ExecuteTemplate(w, "student_cource_assesment", nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}

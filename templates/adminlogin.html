@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/assets/css/formstyletwo.css?v=1.14">
+    <!-- <link rel="stylesheet" href="/assets/css/formstyle.css"> -->
+    <style>
+        body{
+        background-image: url('/assets/Images/home_page_three.png');
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        background-attachment:fixed;
+        margin: auto;
+
+  }
+    </style>
+
+    <title>Administration</title>
+</head>
+<body>
+
+    <div>
+        <a class="header-link" href="/"><h1>UCMS</h1></a>
+    </div>
+    <div class="logdiv">
+        <div class="heading">
+            <h1>Admin</h1>
+        </div>
+        <form action="/admindashboard" method="POST">
+            <div class="input_width">
+                
+            <input class="ctinput" type="email" name="email" required placeholder="Email">
+            </div>
+            <div class="input_width">
+                
+            <input class="ctinput" type="password" name="password" required placeholder="Password"><br>
+            </div>
+            
+            <div class="subbtn">
+                <button  class="ctsubbtn" type="submit" class="custom_btn">Sign in</button>
+            </div>
+            
+        </form>
+
+
+    </div>
+    
+</body>
+</html>

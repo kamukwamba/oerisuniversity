@@ -1,0 +1,136 @@
+
+
+<link rel="stylesheet" href="exam_css.css">
+
+{{ define "write_div"}}
+    <div class="header"> 
+        <div class="timer_div">
+            <p>Remaining Time <span>45:0</span></p>
+        </div>
+        <div class="exam_details">
+            <table>
+                <tbody>
+                    <tr>
+                        <th class="title">Program</th>
+                        <td>{{ .Program_Name}}</td>
+                    </tr>
+                    <tr>
+                        <th class="title">Cource Name</th>
+                        <td>{{ .Cource_Name}}</td>
+
+                    </tr>
+                    <tr>
+                        <th class="title">Cource Code</th>
+                        <td>{{ .Cource_Code}}</td>
+                    </tr>
+                    <tr>
+                        <th class="title">Date</th>
+                        <td>{{ .Date}}</td>
+                    </tr>
+                    <tr>
+                        <th class="title">Start Time</th>
+                        <td>{{ .Start_Time}}</td>
+                    </tr>
+                    <tr>
+                        <th class="title">Submision Time</th>
+                        <td>{{ .Submision_Time}}</td>
+                    </tr>
+                    <tr>
+                        <th class="title">Duration</th>
+                        <td>{{ .Cource_Code}}</td>
+                    </tr>
+                    <tr>
+                        <th class="title">Total  Marks</th>
+                        <td>{{ .Total_Marks}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="instractions">
+                <ol style="list-style: decimal;">
+                    <li>The question paper has two sections, A and B
+                        <ol style="list-style: lower-roman;">
+                            <li>Answer <span style="font-weight: bolder;">ALL</span> questions in Section A,</li>
+                            <li>and answer only <span>THREE</span> Questions out of the seven Questions in Section B</li>
+                        </ol>
+                    </li>
+                    <li>Section A carries 40 Marks and Section B carries 60 Marks</li>
+                    <li>University College of Metaphysical Sciences (UCMS) allows the student to attempt the
+                        final examinations three times within 7 days. There after a different supplementary final
+                        examination will be PREPARED and availed to the student within three.</li>
+                </ol>
+            </div>
+            <div>
+                <p class="warning_text">
+                    YOU ARE YOUR OWN OWNER FOR THIS EXAMINATION. AND DO NOT SHARE WITH NON REGISTERED STUDENTS OF OCERIES UNIVERSITY OF METAPHYSICAL SCIENCES.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="write_div">
+        <form hx-post="/exam?cource_code={{ .Cource_Code}}&student_uuid={{ .Student_UUID}}">
+            {{ if .Section "A"}}
+                {{ template "section_a" .}}
+            {{ else }}
+                {{ template "section_b" .}}
+            {{ end }}
+            
+            <button >Submit</button>
+        </form>
+
+    </div>
+{{ end }}
+
+
+
+{{ define "section_a"}}
+
+    <p>SECTION A</p>
+    <p>
+        ANSWER ALL THE QUESTIONS IN THIS SECTION, QUESTION 1 TO 20 CARRIES ONE MARK.
+        KINDLY NOTE THAT WRONG ANSWER WILL RESULT IN THE DEDUCTION OF A MARK
+    </p>
+    {{ range .Questiions }}
+    <div>
+        <p class="section_question">Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut, dolor? Nostrum, id. Nesciunt incidunt necessitatibus corrupti, vero assumenda inventore culpa fuga voluptatem ab architecto vel perferendis beatae quis, itaque voluptate.</p>
+        <input type="radio" name="{{ .Question_Number}}" value="true">
+        <input type="radio" name="{{ .Question_Number}}" value="false">
+    </div>
+
+    {{ end }}
+{{ end }}
+
+{{ define "section_b"}}
+    <p>SECTION B</p>
+    <p>Answer THREE questions only</p>
+
+    <div>
+        <p class="section_question">Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore totam dicta voluptatibus, maiores natus soluta at, ea asperiores sunt recusandae, eius velit dolores voluptatem laboriosam quasi enim. Quas, pariatur eos.</p>
+        <textarea name="{{ .Question_Number}}" class="section_b_answer" ></textarea>
+        
+    </div>
+
+{{ end }}
+
+
+<!-- <form action="/action_page.php">
+    <p>Please select your favorite Web language:</p>
+    <input type="radio" id="html" name="fav_language" value="HTML">
+    <label for="html">HTML</label><br>
+    <input type="radio" id="css" name="fav_language" value="CSS">
+    <label for="css">CSS</label><br>
+    <input type="radio" id="javascript" name="fav_language" value="JavaScript">
+    <label for="javascript">JavaScript</label>
+  
+    <br>  
+  
+    <p>Please select your age:</p>
+    <input type="radio" id="age1" name="age" value="30">
+    <label for="age1">0 - 30</label><br>
+    <input type="radio" id="age2" name="age" value="60">
+    <label for="age2">31 - 60</label><br>  
+    <input type="radio" id="age3" name="age" value="100">
+    <label for="age3">61 - 100</label><br><br>
+    <input type="submit" value="Submit">
+  </form>
+  
+  </body> -->
