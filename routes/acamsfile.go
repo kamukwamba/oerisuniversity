@@ -3,8 +3,9 @@ package routes
 import (
 	"fmt"
 	"log"
-	"ucmps/dbcode"
-	"ucmps/encription"
+
+	"github.com/kamukwamba/oerisuniversity/dbcode"
+	"github.com/kamukwamba/oerisuniversity/encription"
 )
 
 type ACAMS struct {

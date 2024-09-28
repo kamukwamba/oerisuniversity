@@ -2,7 +2,8 @@ package routes
 
 import (
 	"log"
-	"ucmps/dbcode"
+
+	"github.com/kamukwamba/oerisuniversity/dbcode"
 )
 
 func LoadExam() {

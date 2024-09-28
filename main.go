@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"ucmps/dbcode"
-	"ucmps/routes"
+
+	"github.com/kamukwamba/oerisuniversity/dbcode"
+	"github.com/kamukwamba/oerisuniversity/routes"
 
 	_ "github.com/mattn/go-sqlite3"
 )

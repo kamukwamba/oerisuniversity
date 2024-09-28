@@ -6,8 +6,9 @@ import (
 	"log"
 	"net/http"
 	"time"
-	"ucmps/dbcode"
-	"ucmps/encription"
+
+	"github.com/kamukwamba/oerisuniversity/dbcode"
+	"github.com/kamukwamba/oerisuniversity/encription"
 )
 
 type AdminUser struct {

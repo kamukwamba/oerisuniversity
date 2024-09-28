@@ -9,8 +9,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"ucmps/dbcode"
-	"ucmps/encription"
+
+	"github.com/kamukwamba/oerisuniversity/dbcode"
+	"github.com/kamukwamba/oerisuniversity/encription"
 )
 
 type StudentInfo struct {

@@ -6,7 +6,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"ucmps/dbcode"
+
+	"github.com/kamukwamba/oerisuniversity/dbcode"
 )
 
 type ProgramAvailable struct {

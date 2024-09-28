@@ -5,7 +5,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"ucmps/dbcode"
+
+	"github.com/kamukwamba/oerisuniversity/dbcode"
 )
 
 type ExamQuestons struct {

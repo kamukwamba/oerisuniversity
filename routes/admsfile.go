@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"log"
 	"time"
-	"ucmps/dbcode"
-	"ucmps/encription"
+
+	"github.com/kamukwamba/oerisuniversity/dbcode"
+	"github.com/kamukwamba/oerisuniversity/encription"
 )
 
 func CheckADMS(student_uuid string) bool {

@@ -5,8 +5,9 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"ucmps/dbcode"
-	"ucmps/encription"
+
+	"github.com/kamukwamba/oerisuniversity/dbcode"
+	"github.com/kamukwamba/oerisuniversity/encription"
 )
 
 type CourceDataStruct struct {
