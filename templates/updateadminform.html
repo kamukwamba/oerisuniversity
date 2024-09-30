@@ -1,0 +1,55 @@
+
+
+<script src="/assets/htmx.js"></script>
+
+{{ define "updateform"}}
+    <script>
+        document.form_holder.innerHTML = `<div hx-get='/example'> <button>Working</button></div>`
+        htmx.process(document.form_holder);
+    </script>
+    
+
+    <!-- form_holder -->
+        
+    <form 
+        hx-post="/updateadminuser?uuid={{.UUID}}"
+        hx-target="#{{.UUID}}"
+        hx-swap="innerHTML">
+        <div class="form_div">
+            <div class="segments">
+                <label for="first_name">First Name</label><br>
+                <input type="text" name="first_name" id="" value="{{ .First_Name}}">
+            </div>
+            <div class="segments">
+                <label for="last_name">Last Name</label><br>
+                <input type="text" name="last_name" id="" value="{{ .Last_Name}}">
+            </div>
+            <div class="segments">
+                <label for="email">Email</label><br>
+                <input type="email" name="email" id="" value="{{ .Email}}">
+            </div>
+
+            <div class="segments">
+                <label for="password">Password</label><br>
+                <input type="text" name="password" id="" value="{{ .Password}}">
+            </div>
+            <div class="segments">
+                <label for="authority">User Authority</label>
+                <select name="auth" id="" >
+                    <option value="admin">Admin</option>
+                    <option value="general">General</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="download">Update</button>
+    </form>
+    <div style="display: flex; justify-content: end; width: 100%;" >
+        <button hx-post="/loadform" 
+                hx-target="#form_holder"
+                hx-swap="innerHTML"
+                class="download"  style="width: 150px;"> Create New User</button>
+    </div>
+
+
+
+{{ end }}
