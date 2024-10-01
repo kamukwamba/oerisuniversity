@@ -50,7 +50,7 @@
         </div>
         <div class="newssummary">
 
-            <p class="summarytext">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Modi asperiores excepturi commodi, sequi facilis corporis amet doloribus impedit necessitatibus ab. Amet quos et, possimus placeat neque explicabo mollitia illo! Autem!</p>
+            <p class="summarytext">{{ .Story}}</p>
             <div class="viewupdatedelete">
                 <button class="summarybtn view">view</button>
                 
@@ -69,8 +69,12 @@
     <div class="writearticle">
         <div class="writer">
             <form >
-                <input type="textarea" placeholder="Enter image link" name="image" class="articleinagelink">
+                <input type="text" placeholder="News Title" name="title" class="articletitle">
                 <textarea name="purpose_of_enrolling" class="writerarea" placeholder="Compose article"></textarea>
+                <input type="textarea" placeholder="Enter image link" name="image" class="articleinagelink">
+                <input type="textarea" placeholder="Enter Auther Name" name="auther" class="articleinagelink">
+
+
                 <div class="savearticlediv">
                     <button type="submit" class="savearticle">Save Article</button>
                 </div>
@@ -113,7 +117,7 @@
         <div class="newscontent">
             <p class="newsparagraphs">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Laboriosam reprehenderit aspernatur repellat alias. Reiciendis labore quo dicta maiores. Quasi rem magnam recusandae nobis deleniti illo, quo nemo repellendus culpa placeat!</p>
 
-            <p class="newsparagraphs">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Laboriosam reprehenderit aspernatur repellat alias. Reiciendis labore quo dicta maiores. Quasi rem magnam recusandae nobis deleniti illo, quo nemo repellendus culpa placeat!</p>
+            
 
            
         </div>

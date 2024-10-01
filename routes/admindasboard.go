@@ -241,6 +241,7 @@ func UpdateCource(uuid, cource_name string) bool {
 }
 
 func ApproveCourceUpdate(w http.ResponseWriter, r *http.Request) {
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
 	uuid := r.URL.Query().Get("user_uuid")
 	cource_name := r.URL.Query().Get("cource_name")

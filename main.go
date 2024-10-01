@@ -41,6 +41,7 @@ func main() {
 	router.HandleFunc("/admindashboard", routes.AdminDashboard)
 	router.HandleFunc("/programcards", routes.Programcards)
 	router.HandleFunc("/news", routes.NewsPage)
+	router.HandleFunc("/readnewsstory", routes.ReadNewsRoute)
 	router.HandleFunc("/deletemessage", routes.DeleteMessageRouter)
 	//ADMIN DASHBOARD
 	router.HandleFunc("/confirmlogin", routes.ConfirmStudentLogin) //STUDENT LOGIN CODE
