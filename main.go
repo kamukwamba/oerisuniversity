@@ -63,6 +63,7 @@ func main() {
 	router.HandleFunc("/loadform", routes.LoadAdminForm)
 
 	router.HandleFunc("/deleteadmin", routes.DeleteAdmin)
+	router.HandleFunc("/curiculum", routes.Curiculum)
 
 	//EXAM
 	router.HandleFunc("/create_page", routes.CreatePage)

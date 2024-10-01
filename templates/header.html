@@ -25,19 +25,23 @@
               <a href="/programs">Programs</a>
           </li>
           <li>
-              <a href="/curiculum">Curriculum</a>
+              <a href="/curriculum">Curriculum</a>
           </li>
           <li>
               <a href="/enroll">Enrollment</a>
           </li>
-          <li>
-              <a href="">Offerings</a>
-          </li>
+         
           <li>
               <a href="">FAQ</a>
           </li>
           <li>
-              <a href="">News</a>
+            <div class="hideonsmall">
+              <a hx-get="/news" 
+                hx-target="#loadContent"
+                hx-swap = "outerHTML"
+                class="hxlinks"
+                >News out</a>
+            </div>
           </li>
           <li class="dropdown-list">
               <a href="">Students<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-360 280-560h400L480-360Z"/></svg></a>
@@ -61,24 +65,18 @@
         <a href="/programs">Programs</a>
       </div>
       <div class="hideonsmall">
-        <a href="">Curriculum</a>
+        <a href="/curiculum">Curriculum</a>
       </div>
       <div class="hideonsmall">
         <a href="/enroll">Enrollment</a>
       </div>
-      <div class="hideonsmall">
-        <a href="">Offerings</a>
-      </div>
+     
       <div class="hideonsmall">
         <a href="">FAQ</a>
       </div>
 
-      <div class="hideonsmall">
-        <a hx-get="/news" 
-          hx-target="#loadContent"
-          hx-swap = "outerHTML"
-          class="hxlinks"
-          >News</a>
+      <div class="hideonsmall" style="cursor: pointer;">
+        <a href="/news">News Main</a>
       </div>
       
       <div class="hideonsmall dropdown-list">

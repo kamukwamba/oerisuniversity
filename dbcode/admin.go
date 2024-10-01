@@ -165,11 +165,11 @@ func LoadDB() {
 
 	news_story := `
 		create table if not exists news(
-		uuid blob not null,
-		date tex,
-		auther text,
-		news text,
-		image_link text)
+		uuid blob,
+		auther text, 
+		image text,
+		story text,
+		date text)
 
 	`
 
