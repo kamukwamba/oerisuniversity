@@ -261,14 +261,47 @@ func StudentProfilePortal(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "studentportal.html", students_data)
 }
 
+type VideoStruct struct {
+	Video string
+}
+
+type VideoDisplay struct {
+	MainVideo VideoStruct
+	VideoList []VideoStruct
+}
+
 func WatcVideo(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	videopath := r.PathValue("id")
+	videopath := r.URL.Query().Get("cource_name")
 	fmt.Println(videopath)
 
-	err := tpl.ExecuteTemplate(w, "videos.html", nil)
+	video_list := GetCourceMaterial(videopath, "video")
+
+	fmt.Println(video_list)
+
+	video_list_out := strings.Split(video_list, ",")
+
+	var video_link VideoStruct
+
+	var all_videos []VideoStruct
+
+	for _, item := range video_list_out {
+		video_link = VideoStruct{
+			Video: item,
+		}
+
+		all_videos = append(all_videos, video_link)
+
+	}
+
+	AllVidoes := VideoDisplay{
+		MainVideo: all_videos[0],
+		VideoList: all_videos,
+	}
+
+	err := tpl.ExecuteTemplate(w, "videos.html", AllVidoes)
 
 	if err != nil {
 		log.Fatal(err)

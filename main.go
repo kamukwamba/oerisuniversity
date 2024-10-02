@@ -57,6 +57,7 @@ func main() {
 	router.HandleFunc("/close_cource_div", routes.CloseCreateCourseData)
 	router.HandleFunc("/check_working", routes.IsItWorking)
 	router.HandleFunc("/add_cource", routes.AddCourceData)
+	router.HandleFunc("/getmaterial", routes.GetMaterial)
 	router.HandleFunc("/get_admin_users", routes.AdminUsers)
 	router.HandleFunc("/createadmin", routes.CreatAdminUser)
 	router.HandleFunc("/updateadminuser", routes.UpdateAdminUsers)

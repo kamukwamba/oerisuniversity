@@ -196,6 +196,79 @@ func CloseCreateCourseData(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetCourceMaterial(cource_name, material_name string) string {
+	material_out := dbcode.SqlRead().DB
+	var link_out string
+	if material_name == "module" {
+		stmt, err := material_out.Prepare("select module from cource_table where cource_name = ?")
+
+		if err != nil {
+			fmt.Println("not working")
+		}
+
+		defer stmt.Close()
+
+		err = stmt.QueryRow(cource_name).Scan(&link_out)
+		if err != nil {
+			fmt.Println("failed to get module")
+		}
+
+	} else if material_name == "book" {
+		stmt, err := material_out.Prepare("select recomended_book from cource_table where cource_name = ?")
+
+		if err != nil {
+			fmt.Println("not working")
+		}
+
+		defer stmt.Close()
+
+		err = stmt.QueryRow(cource_name).Scan(&link_out)
+		if err != nil {
+			fmt.Println("failed to get books")
+		}
+	} else if material_name == "video" {
+		stmt, err := material_out.Prepare("select video_list from cource_table where cource_name = ?")
+
+		if err != nil {
+			fmt.Println("not working")
+		}
+
+		defer stmt.Close()
+
+		err = stmt.QueryRow(cource_name).Scan(&link_out)
+		if err != nil {
+			fmt.Println("failed to get video")
+		}
+	}
+
+	return link_out
+
+}
+
+func GetMaterial(w http.ResponseWriter, r *http.Request) {
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	var data_out string
+
+	cource_name := r.URL.Query().Get("cource_name")
+	material_name := r.URL.Query().Get("material_name")
+
+	switch material_name {
+	case "book":
+		data_out = GetCourceMaterial(cource_name, material_name)
+	case "module":
+		data_out = GetCourceMaterial(cource_name, material_name)
+
+	}
+	err := tpl.ExecuteTemplate(w, "cource_data_close", data_out)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
 func AddCourceData(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
