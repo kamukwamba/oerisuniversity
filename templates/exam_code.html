@@ -1,5 +1,7 @@
 
 
+
+
 <link rel="stylesheet" href="exam_css.css">
 
 {{ define "write_div"}}
@@ -89,9 +91,9 @@
         ANSWER ALL THE QUESTIONS IN THIS SECTION, QUESTION 1 TO 20 CARRIES ONE MARK.
         KINDLY NOTE THAT WRONG ANSWER WILL RESULT IN THE DEDUCTION OF A MARK
     </p>
-    {{ range .Questiions }}
+    {{ range .Questiions_A }}
     <div>
-        <p class="section_question">Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut, dolor? Nostrum, id. Nesciunt incidunt necessitatibus corrupti, vero assumenda inventore culpa fuga voluptatem ab architecto vel perferendis beatae quis, itaque voluptate.</p>
+        <p class="section_question">{{ .Question_Section_A}}</p>
         <input type="radio" name="{{ .Question_Number}}" value="true">
         <input type="radio" name="{{ .Question_Number}}" value="false">
     </div>
@@ -103,14 +105,19 @@
     <p>SECTION B</p>
     <p>Answer THREE questions only</p>
 
+    {{ range .Questions_B}}
     <div>
-        <p class="section_question">Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore totam dicta voluptatibus, maiores natus soluta at, ea asperiores sunt recusandae, eius velit dolores voluptatem laboriosam quasi enim. Quas, pariatur eos.</p>
+        <p class="section_question">{{ .Question_Section_B}}</p>
         <textarea name="{{ .Question_Number}}" class="section_b_answer" ></textarea>
         
     </div>
+    {{ end }}
 
 {{ end }}
 
+
+</body>
+</html>
 
 <!-- <form action="/action_page.php">
     <p>Please select your favorite Web language:</p>

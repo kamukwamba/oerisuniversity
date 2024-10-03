@@ -6,20 +6,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/assets/css/newsAdmin.css?v=1.7">
     <title>News</title>
+
+    <style>
+        body{
+        background-image: url('/assets/Images/home_page_three.png');
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        background-attachment:fixed;
+
+        margin: auto;
+        font-weight: lighter;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .leftside{
+            background-color: white;
+            margin-left: 10px;
+            border: solid 1px white;
+            border-radius: 3px;
+        }
+        .rightside{
+            background-color: white;
+            margin-right: 10px;
+            border: solid 1px white;
+            border-radius: 3px;
+
+        }
+
+    </style>
 </head>
 <body>
-    <div class="mainnewsdiv">
+    {{ template "Header"}}
+    <div class="mainnewsdiv" style="padding-top: 30px;">
 
-        <div class="leftside">
+        <div class="leftside" >
 
             {{ template "newsmain" .}}
         
         </div>
         
         <div class="rightside">
-            <h1 class="news">
-                News
-            </h1>
+            <h2 class="news" style="text-align: center;">
+                More News Stories
+            </h2>
 
             {{ range .NewsList}}
                 {{ template "newsdemo" .}}
