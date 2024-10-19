@@ -23,11 +23,15 @@
     
     </div>
 
-    <div class="rightside">
+    <div class="rightside" id="adminright">
         <h3 class="News">
             News Articles
         </h3>
-        {{template "newssamples"}}
+        <ul id="newsamplelist">
+            {{ range .NewsSamples}}
+                 {{template "newssamples" .}}
+            {{ end }}
+        </ul>
     </div>
 
 
@@ -41,7 +45,7 @@
 
 {{define "newssamples"}}
 
-    <div class="newssample" style="background-image: url(/assets/Images/home_page_three.jpg); 
+    <div class="newssample" style="background-image: url('{{.Image_Link }}'); 
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;">
@@ -68,9 +72,11 @@
 
     <div class="writearticle">
         <div class="writer">
-            <form >
+            <form hx-post="createnews"
+            hx-target="#newsamplelist"
+            hx-swap="beforeend">
                 <input type="text" placeholder="News Title" name="title" class="articletitle">
-                <textarea name="purpose_of_enrolling" class="writerarea" placeholder="Compose article"></textarea>
+                <textarea name="composenews" class="writerarea" placeholder="Compose article"></textarea>
                 <input type="textarea" placeholder="Enter image link" name="image" class="articleinagelink">
                 <input type="textarea" placeholder="Enter Auther Name" name="auther" class="articleinagelink">
 

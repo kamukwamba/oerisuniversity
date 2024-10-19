@@ -131,6 +131,7 @@ func ReadNewsRoute(w http.ResponseWriter, r *http.Request) {
 }
 
 func Create_News(w http.ResponseWriter, r *http.Request) {
+
 	create_news := dbcode.SqlRead().DB
 
 	r.ParseForm()
@@ -140,15 +141,18 @@ func Create_News(w http.ResponseWriter, r *http.Request) {
 	image_link := r.FormValue("image")
 	story := r.FormValue("story")
 
+	uuid := encription.Generateuudi()
+	student_create, err := create_news.Begin()
+	date := fmt.Sprintf("%s", time.Now().Local())
+
 	data_out := NewsStruct{
+		UUID:       uuid,
 		Auther:     auther,
 		Title:      title,
 		Image_Link: image_link,
 		Story:      story,
 	}
-	uuid := encription.Generateuudi()
-	student_create, err := create_news.Begin()
-	date := fmt.Sprintf("%s", time.Now().Local())
+
 	if err != nil {
 		fmt.Println("not working")
 	}

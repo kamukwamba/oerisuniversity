@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/assets/css/video.css?v=1.6">
     <link rel="stylesheet" href="/assets/css/messages.css?v=2.8">
     <link rel="stylesheet" href="/assets/css/cource_assesment.css?v=1.1">
+    <link rel="stylesheet" href="/assets/css/studentdata.css?v=1.0">
 
     <title>Student Dash Board</title>
     <script src="/assets/htmx.js"></script>
@@ -115,7 +116,13 @@
         <p class="student_nav"><a  data-hx-post="/messages/{{.StInfo.UUID}}"
             hx-target="#mainpage"
             hx-swap="innerHTML">Messages</a></p>
-        <p class="student_nav"><a href="/studentsettings/{{.StInfo.UUID}}">Settings</a></p>
+
+
+        <p class="student_nav"
+            hx-target="#mainpage"
+            hx-swap="innerHTML">
+            <a data-hx-post="/studentsettings?uuid={{.StInfo.UUID}}">Profile</a></p>
+
         <p class="student_nav"><a href="/studentlogout/{{.StInfo.UUID}}">Log out</a></p>
     </div>
     
@@ -156,3 +163,80 @@
 
 
 {{end}}
+
+
+{{ define  "studentdata"}}
+
+<div class="studentdatadiv">
+
+    <div class="/">
+        <div class="info">
+            <p>First Name: {{ .First_Name}}</p>
+            <p>Last Name: {{ .Last_Name}}</p>
+            <p>Email : {{ .Email }}</p>
+            <p>Phone Number: {{ .Phone}}</p>
+
+        </div>
+
+        <div class="updatediv">
+            <!-- <button>Update Details</button> -->
+            <button
+                
+                hx-get="/getstudentdata"
+                hx-target="#studentupdate"
+                hx-swap="outerHTML">Change Password</button>
+        </div>
+
+    </div>
+
+    <div class="studentupdate" id="studentupdate">
+
+    </div>
+
+</div>
+
+{{ end }}
+
+
+{{ define "closeupdate"}}
+    <div class="studentupdate" id="studentupdate">
+
+    </div>
+{{ end }}
+
+{{ define "updatestudentinfo"}}
+   
+    <form action="">
+        <label for="first_name">First Name</label>
+        <input type="text" name="first_name" placeholder="{{ .First_Name}}">
+        <label for="last_name">Last Name</label>
+        <input type="text" name="last_name" placeholder="{{ .Last_Name}}">
+        <label for="email">Email</label>
+        <input type="email" name="email" placeholder="{{ .Email}}">
+        <label for="phone">Phone</label>
+        <input type="text" name="phone" placeholder="{{ .Phone}}">
+        <button class="updateuser">Update</button>
+    </form>
+
+
+
+{{ end }}
+
+
+{{ define "testingworking" }}
+
+<div id="outmy">
+    <p>Working</p>
+</div>
+<script>
+    document.body.innerHTML = "<div hx-get='/closeupdatedata'>Get it!</div>"
+    
+  htmx.process(document.body);
+</script>
+
+
+
+{{ end }}
+
+
+

@@ -306,7 +306,6 @@ func ConfirmStudentLogin(w http.ResponseWriter, r *http.Request) {
 			programdataout, present = GetStudentProgramData(studentprogramlist, studentuuid)
 			studentinfo = GetStudentAllDetails(studentuuid)
 
-			fmt.Println("confirmed out")
 			setroute = "studentportal.html"
 
 		} else {
@@ -319,14 +318,6 @@ func ConfirmStudentLogin(w http.ResponseWriter, r *http.Request) {
 		Available:        present,
 		StInfo:           studentinfo,
 		AllCourceDataOut: programdataout,
-	}
-
-	for _, item := range programdataout {
-		fmt.Println("The Program Name: ", item.ProgramStruct.Program_Name)
-		for _, cource := range item.Cource_Struct {
-			fmt.Println(cource)
-		}
-
 	}
 
 	tpl.ExecuteTemplate(w, setroute, students_data)

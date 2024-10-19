@@ -214,12 +214,134 @@ func Messages(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func ChangePassword(w http.ResponseWriter, r *http.Request) {
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	var setroute string
+	var settext string
+
+	r.ParseForm()
+	email := r.FormValue("old_password")
+
+	dbread := dbcode.SqlRead()
+	stmt, err := dbread.DB.Prepare("select uuid, student_uuid, email, password from studentcridentials where email = ?")
+
+	if err != nil {
+
+		fmt.Println("First err")
+		log.Fatal(err)
+	}
+
+	defer stmt.Close()
+
+	var uuid_out string
+	var student_uuid string
+	var email_out string
+	var password string
+
+	err = stmt.QueryRow(email).Scan(&uuid_out, &student_uuid, &email_out, &password)
+
+	fmt.Println("The OLD  PASSWORD OUT ", password)
+	if err != nil {
+		fmt.Println("Second err", err)
+		// log.Fatal(err)
+	}
+
+	old_password := r.FormValue("old_password")
+	new_password := r.FormValue("new_password")
+	confirm_password := r.FormValue("confirm_password")
+
+	if old_password != password {
+		setroute = "updateresponce"
+		settext = "old password is in correct"
+	} else {
+		if new_password != confirm_password {
+			setroute = "checkpassword"
+			settext = "Passwords do noot match!!!"
+		} else {
+			dbread := dbcode.SqlRead().DB
+			statement, err := dbread.Prepare("update studentcridentials SET password = ? WHERE uuid = ?")
+
+			if err != nil {
+				error_text := fmt.Sprintf("line 44 error from update prepare:: %s", err)
+				ErrorPrintOut("studentportal", "ApplyForCource", error_text)
+			}
+			defer statement.Close()
+
+			_, errup := statement.Exec(confirm_password, uuid_out)
+
+			if errup != nil {
+				error_text := fmt.Sprintf("line 50 error from update prepare:: %s", errup)
+				ErrorPrintOut("studentportal", "ChangeStudentPassword", error_text)
+			}
+			setroute = "updateresponce"
+			settext = "password updated"
+		}
+	}
+
+	err = tpl.ExecuteTemplate(w, setroute, settext)
+
+	if err != nil {
+		log.Fatal(err)
+
+	}
+
+}
+
+func CloseUpdateData(w http.ResponseWriter, r *http.Request) {
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	fmt.Println("Close Update Passwsord")
+
+	err := tpl.ExecuteTemplate(w, "closeupdate", nil)
+
+	if err != nil {
+		log.Fatal(err)
+
+	}
+}
+
+func ChangeStudentPassword(w http.ResponseWriter, r *http.Request) {
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	err := tpl.ExecuteTemplate(w, "changepassword", nil)
+
+	if err != nil {
+		log.Fatal(err)
+
+	}
+}
+
 func StudentSettings(w http.ResponseWriter, r *http.Request) {
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	uuid := r.URL.Query().Get("uuid")
+
+	data_out := GetStudentAllDetails(uuid)
+
+	err := tpl.ExecuteTemplate(w, "studentdata", data_out)
+
+	if err != nil {
+		log.Fatal(err)
+
+	}
 
 }
 
 func StudentLogOut(w http.ResponseWriter, r *http.Request) {
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
+	uuid := r.URL.Query().Get("uuid")
+
+	data_out := GetStudentAllDetails(uuid)
+
+	err := tpl.ExecuteTemplate(w, "studentdata", data_out)
+
+	if err != nil {
+		log.Fatal(err)
+
+	}
 }
 
 func ContactInstitution(w http.ResponseWriter, r *http.Request) {

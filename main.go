@@ -43,6 +43,10 @@ func main() {
 	router.HandleFunc("/news", routes.NewsPage)
 	router.HandleFunc("/readnewsstory", routes.ReadNewsRoute)
 	router.HandleFunc("/deletemessage", routes.DeleteMessageRouter)
+	router.HandleFunc("/getstudentdata", routes.ChangeStudentPassword)
+	router.HandleFunc("/updtestudentpassword", routes.ChangePassword)
+
+	router.HandleFunc("/closeupdatedata", routes.CloseUpdateData)
 	//ADMIN DASHBOARD
 	router.HandleFunc("/confirmlogin", routes.ConfirmStudentLogin) //STUDENT LOGIN CODE
 	router.HandleFunc("/acamsstudentdata", routes.ACAMSStudentData)
@@ -65,6 +69,7 @@ func main() {
 	router.HandleFunc("/loadform", routes.LoadAdminForm)
 
 	router.HandleFunc("/deleteadmin", routes.DeleteAdmin)
+	router.HandleFunc("/createnews", routes.Create_News)
 	router.HandleFunc("/curiculum", routes.Curiculum)
 
 	//EXAM
@@ -77,7 +82,7 @@ func main() {
 	router.HandleFunc("/approvecource", routes.ApproveCource)
 	router.HandleFunc("/messages/{id}", routes.Messages)
 	router.HandleFunc("/completed", routes.ProgramCompleted)
-	router.HandleFunc("studentsettings/{id}", routes.StudentSettings)
+	router.HandleFunc("/studentsettings", routes.StudentSettings)
 	router.HandleFunc("/studentlogoout/{id}", routes.StudentLogOut)
 	router.HandleFunc("/proceed/{id}", routes.StudentProcced)
 	router.HandleFunc("/contactinstitution/{id}", routes.ContactInstitution)

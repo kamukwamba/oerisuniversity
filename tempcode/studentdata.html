@@ -1,0 +1,67 @@
+
+
+
+<link rel="stylesheet" href="studentdata.css">
+{{ define  "studentdata"}}
+
+<div class="studentdatadiv">
+
+    <div class="studentdata">
+        <div class="info">
+            <p>First Name: {{ .First_Name}}</p>
+            <p>Last Name: {{ .Last_Name}}</p>
+            <p>Email : {{ .Email }}</p>
+            <p>Phone Number: {{ .Phone}}</p>
+
+        </div>
+
+        <div class="updatediv">
+            <button>Update Details</button>
+            <button>Change Password</button>
+        </div>
+
+    </div>
+
+    <div class="studentupdate" id="studentupdate">
+
+    </div>
+
+</div>
+
+{{ end }}
+
+
+{{ define "changepassword"}}
+
+    <form action="">
+        <label for="first_name">First Name</label>
+        <input type="text" name="first_name" placeholder="{{ .First_Name}}">
+        <label for="last_name">Last Name</label>
+        <input type="text" name="last_name" placeholder="{{ .Last_Name}}">
+        <label for="email">Email</label>
+        <input type="email" name="email" placeholder="{{ .Email}}">
+        <label for="phone">Phone</label>
+        <input type="text" name="phone" placeholder="{{ .Phone}}">
+        <button class="updateuser">Update</button>
+    </form>
+
+
+
+{{ end }}
+
+
+
+{{ define "updatestudentinfo"}}
+
+    <form action="">
+        <label for="old_password">Old Password</label>
+        <input type="password" name="old_password">
+        <label for="new_password">New Password</label>
+        <input type="password" name="new_password">
+        <label for="confirm">Confirm New Password</label>
+        <input type="password" name="confirm_password">
+        <button class="updateuser">Save</button>
+    </form>
+
+
+{{ end }}

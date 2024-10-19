@@ -1,63 +1,124 @@
-
-<script src="/assets/htmx.js"></script>
-<div class="program_details">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/assets/css/cource_data.css">
+</head>
+<body>
+    <div class="program_details">
     
-    <div class="program_details_nav">
-        <button>Programs</button>
-        <button  
-        hx-get="/create_cource_code?parameter=create?program_name={{.Program_Name}}"  
-        hx-target="#cource_data"
-        hx-swap="outerHTML">Add Course Data</button>
-    </div>
-
-    <hr>
-
-    <div class="details">
-        {{ if .Present}}
-         {{ template "cource_data_table" .}}
-        {{ end }}
-      
-    </div>
-    <div class="cource_data" id="cource_data">
-
-    </div>
-</div>
-
-{{ define "cource_data_close"}}
-    <div class="cource_data" id="cource_data">
-
-    </div>
-{{ end }}
-
-
-
-
-{{ define "cource_data_table"}}
-    <div class="cource_data_div">
-    <table>
-        <thead>
-            <th>Cource Name</th>
-            <th>Book</th>
-            <th>Module</th>
-            <th>Videos</th>
-            <th>Assesment</th>
-            <th>Exam</th>
-
-
-        </thead>
-        <tbody>
-           {{ range .ProgramData }}
-            {{ template "cource_data_tr" .}}
+        <div class="program_details_nav">
+            <button>Programs</button>
+            <button  
+            hx-get="/create_cource_code?parameter=create&program_name={{ .Program_Name}}"  
+            hx-target="#cource_data"
+            hx-swap="outerHTML">Add Course Data</button>
+        </div>
+    
+        <hr>
+    
+        <div class="details">
+            {{ if .Present}}
+             {{ template "cource_data_table" .}}
             {{ end }}
-            
-        </tbody>
-    </table>
+          
+        </div>
+        <div class="cource_data" id="cource_data">
+    
+        </div>
     </div>
+    
+    {{ define "cource_data_close"}}
+        <div class="cource_data" id="cource_data">
+    
+        </div>
+    {{ end }}
+    
+    
+    
+    
+    {{ define "cource_data_table"}}
+        <div class="cource_data_div">
+        <table>
+            <thead>
+                <th>Cource Name</th>
+                <th>Book</th>
+                <th>Module</th>
+                <th>Videos</th>
+                <th>Assesment</th>
+                <th>Exam</th>
+    
+    
+            </thead>
+            <tbody>
+               {{ range .ProgramData }}
+                {{ template "cource_data_tr" .}}
+                {{ end }}
+                
+            </tbody>
+        </table>
+        </div>
+    
+    {{ end }}
+    
+    
+    {{ define "create_cource_data"}}
+    
+        <div class="create_cource_div" id="create_cource_div">
+            <div class="close_div">
+                <button class="download"
+                hx-post="/close_cource_div"  
+                hx-target="#create_cource_div"
+                hx-swap="outerHTML">X</button>
+    
+            
+            </div>
 
-{{ end }}
 
+            <div id="the_form_div"> 
+                <form hx-post="/add_cource"
+                hx-target="#hidden_div"
+                hx-swap="outerHTML">
+                <h4>Add Cource Data {{ .Data.Program_Name}}</h4>
+                
+                
+                <label for="program_name">Program Name</label>
+                <textarea  style="width: 100%; height: 40px; padding-inline: 5px;" id="" name="program_name" placeholder="">{{ .Data.Program_Name}}</textarea>
+                
+            
+                <label for="cource_name">Cource Name</label>
+                <textarea  style="width: 100%; height: 40px; padding-inline: 5px;"  name="cource_name"></textarea>
+            
+                <label for="book_link">Recommended Book</label>
+                <textarea  style="width: 100%; height: 40px; padding-inline: 5px;" id="" name="book_link"></textarea>
+            
+                <label for="mudule_link">Module</label>
+                <textarea  style="width: 100%; height: 40px; padding-inline: 5px;" id="" name="module_link"></textarea>
+            
+                <label for="video_link">Video List</label>
+                <textarea  style="width: 100%; height: 40px; padding-inline: 5px;" id="" name="video_link"></textarea>
 
-{{ define "create_cource_data"}}
+            
+                <label for="assesment_link">Assesment List</label>
+                <textarea  style="width: 100%; height: 40px; padding-inline: 5px;" id="" name="assesment_link"></textarea>
+            
+                
+                <button type="submit" class="download">Create</button>
+            </form>
+            </div>
+    
+            
+    
+            <div id="hidden_div" style=" width: 100%;
+            height: 30px;">
+            </div>
+
+        </div>
+    
+    {{ end }}
+    
+    {{ define "form_update"}}
 
     <div class="create_cource_div" id="create_cource_div">
         <div class="close_div">
@@ -69,127 +130,117 @@
         
         </div>
 
-        
-        <div class="form_div">
 
-        {{ if .Update}}
-            {{ template "form_update" .}}
-        {{ else}}
-            {{ template "form_create"}}
-        {{ end }}
-        <div id="hidden_div" style="display: none; width: 100%;
+        <div id="the_form_div"> 
+            <form hx-post="/update_cource?uuid={{ .UUID}}"
+            hx-target="#hidden_div"
+            hx-swap="outerHTML">
+        
+            <label for="program_name">Program Name</label>
+            <textarea  style="width: 100%; height: 40px; padding-inline: 5px;" id="" name="program_name" value="{{ .Program_Name}}"></textarea>
+
+            
+        
+            <label for="cource_name">Cource Name</label>
+            <textarea  style="width: 100%; height: 40px; padding-inline: 5px;" id="" name="cource_name" value="{{ .Cource}}"></textarea>
+
+        
+            <label for="book_link">Recommended Book</label>
+            <textarea  style="width: 100%; height: 40px; padding-inline: 5px;" id="" name="book_link" value="{{ .Book}}"></textarea>
+
+
+        
+            <label for="mudule_link">Module</label>
+            <textarea  style="width: 100%; height: 40px; padding-inline: 5px;" id="" name="module_link" value="{{ .Module}}"></textarea>
+
+        
+            <label for="video_link">Video List</label>
+            <textarea  style="width: 100%; height: 40px; padding-inline: 5px;" id="" name="video_link" value="{{ .Video_List}}"></textarea>
+
+        
+            <label for="assesment_link">Assesment List</label>
+            <textarea  style="width: 100%; height: 40px; padding-inline: 5px;" id="" name="assesment_link" value="{{ .Cource_Aseesment}}"></textarea>
+        
+            
+            <button type="submit" class="download">Update</button>
+            </form>
+        </div>
+
+        
+
+        <div id="hidden_div" style=" width: 100%;
         height: 30px;">
         </div>
+
+    </div>
+        
+    {{ end }}
+    
+    
+    
+    {{ define "cource_data_saved"}}
+        <div style="width: 100%; height: 30%; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: lighter;">
+            <p>Saved</p>
         </div>
-    </div>
-
-{{ end }}
-
-{{ define "form_update"}}
-    <form hx-post="/update_cource?uuid={{ .UUID}}"
-    hx-target="#hidden_div"
-    hx-swap="outerHTML">
-
-    <label for="program_name">Program Name</label>
-    <input type="text" class="cource_data_input_two" name="program_name" value="{{ .Program_Name}}">
-
-    <label for="cource_name">Cource Name</label>
-    <input type="text" class="cource_data_input_two"  name="cource_name" value="{{ .Cource_Name}}">
-
-    <label for="book_link">Recommended Book</label>
-    <input type="text" class="cource_data_input_two"  name="book_link" value="{{ .Book}}">
-
-    <label for="mudule_link">Module</label>
-    <input type="text" class="cource_data_input_two" name="module_link" value="{{ .Module}}">
-
-    <label for="video_link">Video List</label>
-    <input type="text" class="cource_data_input_two"  name="video_link" value="{{ .Video_List}}">
-
-    <label for="assesment_link">Assesment List</label>
-    <input type="text" class="cource_data_input_two"  name="assesment_link" value="{{ .Cource_Aseesment}}">
-
+    {{ end }}
     
-    <button type="submit" class="download">Update</button>
-    </form>
-{{ end }}
-
-{{ define "form_create"}}
-    <form hx-post="/add_cource"
-    hx-target="#hidden_div"
-    hx-swap="outerHTML">
-
-    <label for="program_name">Program Name</label>
-    <input type="text" class="cource_data_input_two" name="program_name">
-
-    <label for="cource_name">Cource Name</label>
-    <input type="text" class="cource_data_input_two"  name="cource_name">
-
-    <label for="book_link">Recommended Book</label>
-    <input type="text" class="cource_data_input_two"  name="book_link">
-
-    <label for="mudule_link">Module</label>
-    <input type="text" class="cource_data_input_two" name="module_link">
-
-    <label for="video_link">Video List</label>
-    <input type="text" class="cource_data_input_two"  name="video_link">
-
-    <label for="assesment_link">Assesment List</label>
-    <input type="text" class="cource_data_input_two"  name="assesment_link">
-
     
-    <button type="submit" class="download">Create</button>
-    </form>
-{{ end }}
+    {{ define "cource_data_tr"}}
+    
+    <tr>
+        <td>{{ .Cource_Name}}</td>
+    
+        <td>{{ .Book}}</td>
+        <td>{{ .Module}}</td>
+        <td>{{ .Video_List}}</td>
+        <td>{{ .Cource_Aseesment}}</td>
+        <td> <button hx-get="/create_page?uuid={{ .UUID}}"  
+            hx-target="#maincontaint"
+            hx-swap="innerHTML" 
+            class="download">{{ .Exam}}</button></td>
+    
+        <td> <button hx-get="/create_cource_code?parameter=update?cource_uuid={{ .UUID}}"  
+                    hx-target="#cource_data"
+                    hx-swap="outerHTML" 
+                    class="download">Edit Data</button></td>
+    </tr>
+    
+    {{ end }}
+    
+    {{ define "cource_data_update"}}
+        <div class="update_cource_data">
+            <form hx-post="/update_cource?{{ .Cource_Name}}"
+            hx-target="#cource_data">
+            <label for="update_liks">Enter New Link/s</label>
+            <input type="text" name="update_links" id="">
+            <button type="submit" class="download">Update</button>
+            </form>
+        </div>
+    
+    {{ end }}
+    
+    {{ define "cource_data_add"}}
+        <div class="update_cource_data">
+            <form hx-post="/update_cource?{{ .Cource_Name}}"
+            hx-target="#cource_data">
+            <label for="update_liks">Enter New Link/s</label>
+            <input type="text" name="update_links" id="" class="cource_data_input">
+            <button type="submit"  class="download" >Add</button>
+            </form>
+        </div>
+    {{ end }}
+    
+</body>
+<script src="/assets/htmx.js"></script>
 
-{{ define "cource_data_saved"}}
-    <div style="width: 100%; height: 30%; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-weight: lighter;">
-        <p>Saved</p>
-    </div>
-{{ end }}
+</html>
 
 
-{{ define "cource_data_tr"}}
 
-<tr>
-    <td>{{ .Cource_Name}}</td>
 
-    <td>{{ .Book}}</td>
-    <td>{{ .Module}}</td>
-    <td>{{ .Video_List}}</td>
-    <td>{{ .Cource_Aseesment}}</td>
-    <td> <button hx-get="/create_page?uuid={{ .UUID}}"  
-        hx-target="#maincontaint"
-        hx-swap="innerHTML" 
-        class="download">{{ .Exam}}</button></td>
 
-    <td> <button hx-get="/create_cource_code?parameter=update?cource_uuid={{ .UUID}}"  
-                hx-target="#cource_data"
-                hx-swap="outerHTML" 
-                class="download">Edit Data</button></td>
-</tr>
 
-{{ end }}
 
-{{ define "cource_data_update"}}
-    <div class="update_cource_data">
-        <form hx-post="/update_cource?{{ .Cource_Name}}"
-        hx-target="#cource_data">
-        <label for="update_liks">Enter New Link/s</label>
-        <input type="text" name="update_links" id="">
-        <button type="submit" class="download">Update</button>
-        </form>
-    </div>
 
-{{ end }}
 
-{{ define "cource_data_add"}}
-    <div class="update_cource_data">
-        <form hx-post="/update_cource?{{ .Cource_Name}}"
-        hx-target="#cource_data">
-        <label for="update_liks">Enter New Link/s</label>
-        <input type="text" name="update_links" id="" class="cource_data_input">
-        <button type="submit"  class="download" >Add</button>
-        </form>
-    </div>
-{{ end }}

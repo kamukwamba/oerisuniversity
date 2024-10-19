@@ -1,13 +1,24 @@
-
-
-
-
-<link rel="stylesheet" href="exam_css.css">
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/assets/css/exam_css.css">
+    <style>
+        
+        .timer_p {
+            font-weight: bold;
+            font-size: 1.1em;
+            text-decoration: underline;
+        }
+    </style>
+    
+</head>
+<body>
 {{ define "write_div"}}
     <div class="header"> 
         <div class="timer_div">
-            <p>Remaining Time <span>45:0</span></p>
+            <p class="timer_p">Remaining Time <span id="timer_count"> </span> <span id="hr">00</span>hr <span id="min">00</span>min <span id="sec"></span>sec</p>
         </div>
         <div class="exam_details">
             <table>
@@ -56,7 +67,7 @@
                         </ol>
                     </li>
                     <li>Section A carries 40 Marks and Section B carries 60 Marks</li>
-                    <li>University College of Metaphysical Sciences (UCMS) allows the student to attempt the
+                    <li>University College of Metaphysical Sciences (OCMPS) allows the student to attempt the
                         final examinations three times within 7 days. There after a different supplementary final
                         examination will be PREPARED and availed to the student within three.</li>
                 </ol>
@@ -76,10 +87,51 @@
                 {{ template "section_b" .}}
             {{ end }}
             
-            <button >Submit</button>
+            <button class="submit_exam">Submit</button>
         </form>
 
     </div>
+
+    <script>
+        var hr = 0;
+    var minute = 0;
+    var second = 0;
+    window.onload = function() {
+    var incrementSecond = function () {
+        window.secondsPassed += 1;
+
+        second = window.secondsPassed;
+        
+        document.getElementById("sec").innerHTML = secondsPassed;
+        
+        if( window.secondsPassed == 60 ){
+            window.secondsPassed = 0;
+            minute ++ ;
+            document.getElementById("min").innerHTML = minute;
+
+
+        }
+
+        if (minute == 60){
+            minute = 0;
+            hr ++ ;
+            document.getElementById("hr").innerHTML = hr;
+
+        }
+
+
+
+        
+    }
+
+    window.secondsPassed = 0;
+    window.myTimer = setInterval(incrementSecond, 1000);
+    }
+    var onSubmitClick = function() {
+    window.clearInterval(window.myTimer); // always clean resources
+    // call some other function to do the submit
+    }
+    </script>
 {{ end }}
 
 

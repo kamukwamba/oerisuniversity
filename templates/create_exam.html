@@ -3,8 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"  href="/assets/css/create_exam.css?v=1.0">
     
     <title>Create Exam</title>
+    <style>
+        
+        .question_div_one{
+            width: 100%;
+            height: 400px;
+            border: solid 1px rgb(32, 0, 62);
+            
+        }
+
+    </style>
 </head>
 
 
@@ -20,41 +31,44 @@
         Details
     </button>
 
-    <h3 class="h3_heading">Cource Name Out: {{ .Cource_Name}}</h3>
+    <h3 class="h3_heading">{{ .Cource_Name}}</h3>
     <div class="questions">
         
         <div class="section_a">
             <div id="question_list" class="section_a_question">
+                
 
             </div>
             
         
             <div>
-            <form hx-post="/addexam?uuid={{.UUID}}"
+            <form hx-post="/addexam?program_name={{.Program_Name}}&cource_name={{ .Cource_Name}}"
                     hx-target="#question_list"
                     hx-swap="beforeend">
                 <label for="question" class="compose">Compose Question</label><br>
 
-                <input type="text" class="question_b" name="question" id="" placeholder="Compose Question"><br>
-        
-                <label for="answer" style="text-decoration: underline;">Enter Answer</label>
-
-                <label for="answer">True</label>
-                <input type="radio" name="answer" value="true">
-                <label for="answer">False</label>
-                <input type="radio" name="answer" value="false">
-
+                <div style="background-color: rgb(32, 0, 62); padding: 5px; margin-bottom:5px;">
+                    <label for="answer"  class="compose" style=" color: white;">Section A</label><br>
+                </div>
+                <textarea type="text" class="question_div_one" style="font-size: 1.2em; padding:5px;" name="question_a" id="" >Note when entering questions encapsulate questions in brackets '{' to stipulate the start of a question and '}' to mark its end. with in the question brackets separate the question and the answer by a full colone ':',  eg.{Is Zambia an African Country: True}, first the question then the answer.
                 
+                    
+                </textarea><br>
+        
+
+                <div style="background-color: rgb(32, 0, 62); padding: 5px; margin-bottom:5px;">
+                    <label for="answer"  class="compose" style=" color: white;">Section B</label><br>
+                </div>
+                <textarea name="question_b"  class="question_div_one" style="font-size: 1.2em; padding:5px;" placeholder="Note when entering questions encapsulate questions in brackets '{' to stipulate the start of a question and '}'
+                to mark its end ">Note when entering questions encapsulate questions in brackets '{' to stipulate the start of a question and '}' to mark its end 
+                </textarea>
+                
+                <input type="text" name="exam_time" id="" style="padding: 5px; width: 100%; height: 20px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Enter time in minutes">
+
+                <input type="text" name="cource_code" id="" style="padding: 5px; width: 100%; height: 20px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Cource Code">
 
 
-                <textarea name="text_answer"  class="question_b"></textarea>
 
-                <label for="section" style="text-decoration: underline;">Choose question section</label><br>
-                <select name="section_choice" id="">
-                    <option value="a">Section A</option>
-                    <option value="b">Section B</option>
-
-                </select><br>
                 <button type="submit" class="create_button">Create</button>
             </form>
         </div>
@@ -70,21 +84,36 @@
 
 
 
-{{ define "question_section_a"}}
+{{ define "questions_out"}}
     
     <div class="question_out">
-        <div class="edit_question">
-            <button class="create_button">Update</button>
-            <button class="delete_button">Delete</button>
-        </div>
+        
         <div>
-            <p>{{.Section}}</p>
-            <p>{{.Question}}</p>
-            <p>{{.Answer}}</p>          
+
+            {{ range .Section_A}}
+
+                <p>{{ .Question}}</p>
+                <p>Answer:{{ .Answer}}</p>
+           {{ end }} 
+
+           {{ range .Section_B}}
+                <p>{{ .Question}}</p>
+           
+           {{ end }}
+        
         </div>
     </div>
     
   
+{{ end }}
+
+{{ define "question_saved"}}
+    <div class="edit_question">
+        <button class="create_button">Update</button>
+        <button class="delete_button">Delete</button>
+    </div>
+
+
 {{ end }}
 
 {{ define "question_section_b"}}

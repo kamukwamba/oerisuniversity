@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/assets/css/newsAdmin.css?v=1.7">
+    <link rel="stylesheet" href="/assets/css/newsAdmin.css?v=1.0">
     <title>News</title>
 
     <style>
@@ -13,9 +13,9 @@
         background-repeat: no-repeat;
         background-size: 100% 100%;
         background-attachment:fixed;
-
-        margin: auto;
+        height: 100vh;
         font-weight: lighter;
+  
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .leftside{
@@ -36,7 +36,7 @@
 </head>
 <body>
     {{ template "Header"}}
-    <div class="mainnewsdiv" style="padding-top: 30px;">
+    <div class="mainnewsdiv" style="margin-top: 30px; margin-bottom: 20px;">
 
         <div class="leftside" >
 
@@ -58,6 +58,8 @@
         </div>
     </div>
 </body>
+
+
 {{ template "footer"}}
 </html>
 

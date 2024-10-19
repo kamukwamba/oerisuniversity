@@ -69,6 +69,28 @@ func UpdateProgramDetails(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
+// UPATE THE ALLOW FOR CREATED EXAM
+
+func ExamTrue(uuid string) {
+
+	updateexam := dbcode.SqlRead().DB
+
+	stmt, err := updateexam.Prepare("UPDATE cource_table SET(exam_file = ?) where uuid = ? ")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(true, uuid)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
 func GetProgramDetailsSingle(uuid_out string) CourceDataStruct {
 	var cource_data_out CourceDataStruct
 	get_one := dbcode.SqlRead().DB
@@ -162,20 +184,26 @@ func CreateCourseData(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
 	parameter_in := r.URL.Query().Get("parameter")
+	program_name := r.URL.Query().Get("program_name")
 
 	var data_out CourceDataUpdate
-	fmt.Println(parameter_in)
+	fmt.Println("The Paameter in", program_name)
+
+	var setrout string
 
 	if parameter_in == "update" {
 		uuid := r.URL.Query().Get("uuid")
 		data_out.Update = true
 		data_out.Data = GetProgramDetailsSingle(uuid)
+		setrout = "form_update"
 
 	} else if parameter_in == "create" {
 		data_out.Update = false
+		setrout = "create_cource_data"
+		data_out.Data.Program_Name = program_name
 	}
 
-	err := tpl.ExecuteTemplate(w, "create_cource_data", data_out)
+	err := tpl.ExecuteTemplate(w, setrout, data_out)
 
 	if err != nil {
 		log.Fatal(err)

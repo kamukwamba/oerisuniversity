@@ -220,12 +220,12 @@ table tr:nth-child(odd) a:hover{
 .confirmregistration{
     position: relative;
     width: 50%;
-    height: 35vh;
+    height: 45vh;
     border: 1px solid rgb(32, 0, 67);
     border-radius: 5px;
     margin-left: auto;
     margin-right: auto;
-    padding: 10px;
+    padding: 20px;
     margin-top: 40px;
 }
 

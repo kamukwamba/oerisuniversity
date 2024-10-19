@@ -1,8 +1,13 @@
-
-
-<script src="/assets/htmx.js"></script>
-
-{{ define "updateform"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> </title>
+    <script src="/assets/htmx.js"></script>
+</head>
+<body>
+    {{ define "updateform"}}
     <script>
         document.form_holder.innerHTML = `<div hx-get='/example'> <button>Working</button></div>`
         htmx.process(document.form_holder);
@@ -53,3 +58,10 @@
 
 
 {{ end }}
+
+
+</body>
+</html>
+
+
+
