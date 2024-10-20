@@ -4,12 +4,18 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 	"github.com/kamukwamba/oerisuniversity/routes"
 
 	_ "github.com/mattn/go-sqlite3"
 )
+
+func Env(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Fprintln(w, "Testing OCERIS"+os.Getenv("TEST_ENV"))
+}
 
 func main() {
 
@@ -91,16 +97,22 @@ func main() {
 	router.HandleFunc("/studentprofileportal/{id}", routes.StudentProfilePortal)
 	router.HandleFunc("/close_assesment_div", routes.CloseAssesmentDiv)
 	router.HandleFunc("/close_admin_div", routes.CloseAdmintDiv)
-
+	router.HandleFunc("/env", Env)
 	router.HandleFunc("/example", routes.Example)
 
 	router.HandleFunc("/login", routes.LoginPage)
 	router.HandleFunc("/handinassesment", routes.HandInAssesment)
 
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "3000"
+	}
+
 	//LOAD ASSETS
 	router.Handle("/assets/", http.StripPrefix("/assets", fs))
 
 	//RUN SERVER
-	log.Fatal(http.ListenAndServe(":3000", router))
+	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, router))
 
 }
