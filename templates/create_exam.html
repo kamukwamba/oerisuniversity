@@ -31,9 +31,35 @@
         Details
     </button>
 
-    <h3 class="h3_heading">{{ .Cource_Name}}</h3>
+    <h3 class="h3_heading">{{ .Cource_Data.Cource_Name}} {{ .Cource_Data.UUID}}</h3>
     <div class="questions">
         
+
+
+
+        {{ if .Present }}
+
+        <div class="section_a">
+            <div id="question_list" class="section_a_question">
+                
+
+            </div>
+            <div style="display: flex; width: 100%; height: 50px;justify-content: end;">
+                <button
+                hx-post="/delete_exam_questions?uuid={{ .ExamData.UUID}}"
+                hx-target="deleted_succesfully"
+                hx-swap="innerHTML"
+                class="delete_button">Delete Exam</button>
+            </div>
+
+            <div style="width: 100%; height: 30px;">
+                <p id="deleted_succesfully" style="text-align: center; color: rgb(32, 0, 62); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 1.3em;">{{ . }}</p>
+            </div>
+
+        </div>
+
+
+        {{ else }}
         <div class="section_a">
             <div id="question_list" class="section_a_question">
                 
@@ -42,7 +68,7 @@
             
         
             <div>
-            <form hx-post="/addexam?program_name={{.Program_Name}}&cource_name={{ .Cource_Name}}"
+            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}"
                     hx-target="#question_list"
                     hx-swap="beforeend">
                 <label for="question" class="compose">Compose Question</label><br>
@@ -63,9 +89,9 @@
                 to mark its end ">Note when entering questions encapsulate questions in brackets '{' to stipulate the start of a question and '}' to mark its end 
                 </textarea>
                 
-                <input type="text" name="exam_time" id="" style="padding: 5px; width: 100%; height: 20px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Enter time in minutes">
+                <input type="text" name="exam_time" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Enter time in minutes">
 
-                <input type="text" name="cource_code" id="" style="padding: 5px; width: 100%; height: 20px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Cource Code">
+                <input type="text" name="cource_code" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Cource Code">
 
 
 
@@ -73,6 +99,10 @@
             </form>
         </div>
         </div>
+
+
+        {{ end }}
+        
     </div>
     </div>
 </body>
@@ -80,6 +110,9 @@
 {{ end }}
 
 </html>
+
+
+
 
 
 

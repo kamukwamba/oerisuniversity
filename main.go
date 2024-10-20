@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
 	"os"
 
 	"github.com/kamukwamba/oerisuniversity/dbcode"
@@ -12,11 +13,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func Env(w http.ResponseWriter, r *http.Request) {
+func Enviroment(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Fprintln(w, "Testing OCERIS"+os.Getenv("TEST_ENV"))
-
-	fmt.Println("Testing OCERIS" + os.Getenv("TEST_ENV"))
+	result := os.Getenv("Working")
+	fmt.Fprintln(w, result)
 }
 
 func main() {
@@ -38,6 +38,10 @@ func main() {
 	fmt.Println("::SERVER STARTED::")
 
 	router := http.NewServeMux()
+
+	//ENVIROMENTAL VARIABLES
+
+	router.HandleFunc("/env", Enviroment)
 
 	//MAIN SCREEN
 	router.HandleFunc("/", routes.HomePage)
@@ -99,22 +103,21 @@ func main() {
 	router.HandleFunc("/studentprofileportal/{id}", routes.StudentProfilePortal)
 	router.HandleFunc("/close_assesment_div", routes.CloseAssesmentDiv)
 	router.HandleFunc("/close_admin_div", routes.CloseAdmintDiv)
-	router.HandleFunc("/env", Env)
+
 	router.HandleFunc("/example", routes.Example)
 
 	router.HandleFunc("/login", routes.LoginPage)
 	router.HandleFunc("/handinassesment", routes.HandInAssesment)
 
+	//LOAD ASSETS
+	router.Handle("/assets/", http.StripPrefix("/assets", fs))
+
+	//RUN SERVER
 	port := os.Getenv("PORT")
 
 	if port == "" {
 		port = "3000"
 	}
-
-	//LOAD ASSETS
-	router.Handle("/assets/", http.StripPrefix("/assets", fs))
-
-	//RUN SERVER
 	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, router))
 
 }

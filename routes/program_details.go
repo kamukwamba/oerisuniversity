@@ -75,10 +75,11 @@ func UpdateProgramDetails(w http.ResponseWriter, r *http.Request) {
 func ExamTrue(uuid string) {
 
 	updateexam := dbcode.SqlRead().DB
+	fmt.Println("Exam entered true", uuid)
 
-	stmt, err := updateexam.Prepare("UPDATE cource_table SET(exam_file = ?) where uuid = ? ")
+	stmt, err := updateexam.Prepare("UPDATE cource_table SET exam_file = ?  where uuid = ? ")
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("The error is here error: ", err)
 	}
 
 	defer stmt.Close()
@@ -88,6 +89,8 @@ func ExamTrue(uuid string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println("Exam exiting true")
 
 }
 

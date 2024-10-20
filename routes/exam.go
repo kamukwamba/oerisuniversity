@@ -55,6 +55,8 @@ func Listify(question_a, question_b string) ([]QuestionStruct, []QuestionStruct)
 	section_A := strings.Split(question_a, "}")
 	section_B := strings.Split(question_b, "}")
 
+	fmt.Println(question_a, question_b)
+
 	if len(question_a) > 0 {
 		var count_out int
 		for _, item := range section_A {
@@ -138,7 +140,7 @@ func Read_Exam(cource_name string) QuestionsEntered {
 
 	defer stmt.Close()
 
-	err = stmt.QueryRow(cource_name).Scan(uuid, program_name, cource_name_out, question_count, section_a, section_b, cource_code, time_out, date)
+	err = stmt.QueryRow(cource_name).Scan(&uuid, &program_name, &cource_name_out, &question_count, &section_a, &section_b, &cource_code, &time_out, &date)
 
 	section_a_out, section_b_out := Listify(section_a, section_b)
 
@@ -181,7 +183,7 @@ func Create_Exam(question_in QuestionsEntered) bool {
 	section_a := fmt.Sprintf("%s", question_in.Section_A)
 	section_b := fmt.Sprintf("%s", question_in.Section_B)
 
-	_, err = stmt.Exec(uuid, question_in.Cource_Name, question_in.Question_Count, section_a, section_b, question_in.Cource_Code, question_in.Time, date)
+	_, err = stmt.Exec(uuid, question_in.Program_Name, question_in.Cource_Name, question_in.Question_Count, section_a, section_b, question_in.Cource_Code, question_in.Time, date)
 
 	if err != nil {
 		log.Fatal(err)
@@ -246,7 +248,7 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 
 	var to_show ExamOut
 
-	cource_name_out := get_program_data.Cource_Aseesment
+	cource_name_out := get_program_data.Cource_Name
 	//Get Program Details to use when creating a database entry
 
 	if exam_value == "true" {
@@ -308,6 +310,7 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 
 	program_name := r.URL.Query().Get("program_name")
 	cource_name := r.URL.Query().Get("cource_name")
+	cource_uuid := r.URL.Query().Get("uuid")
 	question_a := r.FormValue("question_a")
 	question_b := r.FormValue("question_b")
 	exam_time := r.FormValue("exam_time")
@@ -326,6 +329,7 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 		for _, item := range section_A {
 
 			count_out++
+			fmt.Println(1)
 
 			if count_out != len(section_A) {
 				the_result := strings.Trim(item, "{")
@@ -399,11 +403,11 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 
 	result_out := Create_Exam(total_questions)
 
-	if result_out != true {
+	if !result_out {
 		fmt.Println("failed to save")
 
 	} else {
-		ExamTrue("uuid")
+		ExamTrue(cource_uuid)
 
 	}
 
