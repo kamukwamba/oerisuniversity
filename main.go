@@ -15,6 +15,8 @@ import (
 func Env(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintln(w, "Testing OCERIS"+os.Getenv("TEST_ENV"))
+
+	fmt.Println("Testing OCERIS" + os.Getenv("TEST_ENV"))
 }
 
 func main() {
