@@ -185,44 +185,6 @@ func LoadDB() {
 
 	`
 
-	exam_questions := `
-		create table if not exists exam_questions(
-		uuid blob not null,
-		cource_name text,
-		section_a text,
-		seaction_a_answers,
-		section_b text,
-		date text)
-
-	`
-
-	write_exam := `
-		create table if not exists write_exam(
-		uuid blob not null,
-		cource_name text,
-		attemp_number integer,
-		first_attempted integer,
-		open_period integer,
-		answers text,
-		grade text,
-		comment text,
-		date text
-		)
-	
-	`
-
-	_, write_out := dbread.DB.Exec(write_exam)
-
-	if write_out != nil {
-		log.Printf("%q: %s\n", write_out, write_exam)
-
-	}
-
-	_, exam_data_error := dbread.DB.Exec(exam_questions)
-	if exam_data_error != nil {
-		log.Printf("%q: %s\n", exam_data_error, exam_questions)
-	}
-
 	_, lectureraserror := dbread.DB.Exec(lectureras)
 	if lectureraserror != nil {
 		log.Printf("%q: %s\n", lectureraserror, lectureras)

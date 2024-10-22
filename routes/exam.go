@@ -44,6 +44,19 @@ type QuestionsEntered struct {
 	Date           string
 }
 
+type ExamTakenStruct struct {
+	UUID            string
+	Cource_Name     string
+	Student_UUID    string
+	Attemp_Number   string
+	First_Attempted string
+	Open_Period     string
+	Answers         string
+	Grade           string
+	Date            string
+	Comment         string
+}
+
 func Listify(question_a, question_b string) ([]QuestionStruct, []QuestionStruct) {
 
 	var question_list_a []QuestionStruct //section a questiions
@@ -217,9 +230,31 @@ func Delete_Exam(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// func Read_Exam_Taken(w http.ResponseWriter, r *http.Request) {
+func Read_Exam_Taken(uuid string) (bool, ExamTakenStruct) {
 
-// }
+	exam_taken := true
+
+	var examout ExamTakenStruct
+
+	check_if_exam_taken := dbcode.SqlRead().DB
+
+	stmt, err := check_if_exam_taken.Prepare("select uuid, student_uuid, attemp_number, first_attempted, open_period,answers,grade,comment,date from write_exam where student_uuid = ?")
+
+	if err != nil {
+		exam_taken = false
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(uuid).Scan(&examout.UUID, &examout.Student_UUID, &examout.Attemp_Number, &examout.First_Attempted, &examout.Open_Period, &examout.Answers, &examout.Grade, &examout.Comment)
+
+	if err != nil {
+		exam_taken = false
+	}
+
+	return exam_taken, examout
+
+}
 
 // func Take_Exam(w http.ResponseWriter, r *http.Request) {
 
@@ -232,6 +267,12 @@ func Delete_Exam(w http.ResponseWriter, r *http.Request) {
 // func Delete_Exam_Taken(w http.ResponseWriter, r *http.Request) {
 
 // }
+
+type TakeExamStruct struct {
+	Taken         bool
+	ExamTaken     QuestionsEntered
+	TakensResults ExamTakenStruct
+}
 
 func CreatePage(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
@@ -279,11 +320,26 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 func TakeExam(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
+	var search_out TakeExamStruct
 
-	uuid := r.URL.Query().Get("")
+	cource_name := r.URL.Query().Get("cource_name")
+	uuid := r.URL.Query().Get("uuid")
 
-	err := tpl.ExecuteTemplate(w, "exam_code.html", nil)
-	fmt.Println(uuid)
+	read_exam, result_out := Read_Exam_Taken(uuid)
+	question_out := Read_Exam(cource_name)
+
+	if read_exam {
+		search_out = TakeExamStruct{
+			Taken:         true,
+			ExamTaken:     question_out,
+			TakensResults: result_out,
+		}
+
+	}
+
+	fmt.Println(uuid, cource_name)
+
+	err := tpl.ExecuteTemplate(w, "exam_code.html", search_out)
 
 	if err != nil {
 		log.Fatal(err)
@@ -447,6 +503,7 @@ func LoadExamTable() {
 		create table if not exists write_exam(
 		uuid blob not null,
 		cource_name text,
+		student_uuid text,
 		attemp_number int,
 		first_attempted int,
 		open_period int,
