@@ -25,6 +25,12 @@ type ExamStruct struct {
 	Questions    []ExamQuestons
 }
 
+type Displayed struct {
+	Section        string
+	Question       string
+	Quesion_number int
+}
+
 type QuestionStruct struct {
 	Section  string
 	Question string
@@ -42,6 +48,30 @@ type QuestionsEntered struct {
 	Cource_Code    string
 	Total_Marks    string
 	Date           string
+}
+
+type DisplayExam struct {
+	AlreadTaken    bool
+	ExamData       QuestionsEntered
+	Exam_Questions []Displayed
+}
+
+type ExamStructOut struct {
+	Student_UUID   string
+	Program_Name   string
+	Cource_Name    string
+	Cource_Code    string
+	Time           string
+	Attempt_Number string
+	Question_List  []QuestionStruct
+}
+
+type ExamComplete struct {
+	Student_UUID string
+	Program_Name string
+	Cource_Name  string
+	Cource_Code  string
+	Grade        string
 }
 
 type ExamTakenStruct struct {
@@ -159,6 +189,7 @@ func Read_Exam(cource_name string) QuestionsEntered {
 
 	question_count_out, _ := strconv.Atoi(question_count)
 	time_out_int, _ := strconv.Atoi(time_out)
+
 	result_out = QuestionsEntered{
 		UUID:           uuid,
 		Program_Name:   program_name,
@@ -246,7 +277,7 @@ func Read_Exam_Taken(uuid string) (bool, ExamTakenStruct) {
 
 	defer stmt.Close()
 
-	err = stmt.QueryRow(uuid).Scan(&examout.UUID, &examout.Student_UUID, &examout.Attemp_Number, &examout.First_Attempted, &examout.Open_Period, &examout.Answers, &examout.Grade, &examout.Comment)
+	err = stmt.QueryRow(uuid).Scan(&examout.UUID, &examout.Student_UUID, &examout.Attemp_Number, &examout.First_Attempted, &examout.Open_Period, &examout.Answers, &examout.Grade, &examout.Comment, &examout.Date)
 
 	if err != nil {
 		exam_taken = false
@@ -320,26 +351,116 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 func TakeExam(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
-	var search_out TakeExamStruct
+
+	var template_name string
+	var display_Exam DisplayExam
+	var question_out Displayed
+	var question_displayed []Displayed
 
 	cource_name := r.URL.Query().Get("cource_name")
 	uuid := r.URL.Query().Get("uuid")
 
 	read_exam, result_out := Read_Exam_Taken(uuid)
-	question_out := Read_Exam(cource_name)
 
-	if read_exam {
-		search_out = TakeExamStruct{
-			Taken:         true,
-			ExamTaken:     question_out,
-			TakensResults: result_out,
+	attemped_number := result_out.Attemp_Number
+	comment := result_out.Comment
+	open_period := result_out.Open_Period
+	first_attempted := result_out.First_Attempted
+
+	get_exam_questions := Read_Exam(cource_name)
+
+	section_a := get_exam_questions.Section_A
+	section_b := get_exam_questions.Section_B
+
+	questions_count := 0
+
+	template_name = "exam_complete"
+
+	fmt.Println(template_name)
+
+	//CREATE LIST OF QUESTION FOR STUDENTS
+
+	for _, item := range section_a {
+		questions_count++
+
+		question_out = Displayed{
+			Section:        "A",
+			Question:       item.Question,
+			Quesion_number: questions_count,
 		}
+
+		question_displayed = append(question_displayed, question_out)
 
 	}
 
-	fmt.Println(uuid, cource_name)
+	for _, item := range section_b {
+		questions_count++
+		question_out = Displayed{
+			Section:        "B",
+			Question:       item.Question,
+			Quesion_number: questions_count,
+		}
 
-	err := tpl.ExecuteTemplate(w, "exam_code.html", search_out)
+		question_displayed = append(question_displayed, question_out)
+	}
+
+	//CULCULATE THE TIME REMANING FROM THE FIRST ATTEMPET
+	attemp_number_out, err := strconv.Atoi(attemped_number)
+	open_period_out, err := strconv.Atoi(open_period)
+
+	date_out := time.Now()
+	// open_period_valid := date_out - open_period_out
+
+	fmt.Println(open_period_out, attemp_number_out, date_out)
+
+	if err != nil {
+		fmt.Print("String Conv: ", err)
+
+	}
+	if comment == "true" {
+		if open_period_out >= 3 {
+			fmt.Println(open_period, first_attempted)
+
+		} else {
+			if read_exam {
+
+				display_Exam = DisplayExam{
+					AlreadTaken:    false,
+					ExamData:       get_exam_questions,
+					Exam_Questions: question_displayed,
+				}
+
+			} else {
+				display_Exam = DisplayExam{
+					AlreadTaken:    true,
+					ExamData:       get_exam_questions,
+					Exam_Questions: question_displayed,
+				}
+			}
+
+		}
+
+	} else {
+		if read_exam {
+
+			display_Exam = DisplayExam{
+				AlreadTaken:    false,
+				ExamData:       get_exam_questions,
+				Exam_Questions: question_displayed,
+			}
+
+		} else {
+			display_Exam = DisplayExam{
+				AlreadTaken:    true,
+				ExamData:       get_exam_questions,
+				Exam_Questions: question_displayed,
+			}
+		}
+	}
+
+	fmt.Println(get_exam_questions, attemped_number)
+
+	err = tpl.ExecuteTemplate(w, "exam_code.html", display_Exam)
 
 	if err != nil {
 		log.Fatal(err)
@@ -510,6 +631,7 @@ func LoadExamTable() {
 		answers text,
 		grade text,
 		comment text,
+		completed  text,
 		date text
 		)`
 
