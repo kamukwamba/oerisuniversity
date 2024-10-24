@@ -356,7 +356,7 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 	var display_Exam DisplayExam
 	var question_out Displayed
 	var question_displayed []Displayed
-
+	var open_time_over bool
 	cource_name := r.URL.Query().Get("cource_name")
 	uuid := r.URL.Query().Get("uuid")
 
@@ -379,6 +379,29 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(template_name)
 
 	//CREATE LIST OF QUESTION FOR STUDENTS
+
+	year := time.Now().Year()
+	month := time.Now().Month()
+	day := time.Now().Day()
+	hour := time.Now().Hour()
+	min := time.Now().Minute()
+
+	first_attemp := fmt.Sprintf("%s,%s,%s,%s,%s", year, month, day, hour, min)
+
+	fmt.Println(first_attemp)
+	t := time.Now()
+	u := time.Date(2020, 5, 16, 20, 45, 34, 0, time.UTC)
+	is_valid := t.Sub(u)
+
+	is_valid.Hours()
+
+	if is_valid >= 7 {
+		open_time_over = true
+	} else {
+		open_time_over = false
+	}
+
+	fmt.Println(open_time_over)
 
 	for _, item := range section_a {
 		questions_count++
