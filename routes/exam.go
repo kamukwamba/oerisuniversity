@@ -348,6 +348,11 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 
 }
 
+type Complition struct {
+	Logo    string
+	Message string
+}
+
 func TakeExam(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
@@ -365,7 +370,7 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 	attemped_number := result_out.Attemp_Number
 	comment := result_out.Comment
 	open_period := result_out.Open_Period
-	first_attempted := result_out.First_Attempted
+	// first_attempted := result_out.First_Attempted
 
 	get_exam_questions := Read_Exam(cource_name)
 
@@ -395,7 +400,7 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 
 	is_valid.Hours()
 
-	if is_valid >= 7 {
+	if is_valid > 7 {
 		open_time_over = true
 	} else {
 		open_time_over = false
@@ -440,53 +445,56 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 		fmt.Print("String Conv: ", err)
 
 	}
-	if comment == "true" {
-		if open_period_out >= 3 {
-			fmt.Println(open_period, first_attempted)
+
+	if read_exam {
+		var print_out_message string
+		var page_data Complition
+
+		if comment == "true" {
+
+			print_out_message = "Congratulations you completed the cources succesfully"
+			page_data = Complition{
+				Logo:    "/assets",
+				Message: print_out_message,
+			}
 
 		} else {
-			if read_exam {
+			if open_time_over {
+				print_out_message = "The grace period allocated for you to retake the exam has expired to retake the exam please contact us for further information"
 
-				display_Exam = DisplayExam{
-					AlreadTaken:    false,
-					ExamData:       get_exam_questions,
-					Exam_Questions: question_displayed,
+				page_data = Complition{
+					Logo:    "/assets",
+					Message: print_out_message,
 				}
 
-			} else {
-				display_Exam = DisplayExam{
-					AlreadTaken:    true,
-					ExamData:       get_exam_questions,
-					Exam_Questions: question_displayed,
-				}
 			}
+			if attemp_number_out > 3 {
+				print_out_message = "Sorry you have exided the attempts given to you to take the exam. For further assistance please contact us fo more information"
+				page_data = Complition{
+					Logo:    "/assets",
+					Message: print_out_message,
+				}
+
+			}
+
+			fmt.Println(page_data)
+
+			fmt.Println(print_out_message)
 
 		}
 
 	} else {
-		if read_exam {
-
-			display_Exam = DisplayExam{
-				AlreadTaken:    false,
-				ExamData:       get_exam_questions,
-				Exam_Questions: question_displayed,
-			}
-
-		} else {
-			display_Exam = DisplayExam{
-				AlreadTaken:    true,
-				ExamData:       get_exam_questions,
-				Exam_Questions: question_displayed,
-			}
+		display_Exam = DisplayExam{
+			AlreadTaken:    false,
+			ExamData:       get_exam_questions,
+			Exam_Questions: question_displayed,
 		}
-	}
 
-	fmt.Println(get_exam_questions, attemped_number)
+		err = tpl.ExecuteTemplate(w, "exam_code.html", display_Exam)
 
-	err = tpl.ExecuteTemplate(w, "exam_code.html", display_Exam)
-
-	if err != nil {
-		log.Fatal(err)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 }
