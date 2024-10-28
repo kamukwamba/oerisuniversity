@@ -68,7 +68,7 @@
             
         
             <div>
-            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}"
+            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}question_secction=A"
                     hx-target="#question_list"
                     hx-swap="beforeend">
                 <label for="question" class="compose">Compose Question</label><br>
@@ -76,26 +76,49 @@
                 <div style="background-color: rgb(32, 0, 62); padding: 5px; margin-bottom:5px;">
                     <label for="answer"  class="compose" style=" color: white;">Section A</label><br>
                 </div>
-                <textarea type="text" class="question_div_one" style="font-size: 1.2em; padding:5px;" name="question_a" id="" >Note when entering questions encapsulate questions in brackets '{' to stipulate the start of a question and '}' to mark its end. with in the question brackets separate the question and the answer by a full colone ':',  eg.{Is Zambia an African Country: True}, first the question then the answer.
+                <textarea type="text" class="question_div_one" style="font-size: 1.2em; padding:5px;" name="question_a" id="" >Enter section A questiion
                 
                     
                 </textarea><br>
-        
 
+                <h4>Enter Answer</h4>
+                <label for="A">A</label>
+                <input type="radio" id="A" name="answer" value="A"><br>
+                <label for="B">B</label>
+                <input type="radio" id="B" name="answer" value="B">
+
+                <button type="submit" class="create_button">Save</button>
+            </form>
+
+            <!-- SECTION B QUESTIONS -->
+
+            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data. UUID}}question_secction=B"
+            hx-target="#question_list"
+            hx-swap="beforeend">
                 <div style="background-color: rgb(32, 0, 62); padding: 5px; margin-bottom:5px;">
                     <label for="answer"  class="compose" style=" color: white;">Section B</label><br>
                 </div>
                 <textarea name="question_b"  class="question_div_one" style="font-size: 1.2em; padding:5px;" placeholder="Note when entering questions encapsulate questions in brackets '{' to stipulate the start of a question and '}'
                 to mark its end ">Note when entering questions encapsulate questions in brackets '{' to stipulate the start of a question and '}' to mark its end 
                 </textarea>
-                
+
+                <button type="submit" class="create_button">Save</button>
+
+
+            </form>
+
+            <!-- EXAM FINE DETAILS  -->
+
+            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}question_secction=C"
+            hx-target="#question_list"
+            hx-swap="beforeend">
                 <input type="text" name="exam_time" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Enter time in minutes">
 
                 <input type="text" name="cource_code" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Cource Code">
 
+                <button type="submit" class="create_button">Cource Details</button>
 
 
-                <button type="submit" class="create_button">Create</button>
             </form>
         </div>
         </div>

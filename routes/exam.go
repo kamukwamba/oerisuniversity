@@ -210,11 +210,11 @@ func Read_Exam(cource_name string) QuestionsEntered {
 
 }
 
-func Create_Exam(question_in QuestionsEntered) bool {
+func Create_Exam(question_in Questions_Construct) bool {
 	result := true
 	create_exam := dbcode.SqlRead().DB
 
-	stmt, err := create_exam.Prepare("insert into exam_questions(uuid, program_name,cource_name, question_count,section_a,section_b,cource_code,time, date) values(?,?,?,?,?,?,?,?,?)")
+	stmt, err := create_exam.Prepare("insert into exam_questions(uuid, cource_uuid,cource_name, section_A_q,section_b_q,section_a_a, question_number) values(?,?,?,?,?,?,?,?,?)")
 
 	if err != nil {
 		log.Fatal(err)
@@ -223,11 +223,35 @@ func Create_Exam(question_in QuestionsEntered) bool {
 	defer stmt.Close()
 
 	uuid := encription.Generateuudi()
-	date := time.Now()
-	section_a := fmt.Sprintf("%s", question_in.Section_A)
-	section_b := fmt.Sprintf("%s", question_in.Section_B)
+	var cource_uuid string
+	var cource_name string
+	var answer string
+	var question_a string
+	var question_b string
+	var question_number int
 
-	_, err = stmt.Exec(uuid, question_in.Program_Name, question_in.Cource_Name, question_in.Question_Count, section_a, section_b, question_in.Cource_Code, question_in.Time, date)
+	section_enter := question_in.Section
+
+	switch section_enter {
+	case "A":
+		cource_name = question_in.Cource_Name
+		cource_uuid = question_in.Cource_UUID
+		answer = question_in.Answer
+		question_a = question_in.Question
+		question_b = ""
+		question_number = question_in.Question_Number
+
+	case "B":
+		cource_name = question_in.Cource_Name
+		cource_uuid = question_in.Cource_UUID
+		answer = question_in.Answer
+		question_a = ""
+		question_b = question_in.Question
+		question_number = question_in.Question_Number
+
+	}
+
+	_, err = stmt.Exec(uuid, cource_uuid, cource_name, question_a, question_b, answer, question_number)
 
 	if err != nil {
 		log.Fatal(err)
@@ -508,124 +532,160 @@ type Questions_Out struct {
 	Section_B []QuestionStruct
 }
 
+type Questions_Construct struct {
+	UUID            string
+	Section         string
+	Cource_UUID     string
+	Cource_Name     string
+	Question        string
+	Answer          string
+	Question_Number int
+}
+
+func Question_Count(uuid string) (bool, string) {
+
+	dbcounter := dbcode.SqlRead().DB
+	present := true
+	var number string
+
+	stmt, err := dbcounter.Prepare("select question_number  from exam_questions where cource_uuid = ?")
+
+	if err != nil {
+		fmt.Println("failed to work properly")
+		present = false
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(uuid).Scan(number)
+
+	if err != nil {
+		fmt.Println("check Query row 548 exam_go")
+	}
+
+	return present, number
+
+}
+
 func AddExam(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
 
-	var question_count int
+	question_section := r.URL.Query().Get("section")
 
 	// when the page loads a uuid will be created which be usedd to track the questions created if the uuid is in the table updates wiil be made to the question list
+
+	var questions_display_out []Questions_Construct
 
 	program_name := r.URL.Query().Get("program_name")
 	cource_name := r.URL.Query().Get("cource_name")
 	cource_uuid := r.URL.Query().Get("uuid")
-	question_a := r.FormValue("question_a")
-	question_b := r.FormValue("question_b")
 	exam_time := r.FormValue("exam_time")
 	exam_code := r.FormValue("exam_code")
 
 	exam_time_out, _ := strconv.Atoi(exam_time)
 
-	var question_list_a []QuestionStruct
-	var question_list_b []QuestionStruct
+	fmt.Println(program_name, exam_code, exam_time_out)
 
-	section_A := strings.Split(question_a, "}")
-	section_B := strings.Split(question_b, "}")
+	switch question_section {
+	case "A":
+		is_present, number := Question_Count(cource_uuid)
+		question_a := r.FormValue("question_a")
+		answers := r.FormValue("answer")
+		var question_content Questions_Construct
 
-	if len(question_a) > 0 {
-		var count_out int
-		for _, item := range section_A {
+		if is_present {
 
-			count_out++
-			fmt.Println(1)
-
-			if count_out != len(section_A) {
-				the_result := strings.Trim(item, "{")
-				the_result_out := strings.Split(the_result, ":")
-				questions_out := QuestionStruct{
-					Section:  "A",
-					Question: the_result_out[0],
-					Answer:   the_result_out[1],
-				}
-
-				question_list_a = append(question_list_a, questions_out)
-
-				fmt.Println(question_list_a)
-
-				question_count++
-			} else {
-				fmt.Println("Out of bounds")
+			number_out, _ := strconv.Atoi(number)
+			number_out++
+			question_content = Questions_Construct{
+				Cource_UUID:     cource_uuid,
+				Section:         "A",
+				Cource_Name:     cource_name,
+				Question:        question_a,
+				Answer:          answers,
+				Question_Number: number_out,
 			}
 
-		}
-	}
+			Create_Exam(question_content)
 
-	//Note This code is for presenting the code
-	if len(question_b) > 0 {
+			questions_display_out = append(questions_display_out, question_content)
 
-		var count_out int
-		for _, item := range section_B {
+		} else {
 
-			if len(item) > 0 {
-
-				the_result := strings.Trim(item, "{ }")
-				fmt.Println(the_result)
-				count_out++
-
-				if count_out != len(section_B) {
-					the_result := strings.Trim(item, "{")
-					questions_out := QuestionStruct{
-						Section:  "B",
-						Question: the_result,
-					}
-
-					question_list_b = append(question_list_b, questions_out)
-
-					question_count++
-				} else {
-					fmt.Println("Out of bounds")
-				}
+			number_out := 1
+			question_content = Questions_Construct{
+				Cource_UUID:     cource_uuid,
+				Cource_Name:     cource_name,
+				Section:         "A",
+				Question:        question_a,
+				Answer:          answers,
+				Question_Number: number_out,
 			}
+
+			Create_Exam(question_content)
+
+			questions_display_out = append(questions_display_out, question_content)
 
 		}
 
-	}
+	case "B":
+		is_present, number := Question_Count(cource_uuid)
+		question_b := r.FormValue("question_b")
+		var question_content Questions_Construct
 
-	//{question one: true}{question two: true}{question three: true}{question four: true}
-	//{question five}{question six}{question seven}{question eight}
+		if is_present {
 
-	question_data := Questions_Out{
-		Section_A: question_list_a,
-		Section_B: question_list_b,
-	}
+			number_out, _ := strconv.Atoi(number)
+			number_out++
+			question_content = Questions_Construct{
+				Cource_UUID:     cource_uuid,
+				Section:         "B",
+				Cource_Name:     cource_name,
+				Question:        question_b,
+				Question_Number: number_out,
+			}
 
-	total_questions := QuestionsEntered{
-		Cource_Name:    cource_name,
-		Program_Name:   program_name,
-		Question_Count: question_count,
-		Section_A:      question_list_a,
-		Section_B:      question_list_b,
-		Cource_Code:    exam_code,
-		Time:           exam_time_out,
-	}
+			Create_Exam(question_content)
 
-	result_out := Create_Exam(total_questions)
+			questions_display_out = append(questions_display_out, question_content)
 
-	if !result_out {
-		fmt.Println("failed to save")
+		} else {
 
-	} else {
-		ExamTrue(cource_uuid)
+			number_out := 1
+			question_content = Questions_Construct{
+				Cource_UUID:     cource_uuid,
+				Cource_Name:     cource_name,
+				Section:         "A",
+				Question:        question_b,
+				Question_Number: number_out,
+			}
+
+			Create_Exam(question_content)
+			questions_display_out = append(questions_display_out, question_content)
+
+		}
+
+	case "C":
 
 	}
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err := tpl.ExecuteTemplate(w, "questions_out", question_data)
+	err := tpl.ExecuteTemplate(w, "questions_out", nil)
 
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+type ExamDetails struct {
+	UUID          string
+	Program_Name  string
+	Cource_Name   string
+	Cource_Code   string
+	Exam_Duration int
+	Total_Marks   string
 }
 
 func LoadExamTable() {
@@ -634,17 +694,29 @@ func LoadExamTable() {
 
 	defer exam_code.Close()
 
-	create_exam := `
-		create table if not exists exam_questions(
+	exam_details := `create table if not exits exam_details(
 		uuid blob not null,
 		program_name text,
 		cource_name text,
-		question_count int,
-		section_a text,
-		section_b text,
-		cource_code text,
-		time int,
-		date text)`
+		cource_code  text,
+		duration int,
+		total string
+	)`
+
+	_, exam_details_error := exam_code.Exec(exam_details)
+	if exam_details_error != nil {
+		log.Printf("%q: %s\n", exam_details_error, exam_details)
+	}
+
+	create_exam := `
+		create table if not exists exam_questions(
+		uuid blob not null,
+		cource_uuid text,
+		cource_name text,
+		section_a_q text,
+		section_b_q text,
+		section_a_a text,
+		question_number int)`
 
 	_, create_exam_error := exam_code.Exec(create_exam)
 	if create_exam_error != nil {
