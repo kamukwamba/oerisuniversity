@@ -68,7 +68,7 @@
             
         
             <div>
-            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}question_secction=A"
+            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}question_section=A"
                     hx-target="#question_list"
                     hx-swap="beforeend">
                 <label for="question" class="compose">Compose Question</label><br>
@@ -92,7 +92,7 @@
 
             <!-- SECTION B QUESTIONS -->
 
-            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data. UUID}}question_secction=B"
+            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}question_section=B"
             hx-target="#question_list"
             hx-swap="beforeend">
                 <div style="background-color: rgb(32, 0, 62); padding: 5px; margin-bottom:5px;">
@@ -109,17 +109,30 @@
 
             <!-- EXAM FINE DETAILS  -->
 
-            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}question_secction=C"
-            hx-target="#question_list"
+            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}question_section=C"
+            hx-target="#cource_data_present"
             hx-swap="beforeend">
-                <input type="text" name="exam_time" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Enter time in minutes">
+
+                <input type="text" name="program_name" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Program Name">
+
+                <input type="text" name="cource_name" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Cource Name">
 
                 <input type="text" name="cource_code" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Cource Code">
 
-                <button type="submit" class="create_button">Cource Details</button>
+                <input type="text" name="exam_time" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Enter time in minutes">
+
+                
+
+                <input type="text" name="total_marks" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Total Marks">
+
+                <button type="submit" class="create_button">Create Details</button>
 
 
             </form>
+        </div>
+
+        <div style="width: 100%; height: 45px;">
+            
         </div>
         </div>
 
@@ -137,6 +150,9 @@
 
 
 
+{{ define "details_saved_temp"}}
+<p id="cource_data_present" style="text-align: center; width: 100%; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: lighter; font-size: 1.2em;" >{{ .Details_Message}}</p>
+{{ end }}
 
 
 
@@ -146,16 +162,17 @@
         
         <div>
 
-            {{ range .Section_A}}
+            {{ range .Questions}}
 
-                <p>{{ .Question}}</p>
-                <p>Answer:{{ .Answer}}</p>
+                {{ if eq .Section "A" .}}
+                    <p>{{ .Question}}</p>
+                    <p>Answer:{{ .Answer}}</p>
+                {{ else }}
+                    <p>{{ .Question}}</p>
+
+                {{ end }}
            {{ end }} 
 
-           {{ range .Section_B}}
-                <p>{{ .Question}}</p>
-           
-           {{ end }}
         
         </div>
     </div>

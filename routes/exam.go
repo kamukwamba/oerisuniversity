@@ -210,11 +210,60 @@ func Read_Exam(cource_name string) QuestionsEntered {
 
 }
 
+type Exam_Details struct {
+	UUID         string
+	Cource_UUID  string
+	Program_Name string
+	Cource_Name  string
+	Cource_Code  string
+	Duration     string
+	Total_Marks  string
+}
+
+func Create_Exam_Details(details Exam_Details) bool {
+	present := false
+
+	// THE RESULT WILL TELL THE INSTRUCT THAT THE DETAILS ARE ALRED PRESENT
+	result := false
+	uuid := encription.Generateuudi()
+	dbcon := dbcode.SqlRead().DB
+	stmt, err := dbcon.Prepare("select * from exam_details where cource_uuid = ?")
+
+	if err != nil {
+		present = true
+	}
+
+	defer stmt.Close()
+
+	if present {
+		result = true
+	} else {
+		stmtcon, errcon := dbcon.Begin()
+
+		if errcon != nil {
+			fmt.Println("failed to initiatte connection")
+		}
+
+		stmtin, errin := stmtcon.Prepare("insert into exam_details(uuid, cource_uuid, program_name, cource_name, cource_code, duration, total_marks) values(?,?,?,?,?,?,?)")
+
+		if errin != nil {
+			fmt.Println("failed to insert cource data")
+		}
+
+		defer stmtin.Close()
+
+		_, errin = stmtin.Exec(uuid, details.Cource_UUID, details.Program_Name, details.Cource_Name, details.Cource_Code, details.Duration, details.Total_Marks)
+
+	}
+
+	return result
+}
+
 func Create_Exam(question_in Questions_Construct) bool {
 	result := true
 	create_exam := dbcode.SqlRead().DB
 
-	stmt, err := create_exam.Prepare("insert into exam_questions(uuid, cource_uuid,cource_name, section_A_q,section_b_q,section_a_a, question_number) values(?,?,?,?,?,?,?,?,?)")
+	stmt, err := create_exam.Prepare("insert into exam_questions(uuid, cource_uuid,cource_name, section_A_q,section_b_q,section_a_a, question_number) values(?,?,?,?,?,?,?)")
 
 	if err != nil {
 		log.Fatal(err)
@@ -542,6 +591,11 @@ type Questions_Construct struct {
 	Question_Number int
 }
 
+type CreateExamResponse struct {
+	Details_Messages string
+	Questions        []Questions_Construct
+}
+
 func Question_Count(uuid string) (bool, string) {
 
 	dbcounter := dbcode.SqlRead().DB
@@ -576,6 +630,9 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 	// when the page loads a uuid will be created which be usedd to track the questions created if the uuid is in the table updates wiil be made to the question list
 
 	var questions_display_out []Questions_Construct
+	var exam_responce CreateExamResponse
+
+	var template_name string
 
 	program_name := r.URL.Query().Get("program_name")
 	cource_name := r.URL.Query().Get("cource_name")
@@ -611,6 +668,12 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 
 			questions_display_out = append(questions_display_out, question_content)
 
+			exam_responce = CreateExamResponse{
+				Details_Messages: "",
+				Questions:        questions_display_out}
+
+			template_name = "questions_out"
+
 		} else {
 
 			number_out := 1
@@ -626,6 +689,11 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 			Create_Exam(question_content)
 
 			questions_display_out = append(questions_display_out, question_content)
+			exam_responce = CreateExamResponse{
+				Details_Messages: "",
+				Questions:        questions_display_out}
+
+			template_name = "questions_out"
 
 		}
 
@@ -650,6 +718,12 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 
 			questions_display_out = append(questions_display_out, question_content)
 
+			exam_responce = CreateExamResponse{
+				Details_Messages: "",
+				Questions:        questions_display_out}
+
+			template_name = "questions_out"
+
 		} else {
 
 			number_out := 1
@@ -664,15 +738,51 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 			Create_Exam(question_content)
 			questions_display_out = append(questions_display_out, question_content)
 
+			exam_responce = CreateExamResponse{
+				Details_Messages: "",
+				Questions:        questions_display_out}
+
+			template_name = "questions_out"
+
 		}
 
 	case "C":
+		pr_name := r.FormValue("program_name")
+		c_name := r.FormValue("cource_name")
+		cource_code := r.FormValue("cource_code")
+		exam_time := r.FormValue("exam_time")
+		total_marks := r.FormValue("total_marks")
+
+		create_exam_detaile := Exam_Details{
+			Cource_UUID:  cource_uuid,
+			Program_Name: pr_name,
+			Cource_Name:  c_name,
+			Cource_Code:  cource_code,
+			Duration:     exam_time,
+			Total_Marks:  total_marks,
+		}
+
+		save_details := Create_Exam_Details(create_exam_detaile)
+
+		if save_details {
+			exam_responce = CreateExamResponse{
+				Details_Messages: "Exam details have already been registered,  click UPDATE button if you wish to change course details "}
+
+			template_name = "details_saved_temp"
+
+		} else {
+			exam_responce = CreateExamResponse{
+				Details_Messages: "Exam details saved succesfully"}
+
+			template_name = "details_saved_temp"
+
+		}
 
 	}
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err := tpl.ExecuteTemplate(w, "questions_out", nil)
+	err := tpl.ExecuteTemplate(w, template_name, exam_responce)
 
 	if err != nil {
 		log.Fatal(err)
@@ -694,13 +804,14 @@ func LoadExamTable() {
 
 	defer exam_code.Close()
 
-	exam_details := `create table if not exits exam_details(
+	exam_details := `create table if not exists exam_details(
 		uuid blob not null,
+		cource_uuid text,
 		program_name text,
 		cource_name text,
 		cource_code  text,
 		duration int,
-		total string
+		total_marks string
 	)`
 
 	_, exam_details_error := exam_code.Exec(exam_details)

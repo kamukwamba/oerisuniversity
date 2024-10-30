@@ -195,7 +195,7 @@
         <td>{{ .Module}}</td>
         <td>{{ .Video_List}}</td>
         <td>{{ .Cource_Aseesment}}</td>
-        <td> <button hx-get="/create_page?uuid={{ .UUID}}&exam_present={{ .Exam}}"  
+        <td> <button hx-get="/create_page?uuid={{ .UUID}}&exam_present={{.Exam}}"  
             hx-target="#maincontaint"
             hx-swap="innerHTML" 
             class="download">{{ .Exam}}</button></td>
