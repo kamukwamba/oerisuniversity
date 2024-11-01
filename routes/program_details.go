@@ -32,6 +32,39 @@ type CourceDataUpdate struct {
 	Data   CourceDataStruct
 }
 
+func UpdateCourceData(w http.ResponseWriter, r *http.Request) {
+
+	uuid := r.URL.Query().Get("uuid")
+	dbconn := dbcode.SqlRead().DB
+	var cource_data CourceDataStruct
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	stmt, err := dbconn.Prepare("select uuid, program_name, cource_name,cource_assesment, video_list, module,recommended_book from cource_table where uuid = ?")
+
+	if err != nil {
+		err_out := fmt.Errorf("Failed to read from DB, error out: %w", err)
+		fmt.Println(err_out)
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(uuid).Scan(&cource_data.UUID, &cource_data.Program_Name, &cource_data.Cource_Name, &cource_data.Cource_Aseesment, &cource_data.Video_List, &cource_data.Module, &cource_data.Book)
+
+	if err != nil {
+		err_out := fmt.Errorf("Failed to read from DB, error out: %w", err)
+
+		fmt.Println(err_out)
+	}
+
+	err_out := tpl.ExecuteTemplate(w, "cource_data_updater", cource_data)
+
+	if err_out != nil {
+		log.Fatal(err)
+	}
+
+}
+
 func UpdateProgramDetails(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()

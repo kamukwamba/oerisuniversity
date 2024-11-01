@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet"  href="/assets/css/create_exam.css?v=1.0">
+    
     
     <title>Create Exam</title>
+
     <style>
         
         .question_div_one{
@@ -31,7 +32,7 @@
         Details
     </button>
 
-    <h3 class="h3_heading">{{ .Cource_Data.Cource_Name}} {{ .Cource_Data.UUID}}</h3>
+    <h3 class="h3_heading">{{ .Cource_Data.Cource_Name}}</h3>
     <div class="questions">
         
 
@@ -68,7 +69,7 @@
             
         
             <div>
-            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}question_section=A"
+            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}&section=A"
                     hx-target="#question_list"
                     hx-swap="beforeend">
                 <label for="question" class="compose">Compose Question</label><br>
@@ -76,30 +77,30 @@
                 <div style="background-color: rgb(32, 0, 62); padding: 5px; margin-bottom:5px;">
                     <label for="answer"  class="compose" style=" color: white;">Section A</label><br>
                 </div>
-                <textarea type="text" class="question_div_one" style="font-size: 1.2em; padding:5px;" name="question_a" id="" >Enter section A questiion
+                <textarea type="text" class="question_div_one" style="font-size: 1em; padding:5px;" name="question_a" id="" >Enter section A questions one at a time.
                 
                     
                 </textarea><br>
 
                 <h4>Enter Answer</h4>
-                <label for="A">A</label>
-                <input type="radio" id="A" name="answer" value="A"><br>
-                <label for="B">B</label>
-                <input type="radio" id="B" name="answer" value="B">
+                <label for="A" style="display: inline;">A</label>
+                <input type="radio" id="A" name="answer" value="A" class="radio_btn" style="height:20px; width:20px; vertical-align: middle;">
+                <label for="B" style="display: inline;">B</label>
+                <input type="radio" id="B" name="answer" value="B" class="radio_btn" style="height:20px; width:20px; vertical-align: middle;"><br>
 
-                <button type="submit" class="create_button">Save</button>
+
+                <button type="submit" class="create_button" style="margin-top: 5px;">Save</button>
             </form>
 
             <!-- SECTION B QUESTIONS -->
 
-            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}question_section=B"
+            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}&section=B"
             hx-target="#question_list"
             hx-swap="beforeend">
                 <div style="background-color: rgb(32, 0, 62); padding: 5px; margin-bottom:5px;">
                     <label for="answer"  class="compose" style=" color: white;">Section B</label><br>
                 </div>
-                <textarea name="question_b"  class="question_div_one" style="font-size: 1.2em; padding:5px;" placeholder="Note when entering questions encapsulate questions in brackets '{' to stipulate the start of a question and '}'
-                to mark its end ">Note when entering questions encapsulate questions in brackets '{' to stipulate the start of a question and '}' to mark its end 
+                <textarea name="question_b"  class="question_div_one" style="font-size: 1em; padding:5px;">Enter section B qustion here  one at a time.
                 </textarea>
 
                 <button type="submit" class="create_button">Save</button>
@@ -109,21 +110,21 @@
 
             <!-- EXAM FINE DETAILS  -->
 
-            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}question_section=C"
+            <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}&section=C"
             hx-target="#cource_data_present"
             hx-swap="beforeend">
 
-                <input type="text" name="program_name" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Program Name">
+                <input type="text" name="program_name" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Program Name">
 
-                <input type="text" name="cource_name" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Cource Name">
+                <input type="text" name="cource_name" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Cource Name">
 
-                <input type="text" name="cource_code" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Cource Code">
+                <input type="text" name="cource_code" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Cource Code">
 
-                <input type="text" name="exam_time" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Enter time in minutes">
+                <input type="text" name="exam_time" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Enter time in minutes">
 
                 
 
-                <input type="text" name="total_marks" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px;" placeholder="Total Marks">
+                <input type="text" name="total_marks" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Total Marks"><br>
 
                 <button type="submit" class="create_button">Create Details</button>
 

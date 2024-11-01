@@ -645,6 +645,7 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(program_name, exam_code, exam_time_out)
 
 	switch question_section {
+
 	case "A":
 		is_present, number := Question_Count(cource_uuid)
 		question_a := r.FormValue("question_a")
@@ -781,6 +782,8 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	fmt.Println(template_name)
 
 	err := tpl.ExecuteTemplate(w, template_name, exam_responce)
 

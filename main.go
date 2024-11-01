@@ -79,6 +79,8 @@ func main() {
 	router.HandleFunc("/updateadminuser", routes.UpdateAdminUsers)
 	router.HandleFunc("/getupdate", routes.GetUpateAdmin)
 	router.HandleFunc("/loadform", routes.LoadAdminForm)
+	router.HandleFunc("/update_cource_data", routes.UpdateCourceData)
+	router.HandleFunc("/saveucdaata", routes.UpdateProgramDetails)
 
 	router.HandleFunc("/deleteadmin", routes.DeleteAdmin)
 	router.HandleFunc("/createnews", routes.Create_News)
