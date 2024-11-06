@@ -87,6 +87,16 @@ type ExamTakenStruct struct {
 	Comment         string
 }
 
+type Exam_Details struct {
+	UUID         string
+	Cource_UUID  string
+	Program_Name string
+	Cource_Name  string
+	Cource_Code  string
+	Duration     string
+	Total_Marks  string
+}
+
 func Listify(question_a, question_b string) ([]QuestionStruct, []QuestionStruct) {
 
 	var question_list_a []QuestionStruct //section a questiions
@@ -210,53 +220,121 @@ func Read_Exam(cource_name string) QuestionsEntered {
 
 }
 
-type Exam_Details struct {
-	UUID         string
-	Cource_UUID  string
-	Program_Name string
-	Cource_Name  string
-	Cource_Code  string
-	Duration     string
-	Total_Marks  string
-}
-
-func Create_Exam_Details(details Exam_Details) bool {
-	present := false
+func Update_Exam_Details(details Exam_Details) (bool, string) {
+	present := true
+	update_msg := "Exam details updated successfully"
 
 	// THE RESULT WILL TELL THE INSTRUCT THAT THE DETAILS ARE ALRED PRESENT
-	result := false
+	saved_succesfully := false
 	uuid := encription.Generateuudi()
+	var details_out string
 	dbcon := dbcode.SqlRead().DB
-	stmt, err := dbcon.Prepare("select * from exam_details where cource_uuid = ?")
+	stmt, err := dbcon.Prepare("select cource_uuid from exam_details where cource_uuid = ?")
 
 	if err != nil {
-		present = true
+		present = false
+		fmt.Println("Program Details Not Present: ", err)
 	}
 
 	defer stmt.Close()
 
-	if present {
-		result = true
-	} else {
-		stmtcon, errcon := dbcon.Begin()
+	err = stmt.QueryRow(details.Cource_UUID).Scan(&details_out)
 
-		if errcon != nil {
-			fmt.Println("failed to initiatte connection")
-		}
-
-		stmtin, errin := stmtcon.Prepare("insert into exam_details(uuid, cource_uuid, program_name, cource_name, cource_code, duration, total_marks) values(?,?,?,?,?,?,?)")
-
-		if errin != nil {
-			fmt.Println("failed to insert cource data")
-		}
-
-		defer stmtin.Close()
-
-		_, errin = stmtin.Exec(uuid, details.Cource_UUID, details.Program_Name, details.Cource_Name, details.Cource_Code, details.Duration, details.Total_Marks)
+	if err != nil {
+		fmt.Println("Failed to get details out: ", err)
+		present = false
 
 	}
 
-	return result
+	if !present {
+		dbcreate := dbcode.SqlRead().DB
+		stmt, err := dbcreate.Prepare("insert into exam_details(uuid,cource_uuid,program_name,cource_name,cource_code,duration, total_marks) values(?,?,?,?,?,?,?)")
+
+		if err != nil {
+			fmt.Println("Fialedd to save exam details: ", err)
+		}
+
+		defer stmt.Close()
+
+		_, err = stmt.Exec(uuid, details.Cource_UUID, details.Program_Name, details.Cource_Name, details.Cource_Code, details.Duration, details.Total_Marks)
+
+		saved_succesfully = true
+		if err != nil {
+			fmt.Println("Fialed to create details entry: ", err)
+			saved_succesfully = false
+		}
+
+		update_msg = "Exam details created successfully"
+	} else if present {
+		dbupdate := dbcode.SqlRead().DB
+		stmt, err := dbupdate.Prepare("update exam_details set(program_name, cource_name, cource_code, duration, total_marks) where uuid = ?")
+
+		if err != nil {
+			fmt.Println("Failed to Execute Update Query: ", err)
+		}
+
+		defer stmt.Close()
+
+		_, err = stmt.Exec(details.Program_Name, details.Cource_Name, details.Cource_Code, details.Duration, details.Total_Marks)
+
+		if err != nil {
+			fmt.Println("Failed To Update Exam Details: ", err)
+		}
+	}
+
+	return saved_succesfully, update_msg
+
+}
+
+func Create_Exam_Details(details Exam_Details) (bool, string) {
+	present := true
+	message_out := "Exam details saved succesfully"
+
+	// THE RESULT WILL TELL THE INSTRUCT THAT THE DETAILS ARE ALRED PRESENT
+	saved_succesfully := false
+	uuid := encription.Generateuudi()
+	var details_out string
+	dbcon := dbcode.SqlRead().DB
+	stmt, err := dbcon.Prepare("select cource_uuid from exam_details where cource_uuid = ?")
+
+	if err != nil {
+		present = false
+		fmt.Println("Program Details Not Present: ", err)
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(details.Cource_UUID).Scan(&details_out)
+
+	if err != nil {
+		fmt.Println("Failed to get details out: ", err)
+		present = false
+
+	}
+
+	if !present {
+		dbcreate := dbcode.SqlRead().DB
+		stmt, err := dbcreate.Prepare("insert into exam_details(uuid,cource_uuid,program_name,cource_name,cource_code,duration, total_marks) values(?,?,?,?,?,?,?)")
+
+		if err != nil {
+			fmt.Println("Failedd to save exam details: ", err)
+		}
+
+		defer stmt.Close()
+
+		_, err = stmt.Exec(uuid, details.Cource_UUID, details.Program_Name, details.Cource_Name, details.Cource_Code, details.Duration, details.Total_Marks)
+
+		saved_succesfully = true
+
+		if err != nil {
+			fmt.Println("Failed to create details entry: ", err)
+			saved_succesfully = false
+		}
+	} else if present {
+		message_out = "Exam details present in database. If you wuld like to make changes please select the 'Update Details'."
+	}
+
+	return saved_succesfully, message_out
 }
 
 func Create_Exam(question_in Questions_Construct) bool {
@@ -593,32 +671,115 @@ type Questions_Construct struct {
 
 type CreateExamResponse struct {
 	Details_Messages string
-	Questions        []Questions_Construct
+	Questions        Questions_Construct
 }
 
 func Question_Count(uuid string) (bool, string) {
 
 	dbcounter := dbcode.SqlRead().DB
 	present := true
+	counter_present := false
 	var number string
+	var number_list []string
+	var last_number string
 
-	stmt, err := dbcounter.Prepare("select question_number  from exam_questions where cource_uuid = ?")
+	stmt, err := dbcounter.Query("SELECT question_number  FROM exam_questions WHERE cource_uuid = ?", uuid)
 
 	if err != nil {
-		fmt.Println("failed to work properly")
+		fmt.Println("failed to work properly", err)
 		present = false
 	}
 
 	defer stmt.Close()
 
-	err = stmt.QueryRow(uuid).Scan(number)
+	for stmt.Next() {
+		err = stmt.Scan(&number)
+		if err != nil {
+			fmt.Println("failed to query row: ", err)
+			break
+		} else {
+			number_list = append(number_list, number)
+			counter_present = true
+		}
 
-	if err != nil {
-		fmt.Println("check Query row 548 exam_go")
 	}
+
+	if err = stmt.Err(); err != nil {
+		fmt.Println("stmt scan failed, error out: ", err)
+	}
+
+	if counter_present {
+		last_number = number_list[len(number_list)-1]
+		number = last_number
+	}
+
+	fmt.Println("Length of number list: ", len(number_list))
 
 	return present, number
 
+}
+
+func AddExamDetails(w http.ResponseWriter, r *http.Request) {
+
+	section_out := r.URL.Query().Get("section")
+
+	fmt.Println(section_out)
+
+	var exam_responce CreateExamResponse
+	var save_details bool
+
+	var template_name string
+	var details_message string
+	cource_uuid := r.URL.Query().Get("uuid")
+	pr_name := r.FormValue("program_name")
+	c_name := r.FormValue("cource_name")
+	cource_code := r.FormValue("cource_code")
+	exam_time := r.FormValue("exam_time")
+	total_marks := r.FormValue("total_marks")
+
+	fmt.Println("Program Details: ", pr_name, c_name, cource_code, exam_time, total_marks)
+
+	create_exam_detaile := Exam_Details{
+		Cource_UUID:  cource_uuid,
+		Program_Name: pr_name,
+		Cource_Name:  c_name,
+		Cource_Code:  cource_code,
+		Duration:     exam_time,
+		Total_Marks:  total_marks,
+	}
+
+	if section_out == "save" {
+		save_details, details_message = Create_Exam_Details(create_exam_detaile)
+
+	}
+	if section_out == "update" {
+		save_details, details_message = Update_Exam_Details(create_exam_detaile)
+
+	}
+
+	if save_details {
+		exam_responce = CreateExamResponse{
+			Details_Messages: details_message}
+
+		template_name = "details_saved_temp"
+
+	} else {
+		exam_responce = CreateExamResponse{
+			Details_Messages: details_message}
+
+		template_name = "details_saved_temp"
+
+	}
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	fmt.Println(template_name)
+
+	err := tpl.ExecuteTemplate(w, template_name, exam_responce)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func AddExam(w http.ResponseWriter, r *http.Request) {
@@ -629,7 +790,7 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 
 	// when the page loads a uuid will be created which be usedd to track the questions created if the uuid is in the table updates wiil be made to the question list
 
-	var questions_display_out []Questions_Construct
+	fmt.Println("Section Letter: ", question_section)
 	var exam_responce CreateExamResponse
 
 	var template_name string
@@ -640,6 +801,8 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 	exam_time := r.FormValue("exam_time")
 	exam_code := r.FormValue("exam_code")
 
+	fmt.Println("Cource UUID: ", cource_uuid)
+
 	exam_time_out, _ := strconv.Atoi(exam_time)
 
 	fmt.Println(program_name, exam_code, exam_time_out)
@@ -648,36 +811,41 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 
 	case "A":
 		is_present, number := Question_Count(cource_uuid)
+
 		question_a := r.FormValue("question_a")
 		answers := r.FormValue("answer")
+
+		if len(answers) < 1 {
+			answers = "false"
+		}
 		var question_content Questions_Construct
 
 		if is_present {
 
 			number_out, _ := strconv.Atoi(number)
-			number_out++
+			fmt.Println("Present", number_out)
+
 			question_content = Questions_Construct{
 				Cource_UUID:     cource_uuid,
 				Section:         "A",
 				Cource_Name:     cource_name,
 				Question:        question_a,
 				Answer:          answers,
-				Question_Number: number_out,
+				Question_Number: number_out + 1,
 			}
 
 			Create_Exam(question_content)
 
-			questions_display_out = append(questions_display_out, question_content)
-
 			exam_responce = CreateExamResponse{
 				Details_Messages: "",
-				Questions:        questions_display_out}
+				Questions:        question_content}
 
-			template_name = "questions_out"
+			template_name = "questions_out_a"
 
 		} else {
 
 			number_out := 1
+			fmt.Println("Not Present", number_out)
 			question_content = Questions_Construct{
 				Cource_UUID:     cource_uuid,
 				Cource_Name:     cource_name,
@@ -689,12 +857,11 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 
 			Create_Exam(question_content)
 
-			questions_display_out = append(questions_display_out, question_content)
 			exam_responce = CreateExamResponse{
 				Details_Messages: "",
-				Questions:        questions_display_out}
+				Questions:        question_content}
 
-			template_name = "questions_out"
+			template_name = "questions_out_a"
 
 		}
 
@@ -706,24 +873,22 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 		if is_present {
 
 			number_out, _ := strconv.Atoi(number)
-			number_out++
+
 			question_content = Questions_Construct{
 				Cource_UUID:     cource_uuid,
 				Section:         "B",
 				Cource_Name:     cource_name,
 				Question:        question_b,
-				Question_Number: number_out,
+				Question_Number: number_out + 1,
 			}
 
 			Create_Exam(question_content)
 
-			questions_display_out = append(questions_display_out, question_content)
-
 			exam_responce = CreateExamResponse{
 				Details_Messages: "",
-				Questions:        questions_display_out}
+				Questions:        question_content}
 
-			template_name = "questions_out"
+			template_name = "questions_out_b"
 
 		} else {
 
@@ -731,51 +896,18 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 			question_content = Questions_Construct{
 				Cource_UUID:     cource_uuid,
 				Cource_Name:     cource_name,
-				Section:         "A",
+				Section:         "B",
 				Question:        question_b,
 				Question_Number: number_out,
 			}
 
 			Create_Exam(question_content)
-			questions_display_out = append(questions_display_out, question_content)
 
 			exam_responce = CreateExamResponse{
 				Details_Messages: "",
-				Questions:        questions_display_out}
+				Questions:        question_content}
 
-			template_name = "questions_out"
-
-		}
-
-	case "C":
-		pr_name := r.FormValue("program_name")
-		c_name := r.FormValue("cource_name")
-		cource_code := r.FormValue("cource_code")
-		exam_time := r.FormValue("exam_time")
-		total_marks := r.FormValue("total_marks")
-
-		create_exam_detaile := Exam_Details{
-			Cource_UUID:  cource_uuid,
-			Program_Name: pr_name,
-			Cource_Name:  c_name,
-			Cource_Code:  cource_code,
-			Duration:     exam_time,
-			Total_Marks:  total_marks,
-		}
-
-		save_details := Create_Exam_Details(create_exam_detaile)
-
-		if save_details {
-			exam_responce = CreateExamResponse{
-				Details_Messages: "Exam details have already been registered,  click UPDATE button if you wish to change course details "}
-
-			template_name = "details_saved_temp"
-
-		} else {
-			exam_responce = CreateExamResponse{
-				Details_Messages: "Exam details saved succesfully"}
-
-			template_name = "details_saved_temp"
+			template_name = "questions_out_b"
 
 		}
 

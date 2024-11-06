@@ -19,7 +19,7 @@
         <hr>
     
         <div class="details">
-            <div class="cource_data_div">
+            <div class="cource_data_div" style="overflow-x: auto;">
                 <table>
                     <thead>
                         <th>Cource Name</th>
@@ -33,7 +33,7 @@
                     </thead>
                     <tbody  id="cource_data_table_tr">
 
-                        {{ if .Present .}}
+                        {{ if .Present }}
                             {{ range .ProgramData }}
                                 {{ template "cource_data_tr" .}}
                             {{ end }}

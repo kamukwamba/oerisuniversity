@@ -89,9 +89,9 @@ func UpdateProgramDetails(w http.ResponseWriter, r *http.Request) {
 
 	defer stmt.Close()
 
-	_, erre := stmt.Exec(program_name, cource_name, assesment_link, video_link, module_link, book_link, uuid)
+	_, err = stmt.Exec(program_name, cource_name, assesment_link, video_link, module_link, book_link, uuid)
 
-	if erre != nil {
+	if err != nil {
 		log.Fatal(err)
 	}
 
