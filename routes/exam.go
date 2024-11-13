@@ -7,11 +7,19 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 	"github.com/kamukwamba/oerisuniversity/encription"
 )
+
+type ExamDetails struct {
+	UUID          string
+	Program_Name  string
+	Cource_Name   string
+	Cource_Code   string
+	Exam_Duration int
+	Total_Marks   string
+}
 
 type ExamQuestons struct {
 	Section   string
@@ -32,28 +40,31 @@ type Displayed struct {
 }
 
 type QuestionStruct struct {
-	Section  string
-	Question string
-	Answer   string
+	Section         string
+	Question        string
+	Question_Number string
+	Answer          string
 }
 
 type QuestionsEntered struct {
-	UUID           string
-	Program_Name   string
-	Cource_Name    string
-	Question_Count int
-	Section_A      []QuestionStruct
-	Section_B      []QuestionStruct
-	Time           int
-	Cource_Code    string
-	Total_Marks    string
-	Date           string
+	UUID            string
+	Program_Name    string
+	Question_Number string
+	Cource_Name     string
+	Question_Count  int
+	Section_A       []QuestionStruct
+	Section_B       []QuestionStruct
+	Time            int
+	Cource_Code     string
+	Total_Marks     string
+	Date            string
 }
 
 type DisplayExam struct {
 	AlreadTaken    bool
-	ExamData       QuestionsEntered
-	Exam_Questions []Displayed
+	Attemp_Number  int ``
+	ExamData       ExamDetails
+	Exam_Questions []Question_Structure
 }
 
 type ExamStructOut struct {
@@ -169,54 +180,72 @@ func Listify(question_a, question_b string) ([]QuestionStruct, []QuestionStruct)
 	return question_list_a, question_list_b
 }
 
-func Read_Exam(cource_name string) QuestionsEntered {
+type Question_Structure struct {
+	Section         string
+	Question_Number string
+	Question        string
+}
+
+func Read_Exam(cource_name string) []Question_Structure {
 
 	get_exam := dbcode.SqlRead().DB
+	var question_structure Question_Structure
+	var question_structure_list []Question_Structure
 
-	var result_out QuestionsEntered
-
-	stmt, err := get_exam.Prepare("select uuid,program_name, cource_name,question_count,section_a,section_b,cource_code,time, date from exam_questions where cource_name = ?")
+	stmt, err := get_exam.Query("select uuid,section, cource_uuid,cource_name,section_a_q,section_b_q, section_a_a,question_number from exam_questions where cource_name = ?", cource_name)
 
 	if err != nil {
 		log.Fatal()
 	}
 
 	var uuid string
-	var program_name string
+	var section string
+	var cource_uuid string
 	var cource_name_out string
-	var question_count string
 	var section_a string
 	var section_b string
-	var cource_code string
-	var time_out string
-	var date string
+	var question_number string
 
 	defer stmt.Close()
 
-	err = stmt.QueryRow(cource_name).Scan(&uuid, &program_name, &cource_name_out, &question_count, &section_a, &section_b, &cource_code, &time_out, &date)
+	for stmt.Next() {
+		err = stmt.Scan(&uuid, &section, &cource_uuid, &cource_name_out, &section_a, &section_b, &question_number)
 
-	section_a_out, section_b_out := Listify(section_a, section_b)
+		if err != nil {
+			fmt.Println("failed to query row: ", err)
+			break
+		} else {
 
-	question_count_out, _ := strconv.Atoi(question_count)
-	time_out_int, _ := strconv.Atoi(time_out)
+			if section == "A" {
+				question_structure = Question_Structure{
+					Section:         section,
+					Question_Number: question_number,
+					Question:        section_a,
+				}
 
-	result_out = QuestionsEntered{
-		UUID:           uuid,
-		Program_Name:   program_name,
-		Cource_Name:    cource_name,
-		Question_Count: question_count_out,
-		Section_A:      section_a_out,
-		Section_B:      section_b_out,
-		Cource_Code:    cource_code,
-		Time:           time_out_int,
-		Date:           date,
+				question_structure_list = append(question_structure_list, question_structure)
+
+			} else if section == "B" {
+				question_structure = Question_Structure{
+					Section:         section,
+					Question_Number: question_number,
+					Question:        section_b,
+				}
+				question_structure_list = append(question_structure_list, question_structure)
+
+			}
+		}
+	}
+
+	if err = stmt.Err(); err != nil {
+		fmt.Println("stmt scan failed, error out: ", err)
 	}
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return result_out
+	return question_structure_list
 
 }
 
@@ -251,7 +280,7 @@ func Update_Exam_Details(details Exam_Details) (bool, string) {
 		stmt, err := dbcreate.Prepare("insert into exam_details(uuid,cource_uuid,program_name,cource_name,cource_code,duration, total_marks) values(?,?,?,?,?,?,?)")
 
 		if err != nil {
-			fmt.Println("Fialedd to save exam details: ", err)
+			fmt.Println("Failedd to save exam details: ", err)
 		}
 
 		defer stmt.Close()
@@ -260,14 +289,14 @@ func Update_Exam_Details(details Exam_Details) (bool, string) {
 
 		saved_succesfully = true
 		if err != nil {
-			fmt.Println("Fialed to create details entry: ", err)
+			fmt.Println("Failed to create details entry: ", err)
 			saved_succesfully = false
 		}
 
 		update_msg = "Exam details created successfully"
 	} else if present {
 		dbupdate := dbcode.SqlRead().DB
-		stmt, err := dbupdate.Prepare("update exam_details set(program_name, cource_name, cource_code, duration, total_marks) where uuid = ?")
+		stmt, err := dbupdate.Prepare("UPDATE exam_details SET  program_name, cource_name, cource_code, duration, total_marks) where uuid = ?")
 
 		if err != nil {
 			fmt.Println("Failed to Execute Update Query: ", err)
@@ -341,7 +370,7 @@ func Create_Exam(question_in Questions_Construct) bool {
 	result := true
 	create_exam := dbcode.SqlRead().DB
 
-	stmt, err := create_exam.Prepare("insert into exam_questions(uuid, cource_uuid,cource_name, section_A_q,section_b_q,section_a_a, question_number) values(?,?,?,?,?,?,?)")
+	stmt, err := create_exam.Prepare("insert into exam_questions(uuid, section,cource_uuid,cource_name, section_A_q,section_b_q,section_a_a, question_number) values(?,?,?,?,?,?,?)")
 
 	if err != nil {
 		log.Fatal(err)
@@ -350,6 +379,7 @@ func Create_Exam(question_in Questions_Construct) bool {
 	defer stmt.Close()
 
 	uuid := encription.Generateuudi()
+	var section string
 	var cource_uuid string
 	var cource_name string
 	var answer string
@@ -363,12 +393,15 @@ func Create_Exam(question_in Questions_Construct) bool {
 	case "A":
 		cource_name = question_in.Cource_Name
 		cource_uuid = question_in.Cource_UUID
+		section = question_in.Section
 		answer = question_in.Answer
 		question_a = question_in.Question
 		question_b = ""
 		question_number = question_in.Question_Number
 
 	case "B":
+
+		section = question_in.Section
 		cource_name = question_in.Cource_Name
 		cource_uuid = question_in.Cource_UUID
 		answer = question_in.Answer
@@ -378,7 +411,7 @@ func Create_Exam(question_in Questions_Construct) bool {
 
 	}
 
-	_, err = stmt.Exec(uuid, cource_uuid, cource_name, question_a, question_b, answer, question_number)
+	_, err = stmt.Exec(uuid, section, cource_uuid, cource_name, question_a, question_b, answer, question_number)
 
 	if err != nil {
 		log.Fatal(err)
@@ -466,7 +499,7 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 	type ExamOut struct {
 		Present     bool
 		Cource_Data CourceDataStruct
-		ExamData    QuestionsEntered
+		ExamData    []Question_Structure
 	}
 
 	var to_show ExamOut
@@ -477,6 +510,7 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 	if exam_value == "true" {
 
 		result_out := Read_Exam(cource_name_out)
+
 		to_show = ExamOut{
 			Present:     true,
 			Cource_Data: get_program_data,
@@ -510,142 +544,63 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 
 	var template_name string
 	var display_Exam DisplayExam
-	var question_out Displayed
-	var question_displayed []Displayed
-	var open_time_over bool
+
+	// GET VARIABLES FROM ROUTE
 	cource_name := r.URL.Query().Get("cource_name")
 	uuid := r.URL.Query().Get("uuid")
 
-	read_exam, result_out := Read_Exam_Taken(uuid)
+	// VERIFY IF EXAM HAS BEEN ATTEMPTED
+	if_taken, result_out := Read_Exam_Taken(uuid)
 
-	attemped_number := result_out.Attemp_Number
-	comment := result_out.Comment
-	open_period := result_out.Open_Period
-	// first_attempted := result_out.First_Attempted
+	var attemped_number int
+	var comment string
+	var open_period int
+	fmt.Println(comment)
 
+	// CHECK IF STUDENT STILL HAS ATTEMPTS TO WRITE EXAM "START"
+	if if_taken {
+		attemped_number, _ = strconv.Atoi(result_out.Attemp_Number)
+		comment = result_out.Comment
+		open_period, _ = strconv.Atoi(result_out.Open_Period)
+
+	} else {
+		attemped_number = 0
+		comment = ""
+		open_period = 7
+	}
+
+	if attemped_number > 3 || open_period > 7 {
+		template_name = "exam_failed"
+	} else {
+		template_name = "exam_code.html"
+
+	}
+
+	// CHECK IF STUDENT STILL HAS ATTEMPTS TO WRITE EXAM "END"
+
+	// GET EXAM QUESTIONS "START"
 	get_exam_questions := Read_Exam(cource_name)
 
-	section_a := get_exam_questions.Section_A
-	section_b := get_exam_questions.Section_B
+	// GET EXAM QUESTIONS "END"
 
-	questions_count := 0
+	// GET EXAM DETAILS "START"
+	get_exam_details := GetExamDetails(uuid)
 
-	template_name = "exam_complete"
+	display_Exam = DisplayExam{
+		AlreadTaken:    false,
+		Attemp_Number:  attemped_number,
+		ExamData:       get_exam_details,
+		Exam_Questions: get_exam_questions,
+	}
 
-	fmt.Println(template_name)
+	// GET EXAM DETAILS "END"
 
 	//CREATE LIST OF QUESTION FOR STUDENTS
 
-	year := time.Now().Year()
-	month := time.Now().Month()
-	day := time.Now().Day()
-	hour := time.Now().Hour()
-	min := time.Now().Minute()
-
-	first_attemp := fmt.Sprintf("%s,%s,%s,%s,%s", year, month, day, hour, min)
-
-	fmt.Println(first_attemp)
-	t := time.Now()
-	u := time.Date(2020, 5, 16, 20, 45, 34, 0, time.UTC)
-	is_valid := t.Sub(u)
-
-	is_valid.Hours()
-
-	if is_valid > 7 {
-		open_time_over = true
-	} else {
-		open_time_over = false
-	}
-
-	fmt.Println(open_time_over)
-
-	for _, item := range section_a {
-		questions_count++
-
-		question_out = Displayed{
-			Section:        "A",
-			Question:       item.Question,
-			Quesion_number: questions_count,
-		}
-
-		question_displayed = append(question_displayed, question_out)
-
-	}
-
-	for _, item := range section_b {
-		questions_count++
-		question_out = Displayed{
-			Section:        "B",
-			Question:       item.Question,
-			Quesion_number: questions_count,
-		}
-
-		question_displayed = append(question_displayed, question_out)
-	}
-
-	//CULCULATE THE TIME REMANING FROM THE FIRST ATTEMPET
-	attemp_number_out, err := strconv.Atoi(attemped_number)
-	open_period_out, err := strconv.Atoi(open_period)
-
-	date_out := time.Now()
-	// open_period_valid := date_out - open_period_out
-
-	fmt.Println(open_period_out, attemp_number_out, date_out)
+	err := tpl.ExecuteTemplate(w, template_name, display_Exam)
 
 	if err != nil {
-		fmt.Print("String Conv: ", err)
-
-	}
-
-	if read_exam {
-		var print_out_message string
-		var page_data Complition
-
-		if comment == "true" {
-
-			print_out_message = "Congratulations you completed the cources succesfully"
-			page_data = Complition{
-				Logo:    "/assets",
-				Message: print_out_message,
-			}
-
-		} else {
-			if open_time_over {
-				print_out_message = "The grace period allocated for you to retake the exam has expired to retake the exam please contact us for further information"
-
-				page_data = Complition{
-					Logo:    "/assets",
-					Message: print_out_message,
-				}
-
-			}
-			if attemp_number_out > 3 {
-				print_out_message = "Sorry you have exided the attempts given to you to take the exam. For further assistance please contact us fo more information"
-				page_data = Complition{
-					Logo:    "/assets",
-					Message: print_out_message,
-				}
-
-			}
-
-			fmt.Println(page_data)
-
-			fmt.Println(print_out_message)
-
-		}
-
-	} else {
-		display_Exam = DisplayExam{
-			AlreadTaken:    false,
-			ExamData:       get_exam_questions,
-			Exam_Questions: question_displayed,
-		}
-
-		err = tpl.ExecuteTemplate(w, "exam_code.html", display_Exam)
-
-		if err != nil {
-			log.Fatal(err)
-		}
+		log.Fatal(err)
 	}
 
 }
@@ -716,6 +671,26 @@ func Question_Count(uuid string) (bool, string) {
 	fmt.Println("Length of number list: ", len(number_list))
 
 	return present, number
+
+}
+
+func GetExamDetails(courceuuid string) ExamDetails {
+
+	var exam_details ExamDetails
+
+	dbconn := dbcode.SqlRead().DB
+
+	stmt, err := dbconn.Prepare("select  program_name, cource_name, cource_code, duration, total_marks")
+
+	if err != nil {
+		fmt.Println("Prepare Statement failed error out: ", err)
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(courceuuid).Scan(exam_details.Program_Name, exam_details.Cource_Name, exam_details.Cource_Code, exam_details.Exam_Duration, exam_details.Total_Marks)
+
+	return exam_details
 
 }
 
@@ -924,15 +899,6 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type ExamDetails struct {
-	UUID          string
-	Program_Name  string
-	Cource_Name   string
-	Cource_Code   string
-	Exam_Duration int
-	Total_Marks   string
-}
-
 func LoadExamTable() {
 
 	exam_code := dbcode.SqlRead().DB
@@ -957,6 +923,7 @@ func LoadExamTable() {
 	create_exam := `
 		create table if not exists exam_questions(
 		uuid blob not null,
+		section text,
 		cource_uuid text,
 		cource_name text,
 		section_a_q text,

@@ -15,6 +15,27 @@
     
 </head>
 <body>
+    {{ if .AlreadyTaken }}
+        {{ template "write_div" .}}
+
+    {{ else }}
+        {{  template "failed" .}}
+
+    {{ end }}
+
+{{ define "failed"}}
+    <div class = "repeate">
+        <h1>Repeat</h1>
+        <p>Sorry you have run  out of attempts to take exam please contact us to get another opotunity to take the examination</p>
+        <div>
+            <button>Contact</button>
+        </div>
+    </div>
+
+{{ end }}
+
+
+
 {{ define "write_div"}}
     <div class="header"> 
         <div class="timer_div">
