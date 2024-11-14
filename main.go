@@ -92,6 +92,7 @@ func main() {
 	router.HandleFunc("/examdetails", routes.AddExamDetails)
 	router.HandleFunc("/faq", routes.FAQ)
 	router.HandleFunc("/takeexam", routes.TakeExam)
+	router.HandleFunc("/submitexam", routes.SubmitExam)
 
 	//STUDENT PORTAL ROUTES
 	router.HandleFunc("/approvecource", routes.ApproveCource)

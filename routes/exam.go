@@ -115,6 +115,15 @@ type Question_Structure struct {
 	Question        string
 }
 
+func CounterFunc(str string) int {
+	var counter int
+
+	counter = counter + 1
+
+	return counter
+
+}
+
 func ToUpperCase(str string) string {
 
 	return strings.ToUpper(str)
@@ -123,13 +132,8 @@ func ToUpperCase(str string) string {
 func Clean(str string) string {
 
 	str_out := strings.Trim(str, "_")
-	var join_string string
 
-	for item, _ := range str_out {
-		join_string = fmt.Sprintf("%s ", item)
-
-	}
-
+	join_string := fmt.Sprintf(" %s ", str_out)
 	capitalised := ToUpperCase(join_string)
 
 	return capitalised
@@ -726,6 +730,47 @@ func GetExamDetails(courceuuid string) ExamDetails {
 	}
 
 	return exam_details
+
+}
+
+func QuestionCount(cource_uuid string) []string {
+
+	var question_number_list []string
+	dbconn := dbcode.SqlRead().DB
+
+	stmt, err := dbconn.Query("select question_number from exam_questions where cource_name = ?", cource_uuid)
+
+	if err != nil {
+		log.Fatal("Failed to get question number: ", err)
+	}
+
+	var question_number string
+
+	defer stmt.Close()
+
+	for stmt.Next() {
+		err = stmt.Scan(&question_number)
+
+		if err != nil {
+			fmt.Println("failed to query row: ", err)
+			break
+		} else {
+
+			question_number_list = append(question_number_list, question_number)
+		}
+	}
+
+	return question_number_list
+}
+
+func SubmitExam(w http.ResponseWriter, r *http.Request) {
+
+	r.ParseForm()
+
+	student_uuid := r.URL.Query().Get("student_uuid")
+	cource_uuid := r.URL.Query().Get("cource_code")
+
+	fmt.Println(student_uuid, cource_uuid)
 
 }
 

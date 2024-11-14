@@ -95,12 +95,13 @@
         </div>
     </div>
     <div class="write_div">
-        <form hx-post="/exam?cource_code={{ .ExamData.Cource_Code}}&student_uuid={{ .Student_UUID}}">
+        <form hx-post="/submitexam?cource_uuid={{ .ExamData.Cource_UUID}}&student_uuid={{ .Student_UUID}}">
                 {{ template "section_a" .}}
                 {{ template "section_b" .}}
             
             
-            <button class="submit_exam">Submit</button>
+            <button class="submit_exam" style="margin-bottom: 30px;">Submit</button>
+
         </form>
 
     </div>
@@ -151,35 +152,35 @@
 
 {{ define "section_a"}}
 
-    <p>SECTION A</p>
-    <p>
+    <p style="font-weight: bold;">SECTION A</p>
+    <p style="font-weight: bold;">
         ANSWER ALL THE QUESTIONS IN THIS SECTION, QUESTION 1 TO 20 CARRIES ONE MARK.
         KINDLY NOTE THAT WRONG ANSWER WILL RESULT IN THE DEDUCTION OF A MARK
     </p>
     {{ range .Exam_Questions }}
 
-    {{ if eq .Section "A"}}
-        <div>
-            <p class="section_question">{{ .Question}}</p>
-            <label for="true">True</label>
-            <input type="radio" name="{{ .Question_Number}}" value="true">
-            <label for="false">False</label>
-            <input type="radio" name="{{ .Question_Number}}" value="false">
-        </div>
-    {{ end }}
+        {{ if eq .Section "A"}}
+            <div>
+                <p class="section_question">{{ .Question_Number}}. {{ .Question}}</p>
+                <label for="true" style="font-weight: bold; padding: 10px">True</label>
+                <input type="radio" name="{{ .Question_Number}}" value="true">
+                <label for="false" style="font-weight: bold;">False</label>
+                <input type="radio" name="{{ .Question_Number}}" value="false">
+            </div>
+        {{ end }}
 
     {{ end }}
 {{ end }}
 
 {{ define "section_b"}}
-    <p>SECTION B</p>
-    <p>Answer THREE questions only</p>
+    <p  style="font-weight: bold;">SECTION B</p>
+    <p  style="font-weight: bold;">Answer THREE questions only</p>
 
     {{ range .Exam_Questions }}
 
         {{ if eq .Section "B"}}
             <div>
-                <p class="section_question">{{ .Question}}</p>
+                <p class="section_question">{{ .Question_Number}}.{{ .Question}}</p>
                 <textarea name="{{ .Question_Number }}"  name="{{ .Question_Number}}" class="section_b_answer" ></textarea>
                 
             </div>
