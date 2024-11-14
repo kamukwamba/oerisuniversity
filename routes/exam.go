@@ -61,8 +61,9 @@ type QuestionsEntered struct {
 }
 
 type DisplayExam struct {
-	AlreadTaken    bool
-	Attemp_Number  int ``
+	AlreadyTaken   bool
+	Student_UUID   string
+	Attempt_Number int ``
 	ExamData       ExamDetails
 	Exam_Questions []Question_Structure
 }
@@ -106,6 +107,32 @@ type Exam_Details struct {
 	Cource_Code  string
 	Duration     string
 	Total_Marks  string
+}
+
+type Question_Structure struct {
+	Section         string
+	Question_Number string
+	Question        string
+}
+
+func ToUpperCase(str string) string {
+
+	return strings.ToUpper(str)
+}
+
+func Clean(str string) string {
+
+	str_out := strings.Trim(str, "_")
+	var join_string string
+
+	for item, _ := range str_out {
+		join_string = fmt.Sprintf("%s ", item)
+
+	}
+
+	capitalised := ToUpperCase(join_string)
+
+	return capitalised
 }
 
 func Listify(question_a, question_b string) ([]QuestionStruct, []QuestionStruct) {
@@ -180,22 +207,16 @@ func Listify(question_a, question_b string) ([]QuestionStruct, []QuestionStruct)
 	return question_list_a, question_list_b
 }
 
-type Question_Structure struct {
-	Section         string
-	Question_Number string
-	Question        string
-}
-
-func Read_Exam(cource_name string) []Question_Structure {
+func Read_Exam(cource_name string) ([]Question_Structure, string) {
 
 	get_exam := dbcode.SqlRead().DB
 	var question_structure Question_Structure
 	var question_structure_list []Question_Structure
 
-	stmt, err := get_exam.Query("select uuid,section, cource_uuid,cource_name,section_a_q,section_b_q, section_a_a,question_number from exam_questions where cource_name = ?", cource_name)
+	stmt, err := get_exam.Query("select uuid, section, cource_uuid,cource_name,section_a_q,section_b_q, question_number from exam_questions where cource_name = ?", cource_name)
 
 	if err != nil {
-		log.Fatal()
+		log.Fatal("Failed to get exam questions: ", err)
 	}
 
 	var uuid string
@@ -245,7 +266,7 @@ func Read_Exam(cource_name string) []Question_Structure {
 		log.Fatal(err)
 	}
 
-	return question_structure_list
+	return question_structure_list, cource_uuid
 
 }
 
@@ -370,10 +391,10 @@ func Create_Exam(question_in Questions_Construct) bool {
 	result := true
 	create_exam := dbcode.SqlRead().DB
 
-	stmt, err := create_exam.Prepare("insert into exam_questions(uuid, section,cource_uuid,cource_name, section_A_q,section_b_q,section_a_a, question_number) values(?,?,?,?,?,?,?)")
+	stmt, err := create_exam.Prepare("insert into exam_questions(uuid, section,cource_uuid,cource_name, section_A_q,section_b_q,section_a_a, question_number) values(?,?,?,?,?,?,?,?)")
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to entere exam", err)
 	}
 
 	defer stmt.Close()
@@ -509,7 +530,7 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 
 	if exam_value == "true" {
 
-		result_out := Read_Exam(cource_name_out)
+		result_out, _ := Read_Exam(cource_name_out)
 
 		to_show = ExamOut{
 			Present:     true,
@@ -540,7 +561,12 @@ type Complition struct {
 
 func TakeExam(w http.ResponseWriter, r *http.Request) {
 
-	tpl = template.Must(template.ParseGlob("templates/*.html"))
+	funcMap := template.FuncMap{
+		"ToCapital": ToUpperCase,
+		"Clean":     Clean,
+	}
+
+	tpl = template.Must(template.New("exam_code.html").Funcs(funcMap).ParseGlob("templates/*.html"))
 
 	var template_name string
 	var display_Exam DisplayExam
@@ -563,6 +589,8 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 		comment = result_out.Comment
 		open_period, _ = strconv.Atoi(result_out.Open_Period)
 
+		fmt.Println(comment)
+
 	} else {
 		attemped_number = 0
 		comment = ""
@@ -579,16 +607,18 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 	// CHECK IF STUDENT STILL HAS ATTEMPTS TO WRITE EXAM "END"
 
 	// GET EXAM QUESTIONS "START"
-	get_exam_questions := Read_Exam(cource_name)
+	get_exam_questions, cource_uuid_out := Read_Exam(cource_name)
 
 	// GET EXAM QUESTIONS "END"
 
 	// GET EXAM DETAILS "START"
-	get_exam_details := GetExamDetails(uuid)
+
+	get_exam_details := GetExamDetails(cource_uuid_out)
 
 	display_Exam = DisplayExam{
-		AlreadTaken:    false,
-		Attemp_Number:  attemped_number,
+		AlreadyTaken:   false,
+		Student_UUID:   uuid,
+		Attempt_Number: attemped_number,
 		ExamData:       get_exam_details,
 		Exam_Questions: get_exam_questions,
 	}
@@ -678,17 +708,22 @@ func GetExamDetails(courceuuid string) ExamDetails {
 
 	var exam_details ExamDetails
 
+	fmt.Println("The Cource Code Search: ", courceuuid, ":")
 	dbconn := dbcode.SqlRead().DB
 
-	stmt, err := dbconn.Prepare("select  program_name, cource_name, cource_code, duration, total_marks")
+	stmt, err := dbconn.Prepare("select  program_name, cource_name, cource_code, duration, total_marks from exam_details where cource_uuid = ?")
 
 	if err != nil {
-		fmt.Println("Prepare Statement failed error out: ", err)
+		fmt.Println("Prepare Statement failed  in 'GetExamDetails' error out : ", err)
 	}
 
 	defer stmt.Close()
 
-	err = stmt.QueryRow(courceuuid).Scan(exam_details.Program_Name, exam_details.Cource_Name, exam_details.Cource_Code, exam_details.Exam_Duration, exam_details.Total_Marks)
+	err = stmt.QueryRow(courceuuid).Scan(&exam_details.Program_Name, &exam_details.Cource_Name, &exam_details.Cource_Code, &exam_details.Exam_Duration, &exam_details.Total_Marks)
+
+	if err != nil {
+		fmt.Println("Failed to get program details: ", err)
+	}
 
 	return exam_details
 

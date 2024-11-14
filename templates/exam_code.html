@@ -16,10 +16,11 @@
 </head>
 <body>
     {{ if .AlreadyTaken }}
-        {{ template "write_div" .}}
+        {{  template "failed" .}}
+        
 
     {{ else }}
-        {{  template "failed" .}}
+        {{ template "write_div" .}}
 
     {{ end }}
 
@@ -46,36 +47,29 @@
                 <tbody>
                     <tr>
                         <th class="title">Program</th>
-                        <td>{{ .Program_Name}}</td>
+                        <td>{{ .ExamData.Program_Name}}</td>
                     </tr>
                     <tr>
                         <th class="title">Cource Name</th>
-                        <td>{{ .Cource_Name}}</td>
+                        <td>{{ .ExamData.Cource_Name}}</td>
 
                     </tr>
                     <tr>
                         <th class="title">Cource Code</th>
-                        <td>{{ .Cource_Code}}</td>
-                    </tr>
-                    <tr>
-                        <th class="title">Date</th>
-                        <td>{{ .Date}}</td>
-                    </tr>
-                    <tr>
-                        <th class="title">Start Time</th>
-                        <td>{{ .Start_Time}}</td>
-                    </tr>
-                    <tr>
-                        <th class="title">Submision Time</th>
-                        <td>{{ .Submision_Time}}</td>
+                        <td>{{ .ExamData.Cource_Code }}</td>
                     </tr>
                     <tr>
                         <th class="title">Duration</th>
-                        <td>{{ .Cource_Code}}</td>
+                        <td>{{ .ExamData.Exam_Duration}}min</td>
                     </tr>
+                
                     <tr>
                         <th class="title">Total  Marks</th>
-                        <td>{{ .Total_Marks}}</td>
+                        <td>{{ .ExamData.Total_Marks}}</td>
+                    </tr>
+                    <tr>
+                        <th class="title">Attempt Number</th>
+                        <td>{{ .Attempt_Number}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -101,12 +95,10 @@
         </div>
     </div>
     <div class="write_div">
-        <form hx-post="/exam?cource_code={{ .Cource_Code}}&student_uuid={{ .Student_UUID}}">
-            {{ if .Section "A"}}
+        <form hx-post="/exam?cource_code={{ .ExamData.Cource_Code}}&student_uuid={{ .Student_UUID}}">
                 {{ template "section_a" .}}
-            {{ else }}
                 {{ template "section_b" .}}
-            {{ end }}
+            
             
             <button class="submit_exam">Submit</button>
         </form>
@@ -164,12 +156,17 @@
         ANSWER ALL THE QUESTIONS IN THIS SECTION, QUESTION 1 TO 20 CARRIES ONE MARK.
         KINDLY NOTE THAT WRONG ANSWER WILL RESULT IN THE DEDUCTION OF A MARK
     </p>
-    {{ range .Questiions_A }}
-    <div>
-        <p class="section_question">{{ .Question_Section_A}}</p>
-        <input type="radio" name="{{ .Question_Number}}" value="true">
-        <input type="radio" name="{{ .Question_Number}}" value="false">
-    </div>
+    {{ range .Exam_Questions }}
+
+    {{ if eq .Section "A"}}
+        <div>
+            <p class="section_question">{{ .Question}}</p>
+            <label for="true">True</label>
+            <input type="radio" name="{{ .Question_Number}}" value="true">
+            <label for="false">False</label>
+            <input type="radio" name="{{ .Question_Number}}" value="false">
+        </div>
+    {{ end }}
 
     {{ end }}
 {{ end }}
@@ -178,12 +175,15 @@
     <p>SECTION B</p>
     <p>Answer THREE questions only</p>
 
-    {{ range .Questions_B}}
-    <div>
-        <p class="section_question">{{ .Question_Section_B}}</p>
-        <textarea name="{{ .Question_Number}}" class="section_b_answer" ></textarea>
-        
-    </div>
+    {{ range .Exam_Questions }}
+
+        {{ if eq .Section "B"}}
+            <div>
+                <p class="section_question">{{ .Question}}</p>
+                <textarea name="{{ .Question_Number }}"  name="{{ .Question_Number}}" class="section_b_answer" ></textarea>
+                
+            </div>
+        {{ end }}
     {{ end }}
 
 {{ end }}

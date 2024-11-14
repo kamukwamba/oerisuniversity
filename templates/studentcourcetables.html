@@ -37,7 +37,7 @@
                         <td><a hx-post="/handinassesment?cource_name={{ .Cource_Name}}&student_uuid={{ .Student_UUID}}"
                                 hx-target="#hidden"
                                 hx-swap="outerHTML">Send</a></td>
-                        <td><a href="/takeexam?cource_name={{ .Cource_Name}}">Write</a></td>
+                        <td><a href="/takeexam?cource_name={{ .Cource_Name}}&uuid={{ .Student_UUID}}">Write</a></td>
                         <td><a href="/takeexam?cource_name={{.Cource_Name}}&uuid={{ .Student_UUID}}">Exam</a></td>
                         
                         <td id="approval">
