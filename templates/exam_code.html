@@ -95,12 +95,13 @@
         </div>
     </div>
     <div class="write_div">
-        <form hx-post="/submitexam?cource_uuid={{ .ExamData.Cource_UUID}}&student_uuid={{ .Student_UUID}}">
+        <p>The Cource{{ .Cource_UUIDOut}}</p>
+        <form action="/submitexam?cource_uuid={{.Cource_UUIDOut}}&student_uuid={{ .Student_UUID}}" method="post">
                 {{ template "section_a" .}}
                 {{ template "section_b" .}}
             
             
-            <button class="submit_exam" style="margin-bottom: 30px;">Submit</button>
+            <button  type="submit" class="submit_exam" style="margin-bottom: 30px;">Submit</button>
 
         </form>
 

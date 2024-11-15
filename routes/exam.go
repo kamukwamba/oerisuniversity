@@ -63,6 +63,7 @@ type QuestionsEntered struct {
 type DisplayExam struct {
 	AlreadyTaken   bool
 	Student_UUID   string
+	Cource_UUIDOut string
 	Attempt_Number int ``
 	ExamData       ExamDetails
 	Exam_Questions []Question_Structure
@@ -617,11 +618,14 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 
 	// GET EXAM DETAILS "START"
 
+	fmt.Println("The Cource UUID is: ", cource_uuid_out)
+
 	get_exam_details := GetExamDetails(cource_uuid_out)
 
 	display_Exam = DisplayExam{
 		AlreadyTaken:   false,
 		Student_UUID:   uuid,
+		Cource_UUIDOut: cource_uuid_out,
 		Attempt_Number: attemped_number,
 		ExamData:       get_exam_details,
 		Exam_Questions: get_exam_questions,
@@ -671,6 +675,8 @@ func Question_Count(uuid string) (bool, string) {
 	var number string
 	var number_list []string
 	var last_number string
+
+	fmt.Println("The UUID ENTERED: ", uuid)
 
 	stmt, err := dbcounter.Query("SELECT question_number  FROM exam_questions WHERE cource_uuid = ?", uuid)
 
@@ -738,7 +744,7 @@ func QuestionCount(cource_uuid string) []string {
 	var question_number_list []string
 	dbconn := dbcode.SqlRead().DB
 
-	stmt, err := dbconn.Query("select question_number from exam_questions where cource_name = ?", cource_uuid)
+	stmt, err := dbconn.Query("select question_number from exam_questions where cource_uuid = ?", cource_uuid)
 
 	if err != nil {
 		log.Fatal("Failed to get question number: ", err)
@@ -753,12 +759,14 @@ func QuestionCount(cource_uuid string) []string {
 
 		if err != nil {
 			fmt.Println("failed to query row: ", err)
-			break
 		} else {
 
 			question_number_list = append(question_number_list, question_number)
 		}
+		fmt.Println("Number: ", question_number)
 	}
+
+	fmt.Println("The numbers: ", question_number_list)
 
 	return question_number_list
 }
@@ -768,9 +776,37 @@ func SubmitExam(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 	student_uuid := r.URL.Query().Get("student_uuid")
-	cource_uuid := r.URL.Query().Get("cource_code")
+	cource_uuid := r.URL.Query().Get("cource_uuid")
 
-	fmt.Println(student_uuid, cource_uuid)
+	fmt.Println("Cource_UUID: ", cource_uuid)
+	out_now, question_number := Question_Count(cource_uuid)
+	var question_count int
+	question_count, err := strconv.Atoi(question_number)
+
+	if err != nil {
+		fmt.Println("Failed to convert string out: ", err)
+	}
+	name := 1
+
+	for name < (question_count + 1) {
+
+		quest_name := fmt.Sprintf("%s", name)
+
+		answer_out := r.FormValue(quest_name)
+
+		fmt.Println("The Answers: ", answer_out)
+
+	}
+
+	fmt.Println(out_now, question_number)
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	err = tpl.ExecuteTemplate(w, "examtaken.html", student_uuid)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }
 
