@@ -164,9 +164,9 @@
             <div>
                 <p class="section_question">{{ .Question_Number}}. {{ .Question}}</p>
                 <label for="true" style="font-weight: bold; padding: 10px">True</label>
-                <input type="radio" name="{{ .Question_Number}}" value="true">
+                <input type="radio" name="{{ .Question_UUID}}" value="true">
                 <label for="false" style="font-weight: bold;">False</label>
-                <input type="radio" name="{{ .Question_Number}}" value="false">
+                <input type="radio" name="{{ .Question_UUID}}" value="false">
             </div>
         {{ end }}
 
@@ -182,7 +182,7 @@
         {{ if eq .Section "B"}}
             <div>
                 <p class="section_question">{{ .Question_Number}}.{{ .Question}}</p>
-                <textarea name="{{ .Question_Number }}"  name="{{ .Question_Number}}" class="section_b_answer" ></textarea>
+                <textarea name="{{ .Question_Number }}"  name="{{ .Question_UUID}}" class="section_b_answer" ></textarea>
                 
             </div>
         {{ end }}

@@ -112,6 +112,7 @@ type Exam_Details struct {
 
 type Question_Structure struct {
 	Section         string
+	Question_UUID   string
 	Question_Number string
 	Question        string
 }
@@ -245,6 +246,7 @@ func Read_Exam(cource_name string) ([]Question_Structure, string) {
 			if section == "A" {
 				question_structure = Question_Structure{
 					Section:         section,
+					Question_UUID:   uuid,
 					Question_Number: question_number,
 					Question:        section_a,
 				}
@@ -254,6 +256,7 @@ func Read_Exam(cource_name string) ([]Question_Structure, string) {
 			} else if section == "B" {
 				question_structure = Question_Structure{
 					Section:         section,
+					Question_UUID:   uuid,
 					Question_Number: question_number,
 					Question:        section_b,
 				}
@@ -739,36 +742,42 @@ func GetExamDetails(courceuuid string) ExamDetails {
 
 }
 
-func QuestionCount(cource_uuid string) []string {
+func QuestionUUID(cource_uuid string) []string {
 
-	var question_number_list []string
-	dbconn := dbcode.SqlRead().DB
+	dbcounter := dbcode.SqlRead().DB
 
-	stmt, err := dbconn.Query("select question_number from exam_questions where cource_uuid = ?", cource_uuid)
+	var uuid_list []string
+	var question_uuid string
+
+	fmt.Println("The UUID ENTERED: ", cource_uuid)
+
+	stmt, err := dbcounter.Query("SELECT uuid  FROM exam_questions WHERE cource_uuid = ?", cource_uuid)
 
 	if err != nil {
-		log.Fatal("Failed to get question number: ", err)
-	}
+		fmt.Println("failed to work properly", err)
 
-	var question_number string
+	}
 
 	defer stmt.Close()
 
 	for stmt.Next() {
-		err = stmt.Scan(&question_number)
-
+		err = stmt.Scan(&question_uuid)
 		if err != nil {
 			fmt.Println("failed to query row: ", err)
+			break
 		} else {
+			uuid_list = append(uuid_list, question_uuid)
 
-			question_number_list = append(question_number_list, question_number)
 		}
-		fmt.Println("Number: ", question_number)
+
 	}
 
-	fmt.Println("The numbers: ", question_number_list)
+	if err = stmt.Err(); err != nil {
+		fmt.Println("stmt scan failed, error out: ", err)
+	}
 
-	return question_number_list
+	return uuid_list
+
 }
 
 func SubmitExam(w http.ResponseWriter, r *http.Request) {
@@ -779,30 +788,35 @@ func SubmitExam(w http.ResponseWriter, r *http.Request) {
 	cource_uuid := r.URL.Query().Get("cource_uuid")
 
 	fmt.Println("Cource_UUID: ", cource_uuid)
-	out_now, question_number := Question_Count(cource_uuid)
-	var question_count int
-	question_count, err := strconv.Atoi(question_number)
 
-	if err != nil {
-		fmt.Println("Failed to convert string out: ", err)
-	}
-	name := 1
+	question_uuids := QuestionUUID(cource_uuid)
 
-	for name < (question_count + 1) {
+	fmt.Println(question_uuids)
 
-		quest_name := fmt.Sprintf("%s", name)
-
-		answer_out := r.FormValue(quest_name)
-
-		fmt.Println("The Answers: ", answer_out)
-
+	type Answer_Out struct {
+		Cource_UUID     string
+		Qustion_UUID    string
+		Question_Number string
+		Question        string
+		Answer          string
 	}
 
-	fmt.Println(out_now, question_number)
+	var store_answer []Answer_Out
+	question_number := 1
+
+	for _, item := range question_uuids {
+
+		answer := r.FormValue(item)
+		fmt.Println(answer)
+		question_number = question_number + 1
+
+	}
+
+	fmt.Println(store_answer)
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err = tpl.ExecuteTemplate(w, "examtaken.html", student_uuid)
+	err := tpl.ExecuteTemplate(w, "examtaken.html", student_uuid)
 
 	if err != nil {
 		log.Fatal(err)
