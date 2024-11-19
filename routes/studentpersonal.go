@@ -392,6 +392,51 @@ type VideoDisplay struct {
 	VideoList []VideoStruct
 }
 
+func DeleteStudentExam(cource_uuid string) {
+
+}
+
+func RetrieveStudentExam(cource_uuid string) {
+
+}
+
+func RecordStudentMarks(student_uuid string) {
+
+}
+
+func MakeStudentExamTable(student_uuid string) {
+	dbconn := dbcode.SqlRead().DB
+
+	create_table := fmt.Sprintf(`create table if not exists %s(
+		uuid blob not null,
+
+		cource_uuid text,
+		student_uuid text,
+		question_number text,
+		question text,
+		answer text,
+	)`, student_uuid)
+
+	stmt, err := dbconn.Prepare(create_table)
+
+	if err != nil {
+		fmt.Println("Failed to create table: ", err)
+	}
+
+	_, err = stmt.Exec(create_table)
+
+	if err != nil {
+		fmt.Println("Failed to load table: ", err)
+	}
+
+	if err != nil {
+		fmt.Println("Failed to create student exam answer table: ", err)
+	}
+
+	defer stmt.Close()
+
+}
+
 func WatcVideo(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))

@@ -780,6 +780,24 @@ func QuestionUUID(cource_uuid string) []string {
 
 }
 
+type QuestionData struct {
+	Questuon_UUID   string
+	Question        string
+	Question_Number string
+}
+
+func GetQuestionData(question_uuid string) QuestionData {
+
+	var question_data QuestionData
+
+	dbconn := dbcode.SqlRead().DB
+
+	stmt, err := dbconn.Prepare("select uuid, sec")
+
+	return question_data
+
+}
+
 func SubmitExam(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
@@ -816,7 +834,7 @@ func SubmitExam(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err := tpl.ExecuteTemplate(w, "examtaken.html", student_uuid)
+	err := tpl.ExecuteTemplate(w, "exam_taken.html", student_uuid)
 
 	if err != nil {
 		log.Fatal(err)
