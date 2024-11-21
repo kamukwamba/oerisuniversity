@@ -396,12 +396,32 @@ func DeleteStudentExam(cource_uuid string) {
 
 }
 
-func RetrieveStudentExam(cource_uuid string) {
+func RetrieveStudentExam(cource_uuid, student_uuid string) {
 
 }
 
-func RecordStudentMarks(student_uuid string) {
+func RecordStudentMarks(student_answers Answer_Out) bool {
+	dbconn := dbcode.SqlRead().DB
 
+	saved := true
+
+	uuid := encription.Generateuudi()
+	prepare_statment := fmt.Sprintf("insert into %s (uuid, cource_uuid, student_uuid, question_number, question, answer) values(?,?,?,?,?,?)", student_answers.Student_UUID)
+	stmt, err := dbconn.Prepare(prepare_statment)
+
+	if err != nil {
+		fmt.Println("Failed to prepare create statment:  ", err)
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(uuid, student_answers.Cource_UUID, student_answers.Student_UUID, student_answers.Question_Number, student_answers.Question, student_answers.Answer)
+
+	if err != nil {
+		fmt.Println("Failed to save exam answers: ", err)
+	}
+
+	return saved
 }
 
 func MakeStudentExamTable(student_uuid string) {

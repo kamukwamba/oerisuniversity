@@ -60,6 +60,35 @@ type QuestionsEntered struct {
 	Date            string
 }
 
+type Questions_Out struct {
+	Section_A []QuestionStruct
+	Section_B []QuestionStruct
+}
+
+type Answer_Out struct {
+	Cource_UUID     string
+	Student_UUID    string
+	Qustion_UUID    string
+	Question_Number string
+	Question        string
+	Answer          string
+}
+
+type Questions_Construct struct {
+	UUID            string
+	Section         string
+	Cource_UUID     string
+	Cource_Name     string
+	Question        string
+	Answer          string
+	Question_Number int
+}
+
+type CreateExamResponse struct {
+	Details_Messages string
+	Questions        Questions_Construct
+}
+
 type DisplayExam struct {
 	AlreadyTaken   bool
 	Student_UUID   string
@@ -219,7 +248,7 @@ func Read_Exam(cource_name string) ([]Question_Structure, string) {
 	var question_structure Question_Structure
 	var question_structure_list []Question_Structure
 
-	stmt, err := get_exam.Query("select uuid, section, cource_uuid,cource_name,section_a_q,section_b_q, question_number from exam_questions where cource_name = ?", cource_name)
+	stmt, err := get_exam.Query("select uuid, section, cource_uuid,cource_name,question, question_number from exam_questions where cource_name = ?", cource_name)
 
 	if err != nil {
 		log.Fatal("Failed to get exam questions: ", err)
@@ -229,14 +258,13 @@ func Read_Exam(cource_name string) ([]Question_Structure, string) {
 	var section string
 	var cource_uuid string
 	var cource_name_out string
-	var section_a string
-	var section_b string
+	var question string
 	var question_number string
 
 	defer stmt.Close()
 
 	for stmt.Next() {
-		err = stmt.Scan(&uuid, &section, &cource_uuid, &cource_name_out, &section_a, &section_b, &question_number)
+		err = stmt.Scan(&uuid, &section, &cource_uuid, &cource_name_out, &question, &question_number)
 
 		if err != nil {
 			fmt.Println("failed to query row: ", err)
@@ -248,7 +276,7 @@ func Read_Exam(cource_name string) ([]Question_Structure, string) {
 					Section:         section,
 					Question_UUID:   uuid,
 					Question_Number: question_number,
-					Question:        section_a,
+					Question:        question,
 				}
 
 				question_structure_list = append(question_structure_list, question_structure)
@@ -258,7 +286,7 @@ func Read_Exam(cource_name string) ([]Question_Structure, string) {
 					Section:         section,
 					Question_UUID:   uuid,
 					Question_Number: question_number,
-					Question:        section_b,
+					Question:        question,
 				}
 				question_structure_list = append(question_structure_list, question_structure)
 
@@ -277,7 +305,36 @@ func Read_Exam(cource_name string) ([]Question_Structure, string) {
 	return question_structure_list, cource_uuid
 
 }
+func Grade_Exam(w http.ResponseWriter, r *http.Request) {
 
+	student_uuid := r.URL.Query().Get("student_uuid")
+	cource_name := r.URL.Query().Get("cource_name")
+
+	dbconn := dbcode.SqlRead().DB
+
+	var cource_uuid string
+
+	stmt, err := dbconn.Prepare("selecte cource_uuid from from questions where cource_name = ?")
+
+	if err != nil {
+		fmt.Println("Failed to initialize prepare statement: ", err)
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(cource_name).Scan(&cource_uuid)
+
+	if err != nil {
+		fmt.Println("Failed to create prapare statement: ", err)
+	}
+
+	defer stmt.Close()
+
+	RetrieveStudentExam(cource_uuid, student_uuid)
+
+	fmt.Println(student_uuid, cource_name)
+
+}
 func Update_Exam_Details(details Exam_Details) (bool, string) {
 	present := true
 	update_msg := "Exam details updated successfully"
@@ -399,7 +456,7 @@ func Create_Exam(question_in Questions_Construct) bool {
 	result := true
 	create_exam := dbcode.SqlRead().DB
 
-	stmt, err := create_exam.Prepare("insert into exam_questions(uuid, section,cource_uuid,cource_name, section_A_q,section_b_q,section_a_a, question_number) values(?,?,?,?,?,?,?,?)")
+	stmt, err := create_exam.Prepare("insert into exam_questions(uuid, section,cource_uuid,cource_name,question,answer, question_number) values(?,?,?,?,?,?,?)")
 
 	if err != nil {
 		log.Fatal("Failed to entere exam", err)
@@ -412,8 +469,7 @@ func Create_Exam(question_in Questions_Construct) bool {
 	var cource_uuid string
 	var cource_name string
 	var answer string
-	var question_a string
-	var question_b string
+	var question string
 	var question_number int
 
 	section_enter := question_in.Section
@@ -424,8 +480,7 @@ func Create_Exam(question_in Questions_Construct) bool {
 		cource_uuid = question_in.Cource_UUID
 		section = question_in.Section
 		answer = question_in.Answer
-		question_a = question_in.Question
-		question_b = ""
+		question = question_in.Question
 		question_number = question_in.Question_Number
 
 	case "B":
@@ -434,13 +489,12 @@ func Create_Exam(question_in Questions_Construct) bool {
 		cource_name = question_in.Cource_Name
 		cource_uuid = question_in.Cource_UUID
 		answer = question_in.Answer
-		question_a = ""
-		question_b = question_in.Question
+		question = question_in.Question
 		question_number = question_in.Question_Number
 
 	}
 
-	_, err = stmt.Exec(uuid, section, cource_uuid, cource_name, question_a, question_b, answer, question_number)
+	_, err = stmt.Exec(uuid, section, cource_uuid, cource_name, question, answer, question_number)
 
 	if err != nil {
 		log.Fatal(err)
@@ -650,26 +704,6 @@ func CheckFoRCource(uuid, question string) {
 
 }
 
-type Questions_Out struct {
-	Section_A []QuestionStruct
-	Section_B []QuestionStruct
-}
-
-type Questions_Construct struct {
-	UUID            string
-	Section         string
-	Cource_UUID     string
-	Cource_Name     string
-	Question        string
-	Answer          string
-	Question_Number int
-}
-
-type CreateExamResponse struct {
-	Details_Messages string
-	Questions        Questions_Construct
-}
-
 func Question_Count(uuid string) (bool, string) {
 
 	dbcounter := dbcode.SqlRead().DB
@@ -781,7 +815,7 @@ func QuestionUUID(cource_uuid string) []string {
 }
 
 type QuestionData struct {
-	Questuon_UUID   string
+	Question_UUID   string
 	Question        string
 	Question_Number string
 }
@@ -792,7 +826,19 @@ func GetQuestionData(question_uuid string) QuestionData {
 
 	dbconn := dbcode.SqlRead().DB
 
-	stmt, err := dbconn.Prepare("select uuid, sec")
+	stmt, err := dbconn.Prepare("select uuid, question, question_number from exam_questions where uuid = ?")
+
+	if err != nil {
+		fmt.Println("Failed to get qustin data, error text: ", err)
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(question_uuid).Scan(&question_data.Question_UUID, &question_data.Question, &question_data.Question_Number)
+
+	if err != nil {
+		fmt.Println("Failed to get question data", err)
+	}
 
 	return question_data
 
@@ -809,24 +855,25 @@ func SubmitExam(w http.ResponseWriter, r *http.Request) {
 
 	question_uuids := QuestionUUID(cource_uuid)
 
-	fmt.Println(question_uuids)
-
-	type Answer_Out struct {
-		Cource_UUID     string
-		Qustion_UUID    string
-		Question_Number string
-		Question        string
-		Answer          string
-	}
-
 	var store_answer []Answer_Out
-	question_number := 1
 
 	for _, item := range question_uuids {
 
 		answer := r.FormValue(item)
-		fmt.Println(answer)
-		question_number = question_number + 1
+		data_out := GetQuestionData(item)
+
+		answer_out := Answer_Out{
+			Cource_UUID:     cource_uuid,
+			Student_UUID:    student_uuid,
+			Qustion_UUID:    item,
+			Question_Number: data_out.Question_Number,
+			Question:        data_out.Question,
+			Answer:          answer,
+		}
+
+		saved := RecordStudentMarks(answer_out)
+
+		fmt.Println(saved)
 
 	}
 
@@ -1074,9 +1121,8 @@ func LoadExamTable() {
 		section text,
 		cource_uuid text,
 		cource_name text,
-		section_a_q text,
-		section_b_q text,
-		section_a_a text,
+		question text,
+		answer text,
 		question_number int)`
 
 	_, create_exam_error := exam_code.Exec(create_exam)

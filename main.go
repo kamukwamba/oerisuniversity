@@ -57,7 +57,7 @@ func main() {
 	router.HandleFunc("/deletemessage", routes.DeleteMessageRouter)
 	router.HandleFunc("/getstudentdata", routes.ChangeStudentPassword)
 	router.HandleFunc("/updtestudentpassword", routes.ChangePassword)
-
+	router.HandleFunc("/grade_exam", routes.Grade_Exam)
 	router.HandleFunc("/closeupdatedata", routes.CloseUpdateData)
 	//ADMIN DASHBOARD
 	router.HandleFunc("/confirmlogin", routes.ConfirmStudentLogin) //STUDENT LOGIN CODE
