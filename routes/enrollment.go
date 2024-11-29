@@ -306,6 +306,7 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 				}
 				CreateStudentCridentials(studentcridentials)
 				AddStudentPrograms(uuid, program_name)
+				MakeStudentExamTable(uuid)
 
 			} else {
 				fmt.Println("Problem with adding student to acams")

@@ -427,30 +427,38 @@ func RecordStudentMarks(student_answers Answer_Out) bool {
 func MakeStudentExamTable(student_uuid string) {
 	dbconn := dbcode.SqlRead().DB
 
+	new_name := strings.Split(student_uuid, "-")
+
+	new_string := ""
+
+	for _, item := range new_name {
+		new_string = new_string + item
+	}
+
+	fmt.Println("The New String Out: ", new_string)
+
 	create_table := fmt.Sprintf(`create table if not exists %s(
 		uuid blob not null,
-
 		cource_uuid text,
 		student_uuid text,
 		question_number text,
 		question text,
-		answer text,
-	)`, student_uuid)
+		answer text)`, new_string)
 
 	stmt, err := dbconn.Prepare(create_table)
 
 	if err != nil {
-		fmt.Println("Failed to create table: ", err)
+		fmt.Println("Failed to create table error_one::: ", err)
 	}
 
-	_, err = stmt.Exec(create_table)
+	_, err = stmt.Exec()
 
 	if err != nil {
-		fmt.Println("Failed to load table: ", err)
+		fmt.Println("Failed to load table error_two: ", err)
 	}
 
 	if err != nil {
-		fmt.Println("Failed to create student exam answer table: ", err)
+		fmt.Println("Failed to create student exam answer table error_three: ", err)
 	}
 
 	defer stmt.Close()
