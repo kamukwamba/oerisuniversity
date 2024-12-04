@@ -34,11 +34,13 @@
                         <td><a href="/getmaterial?cource_name={{.Cource_Name}}&material_name=book">Recommended Book</a></td>
                         <td><a href="/getmaterial?cource_name={{ .Cource_Name}}&material_name=module">Module</a></td>
                         <td> <a class = "watch_video_link" href="/watchvideo?cource_name={{ .Cource_Name}}">Watch</a></td>
-                        <td><a hx-post="/handinassesment?cource_name={{ .Cource_Name}}&student_uuid={{ .Student_UUID}}"
-                                hx-target="#hidden"
-                                hx-swap="outerHTML">Send</a></td>
+                        <td ><a  
+                            data-hx-post="/handinassesment?cource_name={{ .Cource_Name}}&student_uuid={{ .Student_UUID}}"
+                            hx-target="#mainpage"
+                            hx-swap="innerHTML">Open</a></td>
+
                         <td><a href="/takeexam?cource_name={{ .Cource_Name}}&uuid={{ .Student_UUID}}">Write</a></td>
-                        <td><a href="/takeexam?cource_name={{.Cource_Name}}&uuid={{ .Student_UUID}}">Exam</a></td>
+                        <td><a href="/takeexam?cource_name={{.Cource_Name}}&uuid={{ .Student_UUID}}">Results</a></td>
                         
                         <td id="approval">
                         {{ template "cource_approved"}}
@@ -54,7 +56,7 @@
                         <td>Book</td>
                         <td>Modul</td>
                         <td> <a>Watch</a></td>
-                        <td><a href="#">Write</a></td>
+                        <td><a>Write</a></td>
                         <td>Pedding</td>
                         <td>Pedding</td>
                         

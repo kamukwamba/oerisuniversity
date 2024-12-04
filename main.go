@@ -112,6 +112,8 @@ func main() {
 
 	router.HandleFunc("/login", routes.LoginPage)
 	router.HandleFunc("/handinassesment", routes.HandInAssesment)
+	router.HandleFunc("/grade_assesment", routes.GradeAssesment)
+	router.HandleFunc("/deleteassesmentresults", routes.DeleteAssesmentAdmin)
 
 	//LOAD ASSETS
 	router.Handle("/assets/", http.StripPrefix("/assets", fs))

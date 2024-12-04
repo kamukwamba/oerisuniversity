@@ -251,7 +251,7 @@ func CloseCreateCourseData(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	fmt.Println("Close Cource Create")
+	fmt.Println("The close div template called")
 
 	err := tpl.ExecuteTemplate(w, "cource_data_close", nil)
 

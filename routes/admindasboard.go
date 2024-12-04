@@ -485,16 +485,6 @@ func CloseAdmintDiv(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CloseAssesmentDiv(w http.ResponseWriter, r *http.Request) {
-	tpl = template.Must(template.ParseGlob("templates/*.html"))
-
-	err := tpl.ExecuteTemplate(w, "student_cource_assesment", nil)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func ACAMSStudentData(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 

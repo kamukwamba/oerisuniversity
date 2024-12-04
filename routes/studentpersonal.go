@@ -400,6 +400,18 @@ func RetrieveStudentExam(cource_uuid, student_uuid string) {
 
 }
 
+func CloseAssesmentDiv(w http.ResponseWriter, r *http.Request) {
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	fmt.Println("close button pressed")
+
+	err := tpl.ExecuteTemplate(w, "empty_div", nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func RecordStudentMarks(student_answers Answer_Out) bool {
 	dbconn := dbcode.SqlRead().DB
 
@@ -503,15 +515,4 @@ func WatcVideo(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-}
-
-func HandInAssesment(w http.ResponseWriter, r *http.Request) {
-
-	tpl = template.Must(template.ParseGlob("templates/*.html"))
-
-	err := tpl.ExecuteTemplate(w, "student_cource_assesment", nil)
-
-	if err != nil {
-		log.Fatal(err)
-	}
 }

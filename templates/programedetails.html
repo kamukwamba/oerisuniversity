@@ -47,10 +47,12 @@
         <div class="cource_data" id="cource_data">
     
         </div>
+
+        
     </div>
     
     {{ define "cource_data_close"}}
-        <div class="cource_data" id="cource_data">
+        <div class="cource_data" style="display: none;">
     
         </div>
     {{ end }}
@@ -62,8 +64,8 @@
         <div class="close_div">
             <button class="download"
             hx-post="/close_cource_div"  
-            hx-target="#cource_data_table_tr"
-            hx-swap="beforeend">X</button>
+            hx-target="#cource_data"
+            hx-swap="outerHTML">X</button>
 
         
         </div>
@@ -119,9 +121,9 @@
         <div class="create_cource_div" id="create_cource_div">
             <div class="close_div">
                 <button class="download"
-                hx-post="/close_cource_div"  
-                hx-target="#cource_data_table_tr"
-                hx-swap="beforeend">X</button>
+                hx-get="/close_cource_div"  
+                hx-target="#create_cource_div"
+                hx-swap="outerHTML">X</button>
     
             
             </div>
