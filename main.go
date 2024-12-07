@@ -34,6 +34,7 @@ func main() {
 	routes.LoadCource()
 	routes.LoadExamTable()
 	routes.LoadAdminUsers()
+	routes.LoadAssesmentTable()
 
 	fmt.Println("::SERVER STARTED::")
 

@@ -333,6 +333,36 @@ func GetMaterial(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func GetLink(cource_name, material_type string) string {
+	dbconn := dbcode.SqlRead().DB
+
+	var link_name string
+	query_statement := fmt.Sprintf("select %s from cource_table where cource_name = ?", material_type)
+	stmt, err := dbconn.Prepare(query_statement)
+
+	if err != nil {
+		fmt.Println("Prepare statment failed ", err)
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(cource_name).Scan(&link_name)
+
+	fmt.Println(query_statement, stmt, err)
+
+	return link_name
+}
+
+func GetStudyMaterial(w http.ResponseWriter, r *http.Request) {
+
+	material_type := r.URL.Query().Get("item_name")
+	cource_name := r.URL.Query().Get("cource_name")
+
+	link_out := GetLink(cource_name, material_type)
+
+	http.Redirect(w, r, link_out, http.StatusSeeOther)
+}
+
 func AddCourceData(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()

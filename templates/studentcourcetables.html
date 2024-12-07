@@ -31,13 +31,13 @@
                     <tr>
                         <td></td>
                         <td>{{ .Cource_Name}}</td>
-                        <td><a href="/getmaterial?cource_name={{.Cource_Name}}&material_name=book">Recommended Book</a></td>
-                        <td><a href="/getmaterial?cource_name={{ .Cource_Name}}&material_name=module">Module</a></td>
+                        <td><a href="/getmaterial?cource_name={{.Cource_Name}}&material_type=recomended_book">Recommended Book</a></td>
+                        <td><a href="/getmaterial?cource_name={{ .Cource_Name}}&material_type=module">Module</a></td>
                         <td> <a class = "watch_video_link" href="/watchvideo?cource_name={{ .Cource_Name}}">Watch</a></td>
                         <td ><a  
                             data-hx-post="/handinassesment?cource_name={{ .Cource_Name}}&student_uuid={{ .Student_UUID}}"
                             hx-target="#mainpage"
-                            hx-swap="innerHTML">Open</a></td>
+                            hx-swap="innerHTML" style="cursor: pointer;">Open</a></td>
 
                         <td><a href="/takeexam?cource_name={{ .Cource_Name}}&uuid={{ .Student_UUID}}">Write</a></td>
                         <td><a href="/takeexam?cource_name={{.Cource_Name}}&uuid={{ .Student_UUID}}">Results</a></td>

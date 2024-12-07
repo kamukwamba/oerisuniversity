@@ -4,16 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/assets/css/cource_assesment.css">
 </head>
 <body>
 
-    {{ define student_cource_assesment}}
+    {{ define "student_cource_assesment"}}
 
         <div class="assesment_box">
     
             <h2 style="text-align: center;">Cource Name</h2>
 
+            
             <table class="assesment_table" style="margin: auto;">
                 <thead>
 
@@ -26,17 +26,18 @@
 
                 <tbody>
 
-                <tr>
-                    <td>1</td>
-                    <td>60</td>
-                    <td>Passed</td>
-                </tr>
+                    {{ range .AssesmentList}}
 
-                <tr>
-                    <td>1</td>
-                    <td>60</td>
-                    <td>Passed</td>
-                </tr>
+                        <tr>
+                            <td>{{ .Assesment_Title }}</td>
+                            <td>{{ .Grade}}</td>
+                            <td>{{ .Comment }}</td>
+                
+                        </tr>
+
+                    {{ end }}
+
+                
             </tbody>
 
             </table>
@@ -51,16 +52,6 @@
 
     {{ end }}
 
-    {{ define "table_row"}}
-
-        <tr>
-            <td>{{ .Assesment_Title }}</td>
-            <td>{{ .Grade}}</td>
-            <td>{{ Comment }}</td>
-
-        </tr>
-
-    {{ end }}
 
 
 

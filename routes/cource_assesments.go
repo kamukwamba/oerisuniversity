@@ -148,7 +148,7 @@ func DeleteAssesmentAdmin(w http.ResponseWriter, r *http.Request) {
 
 // ASSESMEENT TABLE
 
-func CreateAssesmentTable() {
+func LoadAssesmentTable() {
 	dbconn := dbcode.SqlRead().DB
 
 	defer dbconn.Close()

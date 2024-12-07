@@ -6,7 +6,7 @@
 }
 
 .assesment_box{
-    height: 40vh;
+    height: 50vh;
     position: relative;
     width: 70vw;
     background-color: white;
@@ -14,7 +14,7 @@
     border-radius: 5px;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 10px;
+    margin-top: 50px;
     box-sizing: border-box;
     margin-bottom: 10px;
     padding: 20px;
@@ -216,11 +216,13 @@ table th{
 
 th, tr{
     border-bottom: 1px solid gray;
+    cursor: pointer;
 }
 
 tr td{
     width: 150px;
     text-align: center;
+    cursor: pointer;
 }
 
 table tr:nth-child(even) a{
