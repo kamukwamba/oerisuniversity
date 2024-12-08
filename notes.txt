@@ -8,6 +8,8 @@ background for los=wer div
 updae still not working
 
 
+Func map is in exam_template
+
 
 Links
 [<a href="https://www.flaticon.com/free-icons/question" title="question icons">Question icons created by Freepik - Flaticon</a>, <a href="https://www.flaticon.com/free-icons/question" title="question icons">Question icons created by Freepik - Flaticon</a>]

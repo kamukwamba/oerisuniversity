@@ -336,8 +336,12 @@ func GetMaterial(w http.ResponseWriter, r *http.Request) {
 func GetLink(cource_name, material_type string) string {
 	dbconn := dbcode.SqlRead().DB
 
+	fmt.Println("THE MATERIAL TYPE", material_type)
+
 	var link_name string
 	query_statement := fmt.Sprintf("select %s from cource_table where cource_name = ?", material_type)
+
+	fmt.Println("The Query string: ", query_statement)
 	stmt, err := dbconn.Prepare(query_statement)
 
 	if err != nil {
@@ -355,7 +359,8 @@ func GetLink(cource_name, material_type string) string {
 
 func GetStudyMaterial(w http.ResponseWriter, r *http.Request) {
 
-	material_type := r.URL.Query().Get("item_name")
+	fmt.Println("Route Has Been Hit")
+	material_type := r.URL.Query().Get("material_type")
 	cource_name := r.URL.Query().Get("cource_name")
 
 	link_out := GetLink(cource_name, material_type)
