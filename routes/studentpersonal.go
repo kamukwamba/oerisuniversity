@@ -388,8 +388,10 @@ type VideoStruct struct {
 }
 
 type VideoDisplay struct {
-	MainVideo VideoStruct
-	VideoList []VideoStruct
+	Present     bool
+	Cource_Name string
+	MainVideo   VideoStruct
+	VideoList   []VideoStruct
 }
 
 func DeleteStudentExam(cource_uuid string) {
@@ -417,8 +419,10 @@ func RecordStudentMarks(student_answers Answer_Out) bool {
 
 	saved := true
 
+	table_name := CleanStudentUUID(student_answers.Student_UUID)
+
 	uuid := encription.Generateuudi()
-	prepare_statment := fmt.Sprintf("insert into %s (uuid, cource_uuid, student_uuid, question_number, question, answer) values(?,?,?,?,?,?)", student_answers.Student_UUID)
+	prepare_statment := fmt.Sprintf("insert into %s (uuid, cource_uuid, student_uuid, question_number, question, answer) values(?,?,?,?,?,?)", table_name)
 	stmt, err := dbconn.Prepare(prepare_statment)
 
 	if err != nil {
@@ -436,18 +440,24 @@ func RecordStudentMarks(student_answers Answer_Out) bool {
 	return saved
 }
 
-func MakeStudentExamTable(student_uuid string) {
-	dbconn := dbcode.SqlRead().DB
+func CleanStudentUUID(uuid string) string {
 
-	new_name := strings.Split(student_uuid, "-")
+	new_uuid := strings.Split(uuid, "-")
 
 	new_string := ""
 
-	for _, item := range new_name {
+	for _, item := range new_uuid {
 		new_string = new_string + item
 	}
 
-	fmt.Println("The New String Out: ", new_string)
+	return new_string
+}
+
+func MakeStudentExamTable(student_uuid string) {
+
+	dbconn := dbcode.SqlRead().DB
+
+	new_string := CleanStudentUUID(student_uuid)
 
 	create_table := fmt.Sprintf(`create table if not exists %s(
 		uuid blob not null,
@@ -480,32 +490,49 @@ func MakeStudentExamTable(student_uuid string) {
 func WatcVideo(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
+	var videos_present bool
 
-	videopath := r.URL.Query().Get("cource_name")
-	fmt.Println(videopath)
+	cource_name := r.URL.Query().Get("cource_name")
+	fmt.Println(cource_name)
 
-	video_list := GetCourceMaterial(videopath, "video")
-
-	fmt.Println(video_list)
+	video_list := GetCourceMaterial(cource_name, "video")
 
 	video_list_out := strings.Split(video_list, ",")
+
+	if len(video_list) >= 1 {
+		videos_present = true
+
+	} else {
+		videos_present = false
+	}
 
 	var video_link VideoStruct
 
 	var all_videos []VideoStruct
+	var AllVidoes VideoDisplay
 
-	for _, item := range video_list_out {
-		video_link = VideoStruct{
-			Video: item,
+	if videos_present {
+		for _, item := range video_list_out {
+			video_link = VideoStruct{
+				Video: item,
+			}
+
+			all_videos = append(all_videos, video_link)
+
 		}
 
-		all_videos = append(all_videos, video_link)
+		AllVidoes = VideoDisplay{
+			Present:     true,
+			Cource_Name: cource_name,
+			MainVideo:   all_videos[0],
+			VideoList:   all_videos,
+		}
 
-	}
-
-	AllVidoes := VideoDisplay{
-		MainVideo: all_videos[0],
-		VideoList: all_videos,
+	} else {
+		AllVidoes = VideoDisplay{
+			Present:     false,
+			Cource_Name: cource_name,
+		}
 	}
 
 	err := tpl.ExecuteTemplate(w, "videos.html", AllVidoes)

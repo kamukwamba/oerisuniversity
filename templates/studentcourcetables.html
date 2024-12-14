@@ -19,8 +19,7 @@
                 <th>Download Module</th>
                 <th>Video</th>
                 <th>Cources Assesment</th>
-                <th>Take Exam</th>
-                <th>Result</th>
+                <th>Exam</th>
                 <th>Approval</th>
             </tr>
             </thead>
@@ -33,6 +32,7 @@
                         <td>{{ .Cource_Name}}</td>
                         <td><a href="/getstudymaterial?cource_name={{.Cource_Name}}&material_type=recomended_book">Recommended Book</a></td>
                         <td><a href="/getstudymaterial?cource_name={{ .Cource_Name}}&material_type=module">Module</a></td>
+                        
                         <td> <a class = "watch_video_link" href="/watchvideo?cource_name={{ .Cource_Name}}">Watch</a></td>
                         <td ><a  
                             data-hx-post="/handinassesment?cource_name={{ .Cource_Name}}&student_uuid={{ .Student_UUID}}"
@@ -40,8 +40,6 @@
                             hx-swap="innerHTML" style="cursor: pointer;">Open</a></td>
 
                         <td><a href="/takeexam?cource_name={{ .Cource_Name}}&uuid={{ .Student_UUID}}">Write</a></td>
-                        <td><a href="/takeexam?cource_name={{.Cource_Name}}&uuid={{ .Student_UUID}}">Results</a></td>
-                        
                         <td id="approval">
                         {{ template "cource_approved"}}
                         </td>
@@ -57,7 +55,6 @@
                         <td>Modul</td>
                         <td> <a>Watch</a></td>
                         <td><a>Write</a></td>
-                        <td>Pedding</td>
                         <td>Pedding</td>
                         
                         <td id="approval">

@@ -82,7 +82,7 @@ func UpdateProgramDetails(w http.ResponseWriter, r *http.Request) {
 
 	update := dbcode.SqlRead().DB
 
-	stmt, err := update.Prepare("UPDATE cource_table SET(program_name = ?, cource_name = ? , cource_assesment, video_list,module,recomended_book, exam_file) where uuid = ? ")
+	stmt, err := update.Prepare("UPDATE cource_table SET program_name = ?, cource_name = ? , cource_assesmentv = ?, video_list = ?,module = ?,recomended_book = ?, exam_file = ? where uuid = ? ")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -263,34 +263,8 @@ func CloseCreateCourseData(w http.ResponseWriter, r *http.Request) {
 func GetCourceMaterial(cource_name, material_name string) string {
 	material_out := dbcode.SqlRead().DB
 	var link_out string
-	if material_name == "module" {
-		stmt, err := material_out.Prepare("select module from cource_table where cource_name = ?")
 
-		if err != nil {
-			fmt.Println("not working")
-		}
-
-		defer stmt.Close()
-
-		err = stmt.QueryRow(cource_name).Scan(&link_out)
-		if err != nil {
-			fmt.Println("failed to get module")
-		}
-
-	} else if material_name == "book" {
-		stmt, err := material_out.Prepare("select recomended_book from cource_table where cource_name = ?")
-
-		if err != nil {
-			fmt.Println("not working")
-		}
-
-		defer stmt.Close()
-
-		err = stmt.QueryRow(cource_name).Scan(&link_out)
-		if err != nil {
-			fmt.Println("failed to get books")
-		}
-	} else if material_name == "video" {
+	if material_name == "video" {
 		stmt, err := material_out.Prepare("select video_list from cource_table where cource_name = ?")
 
 		if err != nil {
@@ -309,30 +283,6 @@ func GetCourceMaterial(cource_name, material_name string) string {
 
 }
 
-func GetMaterial(w http.ResponseWriter, r *http.Request) {
-
-	tpl = template.Must(template.ParseGlob("templates/*.html"))
-
-	var data_out string
-
-	cource_name := r.URL.Query().Get("cource_name")
-	material_name := r.URL.Query().Get("material_name")
-
-	switch material_name {
-	case "book":
-		data_out = GetCourceMaterial(cource_name, material_name)
-	case "module":
-		data_out = GetCourceMaterial(cource_name, material_name)
-
-	}
-	err := tpl.ExecuteTemplate(w, "cource_data_close", data_out)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-}
-
 func GetLink(cource_name, material_type string) string {
 	dbconn := dbcode.SqlRead().DB
 
@@ -341,7 +291,7 @@ func GetLink(cource_name, material_type string) string {
 	var link_name string
 	query_statement := fmt.Sprintf("select %s from cource_table where cource_name = ?", material_type)
 
-	fmt.Println("The Query string: ", query_statement)
+	fmt.Println("The Query string: ", query_statement, "Cource Name: ", cource_name)
 	stmt, err := dbconn.Prepare(query_statement)
 
 	if err != nil {
@@ -352,7 +302,9 @@ func GetLink(cource_name, material_type string) string {
 
 	err = stmt.QueryRow(cource_name).Scan(&link_name)
 
-	fmt.Println(query_statement, stmt, err)
+	if err != nil {
+		fmt.Println("Query Failed: ", err)
+	}
 
 	return link_name
 }

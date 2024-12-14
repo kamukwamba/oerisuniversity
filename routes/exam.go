@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 	"github.com/kamukwamba/oerisuniversity/encription"
@@ -90,12 +91,15 @@ type CreateExamResponse struct {
 }
 
 type DisplayExam struct {
-	AlreadyTaken   bool
-	Student_UUID   string
-	Cource_UUIDOut string
-	Attempt_Number int ``
-	ExamData       ExamDetails
-	Exam_Questions []Question_Structure
+	AlreadyTaken      bool
+	Student_UUID      string
+	Qusetions_Present bool
+	Cource_UUIDOut    string
+	Attempt_Number    int ``
+	ExamData          ExamDetails
+	Exam_Questions    []Question_Structure
+	Cource_Name_Two   string
+	Writen_UUID       string
 }
 
 type ExamStructOut struct {
@@ -126,7 +130,9 @@ type ExamTakenStruct struct {
 	Answers         string
 	Grade           string
 	Date            string
+	Completed       string
 	Comment         string
+	Passed          string
 }
 
 type Exam_Details struct {
@@ -242,8 +248,9 @@ func Listify(question_a, question_b string) ([]QuestionStruct, []QuestionStruct)
 	return question_list_a, question_list_b
 }
 
-func Read_Exam(cource_name string) ([]Question_Structure, string) {
+func Read_Exam(cource_name string) ([]Question_Structure, string, bool) {
 
+	questions_present := true
 	get_exam := dbcode.SqlRead().DB
 	var question_structure Question_Structure
 	var question_structure_list []Question_Structure
@@ -252,6 +259,7 @@ func Read_Exam(cource_name string) ([]Question_Structure, string) {
 
 	if err != nil {
 		log.Fatal("Failed to get exam questions: ", err)
+		questions_present = false
 	}
 
 	var uuid string
@@ -302,7 +310,7 @@ func Read_Exam(cource_name string) ([]Question_Structure, string) {
 		log.Fatal(err)
 	}
 
-	return question_structure_list, cource_uuid
+	return question_structure_list, cource_uuid, questions_present
 
 }
 func Grade_Exam(w http.ResponseWriter, r *http.Request) {
@@ -528,27 +536,48 @@ func Delete_Exam(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func Read_Exam_Taken(uuid string) (bool, ExamTakenStruct) {
+func Read_Exam_Taken(uuid, cource_name string) (bool, ExamTakenStruct) {
 
-	exam_taken := true
+	exam_taken := false
 
 	var examout ExamTakenStruct
 
-	check_if_exam_taken := dbcode.SqlRead().DB
+	check_e_taken := dbcode.SqlRead().DB
 
-	stmt, err := check_if_exam_taken.Prepare("select uuid, student_uuid, attemp_number, first_attempted, open_period,answers,grade,comment,date from write_exam where student_uuid = ?")
+	stmt, err := check_e_taken.Query("select * from write_exam")
 
 	if err != nil {
+		fmt.Println("failed to query")
 		exam_taken = false
 	}
 
 	defer stmt.Close()
 
-	err = stmt.QueryRow(uuid).Scan(&examout.UUID, &examout.Student_UUID, &examout.Attemp_Number, &examout.First_Attempted, &examout.Open_Period, &examout.Answers, &examout.Grade, &examout.Comment, &examout.Date)
+	for stmt.Next() {
+		err = stmt.Scan(&examout.UUID, &examout.Cource_Name, &examout.Student_UUID, &examout.Attemp_Number, &examout.First_Attempted, &examout.Open_Period, &examout.Grade, &examout.Comment, &examout.Passed, &examout.Date)
+
+		uuid_out := &examout.Student_UUID
+		cource_name_out := &examout.Cource_Name
+
+		if err != nil {
+			fmt.Println("Error OUT: ", err)
+		}
+
+		fmt.Println(examout)
+
+		if *uuid_out == uuid && *cource_name_out == cource_name {
+
+			fmt.Println(examout)
+			exam_taken = true
+			break
+		}
+	}
 
 	if err != nil {
 		exam_taken = false
 	}
+
+	fmt.Println(examout)
 
 	return exam_taken, examout
 
@@ -592,7 +621,7 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 
 	if exam_value == "true" {
 
-		result_out, _ := Read_Exam(cource_name_out)
+		result_out, _, _ := Read_Exam(cource_name_out)
 
 		to_show = ExamOut{
 			Present:     true,
@@ -628,48 +657,65 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 		"Clean":     Clean,
 	}
 
-	tpl = template.Must(template.New("exam_code.html").Funcs(funcMap).ParseGlob("templates/*.html"))
+	var display_number int
+
+	t := template.New("").Funcs(funcMap)
+
+	tpl = template.Must(t.ParseGlob("templates/*.html"))
 
 	var template_name string
-	var display_Exam DisplayExam
 
 	// GET VARIABLES FROM ROUTE
 	cource_name := r.URL.Query().Get("cource_name")
 	uuid := r.URL.Query().Get("uuid")
 
 	// VERIFY IF EXAM HAS BEEN ATTEMPTED
-	if_taken, result_out := Read_Exam_Taken(uuid)
+	if_taken, result_out := Read_Exam_Taken(uuid, cource_name)
+
+	fmt.Println("Exam Has Been Taken: ", if_taken)
 
 	var attemped_number int
-	var comment string
+	var write_exam_uuid string
 	var open_period int
-	fmt.Println(comment)
+	var passed string
 
 	// CHECK IF STUDENT STILL HAS ATTEMPTS TO WRITE EXAM "START"
 	if if_taken {
 		attemped_number, _ = strconv.Atoi(result_out.Attemp_Number)
-		comment = result_out.Comment
+		write_exam_uuid = result_out.UUID
+		passed = result_out.Passed
 		open_period, _ = strconv.Atoi(result_out.Open_Period)
 
-		fmt.Println(comment)
+		if passed == "true" {
+			template_name = "exam_passed"
+			display_number = 2
+
+		} else if passed == "false" || passed == "" {
+			if attemped_number > 3 || open_period > 7 {
+				template_name = "exam_failed.html"
+				display_number = 3
+			} else {
+				template_name = "exam_code.html"
+				display_number = 1
+				UpdateExamTaken(uuid, cource_name)
+
+			}
+
+		}
 
 	} else {
 		attemped_number = 0
-		comment = ""
 		open_period = 7
-	}
-
-	if attemped_number > 3 || open_period > 7 {
-		template_name = "exam_failed"
-	} else {
 		template_name = "exam_code.html"
+		display_number = 1
+		UpdateExamTaken(uuid, cource_name)
 
 	}
 
 	// CHECK IF STUDENT STILL HAS ATTEMPTS TO WRITE EXAM "END"
 
 	// GET EXAM QUESTIONS "START"
-	get_exam_questions, cource_uuid_out := Read_Exam(cource_name)
+	get_exam_questions, cource_uuid_out, questiions_present := Read_Exam(cource_name)
 
 	// GET EXAM QUESTIONS "END"
 
@@ -679,24 +725,48 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 
 	get_exam_details := GetExamDetails(cource_uuid_out)
 
-	display_Exam = DisplayExam{
-		AlreadyTaken:   false,
-		Student_UUID:   uuid,
-		Cource_UUIDOut: cource_uuid_out,
-		Attempt_Number: attemped_number,
-		ExamData:       get_exam_details,
-		Exam_Questions: get_exam_questions,
+	cource_name_out := cource_name
+
+	if display_number == 1 {
+		display_data := DisplayExam{
+			AlreadyTaken:      false,
+			Qusetions_Present: questiions_present,
+			Student_UUID:      uuid,
+			Cource_UUIDOut:    cource_uuid_out,
+			Attempt_Number:    attemped_number,
+			ExamData:          get_exam_details,
+			Exam_Questions:    get_exam_questions,
+			Cource_Name_Two:   cource_name_out,
+			Writen_UUID:       write_exam_uuid,
+		}
+
+		err := tpl.ExecuteTemplate(w, template_name, display_data)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	} else if display_number == 2 {
+
+		display_data := result_out
+
+		err := tpl.ExecuteTemplate(w, template_name, display_data)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	} else if display_number == 3 {
+		err := tpl.ExecuteTemplate(w, template_name, uuid)
+
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	// GET EXAM DETAILS "END"
 
 	//CREATE LIST OF QUESTION FOR STUDENTS
-
-	err := tpl.ExecuteTemplate(w, template_name, display_Exam)
-
-	if err != nil {
-		log.Fatal(err)
-	}
 
 }
 
@@ -844,6 +914,96 @@ func GetQuestionData(question_uuid string) QuestionData {
 
 }
 
+func SubTwoDay(date_two string) int64 {
+
+	date_now := time.Now()
+	date_t := strings.Split(date_two, ".")
+
+	var days_out int64
+
+	year_out := date_now.Year()
+	month_out := date_now.Month()
+	day_out := date_now.Day()
+
+	year_t, _ := strconv.Atoi(date_t[0])
+	month_t, _ := strconv.Atoi(date_t[1])
+	day_t, _ := strconv.Atoi(date_t[2])
+
+	form_day_one := time.Date(year_out, month_out, day_out, 0, 0, 0, 0, time.UTC)
+
+	form_day_two := time.Date(year_t, time.Month(month_t), day_t, 0, 0, 0, 0, time.UTC)
+
+	difference := form_day_one.Sub(form_day_two)
+
+	days_out = int64(difference.Hours() / 24)
+	return days_out
+}
+
+func UpdateExamTaken(student_uuid, cource_name string) bool {
+
+	updated := true
+	dbconn := dbcode.SqlRead().DB
+	uuid := encription.Generateuudi()
+
+	allready_taken, data_out := Read_Exam_Taken(student_uuid, cource_name)
+
+	if allready_taken {
+
+		attemp_number := data_out.Attemp_Number
+		uuid_out := data_out.UUID
+
+		attemp_number_out, _ := strconv.Atoi(attemp_number)
+		attempt_out := attemp_number_out + 1
+		attempt_string := strconv.Itoa(attempt_out)
+
+		stmt, err := dbconn.Prepare("UPDATE write_exam SET attemp_number = ? WHERE uuid = ?")
+
+		// update_string := fmt.Sprintf("Update write_exam SET(attemp_number = ?) where uuid = %s ", uuid_out)
+
+		// fmt.Println("The Update String: ", update_string, ": ")
+		// _, err := dbconn.Exec(update_string, attempt_string)
+
+		if err != nil {
+			fmt.Println("Failed to update write exam::::: ", err)
+		}
+
+		defer stmt.Close()
+
+		_, err = stmt.Exec(attempt_string, uuid_out)
+
+		if err != nil {
+			fmt.Println("Failed to update write exam two::::: ", err)
+		}
+
+	} else {
+
+		attemped_number := 1
+		first_attempted := time.Now().Format("2017.09.07")
+		open_period := 7
+		grade := ""
+		comment := ""
+		passed := ""
+		date := time.Now().Format("2017.09.07")
+
+		stmt, err := dbconn.Prepare("insert into write_exam(uuid, student_uuid, cource_name,attemp_number, first_attempted, open_period,grade,comment,passed, date) values(?,?,?,?,?,?,?,?,?,?)")
+
+		if err != nil {
+			fmt.Println("Failed to insert into write_exam one: ", err)
+		}
+
+		defer stmt.Close()
+
+		_, err = stmt.Exec(uuid, student_uuid, cource_name, attemped_number, first_attempted, open_period, grade, comment, passed, date)
+
+		if err != nil {
+			fmt.Println("Failed to insert into write_exam two:", err)
+		}
+
+	}
+
+	return updated
+}
+
 func SubmitExam(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
@@ -871,9 +1031,7 @@ func SubmitExam(w http.ResponseWriter, r *http.Request) {
 			Answer:          answer,
 		}
 
-		saved := RecordStudentMarks(answer_out)
-
-		fmt.Println(saved)
+		RecordStudentMarks(answer_out)
 
 	}
 
@@ -1138,10 +1296,9 @@ func LoadExamTable() {
 		attemp_number int,
 		first_attempted int,
 		open_period int,
-		answers text,
 		grade text,
 		comment text,
-		completed  text,
+		passed bool,
 		date text
 		)`
 
