@@ -16,7 +16,7 @@
 </head>
 <body>
     {{ if .AlreadyTaken }}
-        {{  template "failed" .}}
+        
         
 
     {{ else }}
@@ -104,7 +104,7 @@
     </div>
     <div class="write_div">
        
-        <form action="/submitexam?cource_uuid={{.Cource_UUIDOut}}&student_uuid={{ .Student_UUID}}&cource_name={{ .Cource_Name_Two}}" method="POST">
+        <form action="/submitexam?cource_uuid={{.Cource_UUIDOut}}&student_uuid={{ .Student_UUID}}&cource_name={{ .Cource_Name_Two}}&attempt_out = {{ .Attempt_Out}}" method="POST">
                 {{ template "section_a" .}}
                 {{ template "section_b" .}}
 
@@ -196,7 +196,7 @@
         {{ if eq .Section "B"}}
             <div>
                 <p class="section_question">{{ .Question_Number}}.{{ .Question}}</p>
-                <textarea name="{{ .Question_Number }}"  name="{{ .Question_UUID}}" class="section_b_answer" ></textarea>
+                <textarea name="{{ .Question_Number }}"  name="{{ .Question_UUID}}" class="section_b_answer" style="padding: 10px;"></textarea>
                 
             </div>
         {{ end }}

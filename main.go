@@ -21,8 +21,6 @@ func Enviroment(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	fs := http.FileServer(http.Dir("assets"))
-
 	//LOAD DATA TABLES
 	dbcode.LoadDB()
 
@@ -58,8 +56,8 @@ func main() {
 	router.HandleFunc("/deletemessage", routes.DeleteMessageRouter)
 	router.HandleFunc("/getstudentdata", routes.ChangeStudentPassword)
 	router.HandleFunc("/updtestudentpassword", routes.ChangePassword)
-	router.HandleFunc("/grade_exam", routes.Grade_Exam)
 	router.HandleFunc("/closeupdatedata", routes.CloseUpdateData)
+
 	//ADMIN DASHBOARD
 	router.HandleFunc("/confirmlogin", routes.ConfirmStudentLogin) //STUDENT LOGIN CODE
 	router.HandleFunc("/acamsstudentdata", routes.ACAMSStudentData)
@@ -94,6 +92,7 @@ func main() {
 	router.HandleFunc("/faq", routes.FAQ)
 	router.HandleFunc("/takeexam", routes.TakeExam)
 	router.HandleFunc("/submitexam", routes.SubmitExam)
+	// router.HandleFunc("/grade_exam", routes.GradeExam)
 
 	//STUDENT PORTAL ROUTES
 	router.HandleFunc("/approvecource", routes.ApproveCource)
@@ -117,7 +116,9 @@ func main() {
 	router.HandleFunc("/deleteassesmentresults", routes.DeleteAssesmentAdmin)
 
 	//LOAD ASSETS
-	router.Handle("/assets/", http.StripPrefix("/assets", fs))
+
+	fs := http.FileServer(http.Dir("assets"))
+	router.Handle("/assets/", http.StripPrefix("/assets/", fs))
 
 	//RUN SERVER
 	port := os.Getenv("PORT")

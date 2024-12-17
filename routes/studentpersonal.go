@@ -398,10 +398,6 @@ func DeleteStudentExam(cource_uuid string) {
 
 }
 
-func RetrieveStudentExam(cource_uuid, student_uuid string) {
-
-}
-
 func CloseAssesmentDiv(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
@@ -422,7 +418,7 @@ func RecordStudentMarks(student_answers Answer_Out) bool {
 	table_name := CleanStudentUUID(student_answers.Student_UUID)
 
 	uuid := encription.Generateuudi()
-	prepare_statment := fmt.Sprintf("insert into %s (uuid, cource_uuid, student_uuid, question_number, question, answer) values(?,?,?,?,?,?)", table_name)
+	prepare_statment := fmt.Sprintf("insert into %s (uuid, cource_uuid, cource_name,student_uuid, question_number, question, attempt_number,answer) values(?,?,?,?,?,?,?,?)", table_name)
 	stmt, err := dbconn.Prepare(prepare_statment)
 
 	if err != nil {
@@ -431,7 +427,7 @@ func RecordStudentMarks(student_answers Answer_Out) bool {
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(uuid, student_answers.Cource_UUID, student_answers.Student_UUID, student_answers.Question_Number, student_answers.Question, student_answers.Answer)
+	_, err = stmt.Exec(uuid, student_answers.Cource_UUID, student_answers.Cource_Name, student_answers.Student_UUID, student_answers.Question_Number, student_answers.Question, student_answers.Attemp_Number, student_answers.Answer)
 
 	if err != nil {
 		fmt.Println("Failed to save exam answers: ", err)
@@ -462,9 +458,11 @@ func MakeStudentExamTable(student_uuid string) {
 	create_table := fmt.Sprintf(`create table if not exists %s(
 		uuid blob not null,
 		cource_uuid text,
+		cource_name text,
 		student_uuid text,
 		question_number text,
 		question text,
+		attempt_number text,
 		answer text)`, new_string)
 
 	stmt, err := dbconn.Prepare(create_table)

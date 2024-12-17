@@ -69,8 +69,10 @@ type Questions_Out struct {
 type Answer_Out struct {
 	Cource_UUID     string
 	Student_UUID    string
+	Cource_Name     string
 	Qustion_UUID    string
 	Question_Number string
+	Attemp_Number   string
 	Question        string
 	Answer          string
 }
@@ -100,6 +102,7 @@ type DisplayExam struct {
 	Exam_Questions    []Question_Structure
 	Cource_Name_Two   string
 	Writen_UUID       string
+	Attempt_Out       string
 }
 
 type ExamStructOut struct {
@@ -150,6 +153,17 @@ type Question_Structure struct {
 	Question_UUID   string
 	Question_Number string
 	Question        string
+}
+
+type Complition struct {
+	Logo    string
+	Message string
+}
+
+type TakeExamStruct struct {
+	Taken         bool
+	ExamTaken     QuestionsEntered
+	TakensResults ExamTakenStruct
 }
 
 func CounterFunc(str string) int {
@@ -313,36 +327,7 @@ func Read_Exam(cource_name string) ([]Question_Structure, string, bool) {
 	return question_structure_list, cource_uuid, questions_present
 
 }
-func Grade_Exam(w http.ResponseWriter, r *http.Request) {
 
-	student_uuid := r.URL.Query().Get("student_uuid")
-	cource_name := r.URL.Query().Get("cource_name")
-
-	dbconn := dbcode.SqlRead().DB
-
-	var cource_uuid string
-
-	stmt, err := dbconn.Prepare("selecte cource_uuid from from questions where cource_name = ?")
-
-	if err != nil {
-		fmt.Println("Failed to initialize prepare statement: ", err)
-	}
-
-	defer stmt.Close()
-
-	err = stmt.QueryRow(cource_name).Scan(&cource_uuid)
-
-	if err != nil {
-		fmt.Println("Failed to create prapare statement: ", err)
-	}
-
-	defer stmt.Close()
-
-	RetrieveStudentExam(cource_uuid, student_uuid)
-
-	fmt.Println(student_uuid, cource_name)
-
-}
 func Update_Exam_Details(details Exam_Details) (bool, string) {
 	present := true
 	update_msg := "Exam details updated successfully"
@@ -595,12 +580,6 @@ func Read_Exam_Taken(uuid, cource_name string) (bool, ExamTakenStruct) {
 
 // }
 
-type TakeExamStruct struct {
-	Taken         bool
-	ExamTaken     QuestionsEntered
-	TakensResults ExamTakenStruct
-}
-
 func CreatePage(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
@@ -645,11 +624,6 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type Complition struct {
-	Logo    string
-	Message string
-}
-
 func TakeExam(w http.ResponseWriter, r *http.Request) {
 
 	funcMap := template.FuncMap{
@@ -672,12 +646,11 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 	// VERIFY IF EXAM HAS BEEN ATTEMPTED
 	if_taken, result_out := Read_Exam_Taken(uuid, cource_name)
 
-	fmt.Println("Exam Has Been Taken: ", if_taken)
-
 	var attemped_number int
 	var write_exam_uuid string
 	var open_period int
 	var passed string
+	var attempt_out string
 
 	// CHECK IF STUDENT STILL HAS ATTEMPTS TO WRITE EXAM "START"
 	if if_taken {
@@ -697,18 +670,23 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 			} else {
 				template_name = "exam_code.html"
 				display_number = 1
-				UpdateExamTaken(uuid, cource_name)
+				if attemped_number <= 3 {
+					_, attempt_out = UpdateExamTaken(uuid, cource_name)
+
+					attemped_number, _ = strconv.Atoi(attempt_out)
+				}
 
 			}
 
 		}
 
 	} else {
-		attemped_number = 0
+
 		open_period = 7
 		template_name = "exam_code.html"
 		display_number = 1
-		UpdateExamTaken(uuid, cource_name)
+		_, attempt_out = UpdateExamTaken(uuid, cource_name)
+		attemped_number, _ = strconv.Atoi(attempt_out)
 
 	}
 
@@ -720,8 +698,6 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 	// GET EXAM QUESTIONS "END"
 
 	// GET EXAM DETAILS "START"
-
-	fmt.Println("The Cource UUID is: ", cource_uuid_out)
 
 	get_exam_details := GetExamDetails(cource_uuid_out)
 
@@ -738,6 +714,7 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 			Exam_Questions:    get_exam_questions,
 			Cource_Name_Two:   cource_name_out,
 			Writen_UUID:       write_exam_uuid,
+			Attempt_Out:       attempt_out,
 		}
 
 		err := tpl.ExecuteTemplate(w, template_name, display_data)
@@ -939,11 +916,12 @@ func SubTwoDay(date_two string) int64 {
 	return days_out
 }
 
-func UpdateExamTaken(student_uuid, cource_name string) bool {
+func UpdateExamTaken(student_uuid, cource_name string) (bool, string) {
 
 	updated := true
 	dbconn := dbcode.SqlRead().DB
 	uuid := encription.Generateuudi()
+	var new_attmp string
 
 	allready_taken, data_out := Read_Exam_Taken(student_uuid, cource_name)
 
@@ -955,6 +933,8 @@ func UpdateExamTaken(student_uuid, cource_name string) bool {
 		attemp_number_out, _ := strconv.Atoi(attemp_number)
 		attempt_out := attemp_number_out + 1
 		attempt_string := strconv.Itoa(attempt_out)
+
+		new_attmp = attempt_string
 
 		stmt, err := dbconn.Prepare("UPDATE write_exam SET attemp_number = ? WHERE uuid = ?")
 
@@ -985,6 +965,8 @@ func UpdateExamTaken(student_uuid, cource_name string) bool {
 		passed := ""
 		date := time.Now().Format("2017.09.07")
 
+		new_attmp = strconv.Itoa(attemped_number)
+
 		stmt, err := dbconn.Prepare("insert into write_exam(uuid, student_uuid, cource_name,attemp_number, first_attempted, open_period,grade,comment,passed, date) values(?,?,?,?,?,?,?,?,?,?)")
 
 		if err != nil {
@@ -1001,7 +983,7 @@ func UpdateExamTaken(student_uuid, cource_name string) bool {
 
 	}
 
-	return updated
+	return updated, new_attmp
 }
 
 func SubmitExam(w http.ResponseWriter, r *http.Request) {
@@ -1010,6 +992,11 @@ func SubmitExam(w http.ResponseWriter, r *http.Request) {
 
 	student_uuid := r.URL.Query().Get("student_uuid")
 	cource_uuid := r.URL.Query().Get("cource_uuid")
+	cource_name := r.URL.Query().Get("cource_name")
+
+	_, data_out := Read_Exam_Taken(student_uuid, cource_name)
+
+	attempt_number := data_out.Attemp_Number
 
 	fmt.Println("Cource_UUID: ", cource_uuid)
 
@@ -1028,7 +1015,9 @@ func SubmitExam(w http.ResponseWriter, r *http.Request) {
 			Qustion_UUID:    item,
 			Question_Number: data_out.Question_Number,
 			Question:        data_out.Question,
+			Attemp_Number:   attempt_number,
 			Answer:          answer,
+			Cource_Name:     cource_name,
 		}
 
 		RecordStudentMarks(answer_out)
@@ -1246,6 +1235,60 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(template_name)
 
 	err := tpl.ExecuteTemplate(w, template_name, exam_responce)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func OpenGradeExam(w http.ResponseWriter, r *http.Request) {
+
+	student_uuid := r.URL.Query().Get("student_uuid")
+	cource_name := r.URL.Query().Get("courcer_name")
+	dbconn := dbcode.SqlRead().DB
+
+	var answer_out Answer_Out
+	var answers_out []Answer_Out
+
+	clean_uuid := CleanStudentUUID(student_uuid)
+
+	_, data_out := Read_Exam_Taken(student_uuid, cource_name)
+	attempt_number := data_out.Attemp_Number
+
+	fmt.Println(clean_uuid, data_out)
+
+	query_statement := fmt.Sprintf("select * from %s ")
+
+	stmt, err := dbconn.Query(query_statement)
+
+	if err != nil {
+		fmt.Print("Failed to To Load Prepare statement")
+	}
+
+	defer stmt.Close()
+
+	for stmt.Next() {
+		err = stmt.Scan(&answer_out.Qustion_UUID, &answer_out.Cource_UUID, &answer_out.Student_UUID, &answer_out.Question_Number, &answer_out.Question, &answer_out.Attemp_Number, &answer_out.Answer)
+		attempt_number_out := &answer_out.Attemp_Number
+		cource_name_out := &answer_out.Cource_Name
+
+		if *cource_name_out == cource_name && *attempt_number_out == attempt_number {
+			answers_out = append(answers_out, answer_out)
+		}
+
+		if err != nil {
+			fmt.Println("Failed to get questions and answers out")
+
+		}
+
+	}
+
+	type Display_To_Grade struct {
+	}
+
+	to_grade := Display_To_Grade{}
+
+	err = tpl.ExecuteTemplate(w, "grade_exam.html", to_grade)
 
 	if err != nil {
 		log.Fatal(err)
