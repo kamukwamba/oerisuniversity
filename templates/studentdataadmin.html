@@ -1,95 +1,187 @@
 
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.84.0">
+    <title>OUMPS Admin</title>
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
 
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/dashboard/">
 
-<h2 class="dashboard_name">
-    Students
-</h2>
-<hr>
-<div class="tochange">
-  <div class="tableheader">
-    <p class="programname">Award of Certificate of Attendance in Metaphysical Sciences</p>
-    <select class="programnamelist" id="">
-      <option value="">ALL</option>
-      <option value="">ACAMS</option>
-      <option value="">ACMS</option>
-      <option value="">ADMS</option>
-      <option value="">ABDMS</option>
-      <option value="">AMDMS</option>
-      <option value="">Ph.DMS</option>
-      
-  
-    </select>
-  </div> 
-  <div class="programdiv">
-     
-    <div class="table_div">
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">First Name</th>
-            <th scope="col">Last Name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Applied</th>
-            <th scope="col">Paid</th>
-            <th scope="col">Payment Method</th>
-            <th scope="col">Completed</th>
-            <th scope="col">Details</th>
-          
     
-          </tr>
-        </thead>
 
-        
-        <tbody>
-          {{ range .}}
-            {{ if .Approved }}
-            <tr>
-              <th scope="row"></th>
-              <td>{{ .First_Name}}</td>
-              <td>{{ .Last_Name}}</td>
-              <td>{{ .Email}}</td>
-              <td>{{ .Approved}}</td>
-              <td>{{ .Paid}}</td>
-              <td>{{ .Payment_Method}}</td>
-              <td>{{ .Completed}}</td>
-            
-      
-              <td>
-                <div hx-post ="studentedataadmin/{{ .Student_UUID}}" 
-                hx-target = "#maincontaint" class="studentdetailsbtn">
-                Details
-              </div>
-              </td>
-              </tr>
+    <link href="/assets/css/dasboard.css?v=2.2" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/studentportal.css?v=2">
+    <link rel="stylesheet" href="/assets/css/studentdetails.css?=1.1">
+    <link rel="stylesheet" href="/assets/css/messages.css?v=1.6">
+    <link rel="stylesheet" href="/assets/css/messageAdmin.css?v=1.1">
+    <link rel="stylesheet" href="/assets/css/newsAdmin.css?v=1.6">
+    <link rel="stylesheet" href="/assets/css/cource_data.css?v=1.2">
+    <link rel="stylesheet" href="/assets/css/admin_users.css?v=1.6">
+    <link rel="stylesheet" href="/assets/css/create_exam.css?v=1">
+
+
+    
+    <link rel="stylesheet" href="/assets/css/messageAdmin.css">
+
+    <script src="/assets/htmx.js"></script>
+
+    </head>
+
+   
+  <body>
+    <div class="heading">
+      <h3 class="ucms_name">
+          Admin
+      </h3>
+      <div class="heading_nav">
+        <div>
+            <a href="">{{ .Admin.Name}}</a>
+        </div>
+        <div>
+            <a href="">sign out</a>
+        </div>
+      </div>
+  </div>
+ 
+
+  <div class="side_bar">
+      <ul class="side_ul">
+          <li><button 
+                    hx-get="/programcards"  
+                    hx-target="#maincontaint"
+                    hx-push-url="true"
+                    class="dashbuttons">Programs</button>
+            </li>
+          <li><a  href="/acamsstudentdata?out={{ .Admin.ID}}" class="dashbuttons">Students</a>
+            </li>
+          <li><button hx-get  = "/adminMessages"
+                    hx-target = "#maincontaint"
+                    hx-push-url="true"
+                    class="dashbuttons">Messages</button></li>
+
+          <li><button   hx-get = "/adminNews"
+                        hx-target ="#maincontaint"
+                        hx-push-url="true"
+                        hx-swap="innerHTML"
+                    class="dashbuttons" >News</button></li>
+                    <li><button
+                        hx-get="/get_admin_users"
+                        hx-target="#maincontaint"
+                        hx-push-url="true"
+                        class="dashbuttons">Lecturers</button></li>
+        <hr>
+          <li><button class="dashbuttons">Store</button></li>
           
-            {{ else }}
-            <tr>
-              <th scope="row"></th>
-              <td>{{ .First_Name}}</td>
-              <td>{{ .Last_Name}}</td>
-              <td>{{ .Email}}</td>
-              <td>{{ .Approved}}</td>
-              <td>{{ .Paid}}</td>
-              <td>{{ .Payment_Method}}</td>
-              <td>{{ .Payment_Method}}</td>
 
-            
-      
-              <td>
-                <div hx-post ="studentedataadmin/{{ .Student_UUID}}" 
-                hx-target = "#maincontaint" class="studentdetailsbtnapprove">
-                Details
-              </div>
-              </td>
-              </tr>
-            
-          {{ end }}
-          {{end}}
-        </tbody>
-      </table>
-    </div>    
+      </ul>
       
   </div>
-</div>
+
+
+    <div class="main">
+      <h2 class="dashboard_name">
+        Students
+    </h2>
+    <hr>
+    <div class="tochange">
+      <div class="tableheader">
+        <p class="programname">Award of Certificate of Attendance in Metaphysical Sciences</p>
+        <select class="programnamelist" id="">
+          <option value="">ALL</option>
+          <option value="">ACAMS</option>
+          <option value="">ACMS</option>
+          <option value="">ADMS</option>
+          <option value="">ABDMS</option>
+          <option value="">AMDMS</option>
+          <option value="">Ph.DMS</option>
+          
+      
+        </select>
+      </div> 
+      <div class="programdiv">
+        
+        <div class="table_div">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">First Name</th>
+                <th scope="col">Last Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Applied</th>
+                <th scope="col">Paid</th>
+                <th scope="col">Payment Method</th>
+                <th scope="col">Completed</th>
+                <th scope="col">Details</th>
+              
+        
+              </tr>
+            </thead>
+
+            
+            <tbody>
+              {{ range .}}
+                {{ if .Approved }}
+                <tr>
+                  <th scope="row"></th>
+                  <td>{{ .AcamsData.First_Name}}</td>
+                  <td>{{ .AcamsData.Last_Name}}</td>
+                  <td>{{ .AcamsData.Email}}</td>
+                  <td>{{ .AcamsData.Approved}}</td>
+                  <td>{{ .AcamsData.Paid}}</td>
+                  <td>{{ .AcamsData.Payment_Method}}</td>
+                  <td>{{ .AcamsData.Completed}}</td>
+                
+          
+                  <td>
+                    <div hx-post ="studentedataadmin/{{ .Student_UUID}}" 
+                    hx-target = "#maincontaint" class="studentdetailsbtn">
+                    Details
+                  </div>
+                  </td>
+                  </tr>
+              
+                {{ else }}
+                <tr>
+                  <th scope="row"></th>
+                  <td>{{ .AcamsData.First_Name}}</td>
+                  <td>{{ .AcamsData.Last_Name}}</td>
+                  <td>{{ .AcamsData.Email}}</td>
+                  <td>{{ .AcamsData.Approved}}</td>
+                  <td>{{ .AcamsData.Paid}}</td>
+                  <td>{{ .AcamsData.Payment_Method}}</td>
+                  <td>{{ .AcamsData.Payment_Method}}</td>
+
+                
+          
+                  <td>
+                    <div hx-post ="studentedataadmin/{{ .Student_UUID}}" 
+                    hx-target = "#maincontaint" class="studentdetailsbtnapprove">
+                    Details
+                  </div>
+                  </td>
+                  </tr>
+                
+              {{ end }}
+              {{end}}
+            </tbody>
+          </table>
+        </div>    
+          
+      </div>
+    </div>
+    </div>
+
+    
+
+
+
+</body>
+</html>
+
 

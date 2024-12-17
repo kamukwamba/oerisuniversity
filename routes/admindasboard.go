@@ -29,6 +29,39 @@ type StudentProgramList struct {
 	Program_Name string
 }
 
+func AdminData(uuid string) AdminInfo {
+	var admin_info AdminInfo
+	dbconn := dbcode.SqlRead().DB
+
+	stmt, err := dbconn.Prepare("select uuid, first_name, last_name, email from admin where uuid = ?")
+
+	if err != nil {
+		fmt.Println("Failed to load admin prepare", err)
+	}
+
+	defer stmt.Close()
+
+	var first_name string
+	var last_name string
+	var id string
+	var email string
+	name := fmt.Sprintf("%s %s", first_name, last_name)
+
+	err = stmt.QueryRow(uuid).Scan(&id, &first_name, &last_name, &email)
+
+	admin_info = AdminInfo{
+		ID:    id,
+		Name:  name,
+		Email: email,
+	}
+
+	if err != nil {
+		fmt.Println("Failed to QueryRow: ", err)
+	}
+
+	return admin_info
+}
+
 func AdminAuth(data AdminLogData, dataList []dbcode.AdminInfo) (bool, AdminInfo) {
 
 	var result bool
@@ -489,8 +522,21 @@ func ACAMSStudentData(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
 	acamsstudents := GetACAMSStudents()
+	admin_id := r.URL.Query().Get("out")
 
-	err := tpl.ExecuteTemplate(w, "studentdataadmin.html", acamsstudents)
+	type AdminPage struct {
+		Admin     AdminInfo
+		AcamsData []ProgramStruct
+	}
+
+	admin_infor := AdminData(admin_id)
+
+	data_out := AdminPage{
+		Admin:     admin_infor,
+		AcamsData: acamsstudents,
+	}
+
+	err := tpl.ExecuteTemplate(w, "studentdataadmin.html", data_out)
 
 	if err != nil {
 		log.Fatal(err)
