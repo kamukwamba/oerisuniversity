@@ -1,6 +1,3 @@
-
-
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -42,7 +39,7 @@
       </h3>
       <div class="heading_nav">
         <div>
-            <a href="">{{ .Name}}</a>
+            <a href="">{{ .Admin.Name}}</a>
         </div>
         <div>
             <a href="">sign out</a>
@@ -112,7 +109,7 @@
 
 {{ define "messageslog"}}
 
-    {{ range .}}
+    {{ range .Msg}}
 
         {{ if .Seen_Admin}}
         <div class="messagelogseen"

@@ -1,9 +1,61 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    {{ template "head_temp"}}
+
+    <style>
+      .details_btn{
+          display: block; 
+          text-decoration: none; 
+          text-align: center; 
+          width: 100px;
+          height: 30px;
+          background-color: rgb(32, 0, 62);
+          border: solid 1px rgb(32, 0, 62);
+          color: white;
+      }
+
+      .details_btn:hover{
+        color: rgb(32, 0, 62);
+        background-color: white;
+      }
+
+      .details_btn:visited{
+        color: white;
+      }
+
+      .details_btn:visited:hover{
+        color: rgb(32, 0, 62);
+      }
+    </style>
+
+  </head>
+
+   
+  <body>
+    <div class="heading">
+      <h3 class="ucms_name">
+          Admin
+      </h3>
+      <div class="heading_nav">
+        <div>
+            <a href="">{{ .Admin.Name}}</a>
+        </div>
+        <div>
+            <a href="">sign out</a>
+        </div>
+      </div>
+  </div>
+ 
 
 
 
 
+  {{  template "side_bar" .}}
 
-<h2 class="dashboard_name">
+
+    <h2 class="dashboard_name">
         News
     </h2>
     <hr>
@@ -37,11 +89,6 @@
 
     
 </div>
-
-
-
-
-
 
 {{define "newssamples"}}
 
@@ -129,3 +176,25 @@
         </div>
     </div>
 {{end}}
+
+    
+
+
+
+</body>
+</html>
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+

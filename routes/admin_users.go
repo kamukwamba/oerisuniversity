@@ -277,7 +277,7 @@ func AdminUsers(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("The user list", admin_user_data_list)
 
-	err := tpl.ExecuteTemplate(w, "users_admin", display_data)
+	err := tpl.ExecuteTemplate(w, "admin_users.html", display_data)
 
 	if err != nil {
 		log.Fatal(err)

@@ -580,6 +580,10 @@ func ACAMSStudentData(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type CreatNews struct {
+	Admin AdminInfo
+}
+
 func AdminNews(w http.ResponseWriter, r *http.Request) {
 
 	admin_id := r.URL.Query().Get("out")
@@ -588,7 +592,11 @@ func AdminNews(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(admin_infor)
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err := tpl.ExecuteTemplate(w, "NewsAdminCreate.html", nil)
+	display_data := CreatNews{
+		Admin: admin_infor,
+	}
+
+	err := tpl.ExecuteTemplate(w, "NewsAdminCreate.html", display_data)
 
 	if err != nil {
 		log.Fatal(err)
