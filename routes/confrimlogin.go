@@ -103,6 +103,7 @@ type ProgramStruct struct {
 	Applied        bool
 	Completed      bool
 	Date           string
+	Admin_ID       string
 }
 
 type CourceStruct struct {
@@ -124,6 +125,7 @@ type StudentCourse struct {
 	Available        bool
 	StInfo           StudentInfo
 	AllCourceDataOut []AllCourceData
+	Admin            AdminInfo
 }
 
 func ValidateSudent(email_in, password_in string) (bool, string) {

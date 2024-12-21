@@ -256,15 +256,28 @@ func UpdateAdminUsers(w http.ResponseWriter, r *http.Request) {
 
 }
 
+type AdminUserData struct {
+	Admin AdminInfo
+	Users []AdminUser
+}
+
 func AdminUsers(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
+	admin_id := r.URL.Query().Get("out")
+	admin_infor := AdminData(admin_id)
+
 	_, admin_user_data_list := GetAdminUsers("many", "none")
+
+	display_data := AdminUserData{
+		Admin: admin_infor,
+		Users: admin_user_data_list,
+	}
 
 	fmt.Println("The user list", admin_user_data_list)
 
-	err := tpl.ExecuteTemplate(w, "users_admin", admin_user_data_list)
+	err := tpl.ExecuteTemplate(w, "users_admin", display_data)
 
 	if err != nil {
 		log.Fatal(err)

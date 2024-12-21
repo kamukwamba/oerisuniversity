@@ -20,6 +20,10 @@ type AdminInfo struct {
 	Password string
 }
 
+type AdminPage struct {
+	Admin     AdminInfo
+	AcamsData []ProgramStruct
+}
 type DashData struct {
 	ACAMSTotal int
 	AdminInfo
@@ -45,9 +49,10 @@ func AdminData(uuid string) AdminInfo {
 	var last_name string
 	var id string
 	var email string
-	name := fmt.Sprintf("%s %s", first_name, last_name)
 
 	err = stmt.QueryRow(uuid).Scan(&id, &first_name, &last_name, &email)
+
+	name := fmt.Sprintf("%s %s", first_name, last_name)
 
 	admin_info = AdminInfo{
 		ID:    id,
@@ -163,7 +168,7 @@ func StudentACAMSData(student_uuid string) {
 
 }
 
-func GetACAMSStudents() []ProgramStruct {
+func GetACAMSStudents(admin_id string) []ProgramStruct {
 	dbread := dbcode.SqlRead()
 	var conuter int
 	var datalist []ProgramStruct
@@ -178,7 +183,35 @@ func GetACAMSStudents() []ProgramStruct {
 	for rows.Next() {
 		conuter += 1
 
-		err := rows.Scan(&cource_data.UUID, &cource_data.Student_UUID, &cource_data.Program_Name, &cource_data.First_Name, &cource_data.Last_Name, &cource_data.Email, &cource_data.Applied, &cource_data.Approved, &cource_data.Payment_Method, &cource_data.Paid, &cource_data.Completed, &cource_data.Date)
+		var uuid string
+		var student_uuid string
+		var program_name string
+		var first_name string
+		var last_name string
+		var email string
+		var applied bool
+		var approved bool
+		var payment_method string
+		var paid string
+		var completed bool
+		var date string
+		err := rows.Scan(&uuid, &student_uuid, &program_name, &first_name, &last_name, &email, &applied, &approved, &payment_method, &paid, &completed, &date)
+
+		cource_data = ProgramStruct{
+			UUID:           uuid,
+			Student_UUID:   student_uuid,
+			Program_Name:   program_name,
+			First_Name:     first_name,
+			Last_Name:      last_name,
+			Email:          email,
+			Applied:        applied,
+			Approved:       approved,
+			Payment_Method: payment_method,
+			Paid:           paid,
+			Completed:      completed,
+			Date:           date,
+			Admin_ID:       admin_id,
+		}
 
 		fmt.Println("the cource data out: ", cource_data)
 		if err != nil {
@@ -482,7 +515,13 @@ func ReadMessageAdmin(w http.ResponseWriter, r *http.Request) {
 
 func StudentProfileData(w http.ResponseWriter, r *http.Request) {
 
-	studentuuid := r.PathValue("id")
+	studentuuid := r.URL.Query().Get("student_uuid")
+
+	admin_id := r.URL.Query().Get("out")
+
+	admin_infor := AdminData(admin_id)
+
+	fmt.Println("Admin Id: ", admin_id, "Admin Infor: ", admin_infor)
 
 	studentdataout := GetStudentAllDetails(studentuuid)
 	listout := GetStudentPrograms(studentuuid)
@@ -493,6 +532,7 @@ func StudentProfileData(w http.ResponseWriter, r *http.Request) {
 		Available:        present,
 		StInfo:           studentdataout,
 		AllCourceDataOut: programdataout,
+		Admin:            admin_infor,
 	}
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
@@ -521,13 +561,10 @@ func CloseAdmintDiv(w http.ResponseWriter, r *http.Request) {
 func ACAMSStudentData(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	acamsstudents := GetACAMSStudents()
 	admin_id := r.URL.Query().Get("out")
+	acamsstudents := GetACAMSStudents(admin_id)
 
-	type AdminPage struct {
-		Admin     AdminInfo
-		AcamsData []ProgramStruct
-	}
+	fmt.Println("ADMIN ID::::", admin_id)
 
 	admin_infor := AdminData(admin_id)
 
@@ -545,6 +582,10 @@ func ACAMSStudentData(w http.ResponseWriter, r *http.Request) {
 
 func AdminNews(w http.ResponseWriter, r *http.Request) {
 
+	admin_id := r.URL.Query().Get("out")
+	admin_infor := AdminData(admin_id)
+
+	fmt.Println(admin_infor)
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
 	err := tpl.ExecuteTemplate(w, "NewsAdminCreate.html", nil)

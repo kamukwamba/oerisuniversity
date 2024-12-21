@@ -210,12 +210,25 @@ func LoadMessages() []MessageOut {
 
 }
 
+type LoadMsg struct {
+	Admin AdminInfo
+	Msg   []MessageOut
+}
+
 func AdminMessagesPage(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
+	admin_id := r.URL.Query().Get("out")
+	admin_infor := AdminData(admin_id)
+
 	messages_out := LoadMessages()
 
-	err := tpl.ExecuteTemplate(w, "messageAdmin", messages_out)
+	display_data := LoadMsg{
+		Admin: admin_infor,
+		Msg:   messages_out,
+	}
+
+	err := tpl.ExecuteTemplate(w, "messageAdmin.html", display_data)
 
 	if err != nil {
 		log.Fatal(err)

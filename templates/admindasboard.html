@@ -39,7 +39,7 @@
       </h3>
       <div class="heading_nav">
         <div>
-            <a href="">{{ .Name}}</a>
+            <a href="">{{ .Name}} a>
         </div>
         <div>
             <a href="">sign out</a>
@@ -56,7 +56,7 @@
                     hx-push-url="true"
                     class="dashbuttons">Programs</button>
             </li>
-          <li><a  href="/acamsstudentdata?out={{ .ID}}" class="dashbuttons">Students</a>
+          <li><a  href="/acamsstudentdata?out={{ .ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 230px; height: 40px;">Students</a>
             </li>
           <li><button hx-get  = "/adminMessages"
                     hx-target = "#maincontaint"

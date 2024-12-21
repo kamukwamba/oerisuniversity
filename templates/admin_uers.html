@@ -1,5 +1,84 @@
 
 
+<!doctype html>
+<html lang="en">
+
+  <head>
+    {{ template "head_temp"}}
+
+    <style>
+      .details_btn{
+          display: block; 
+          text-decoration: none; 
+          text-align: center; 
+          width: 100px;
+          height: 30px;
+          background-color: rgb(32, 0, 62);
+          border: solid 1px rgb(32, 0, 62);
+          color: white;
+      }
+
+      .details_btn:hover{
+        color: rgb(32, 0, 62);
+        background-color: white;
+      }
+
+      .details_btn:visited{
+        color: white;
+      }
+
+      .details_btn:visited:hover{
+        color: rgb(32, 0, 62);
+      }
+    </style>
+
+  </head>
+
+   
+  <body>
+    <div class="heading">
+      <h3 class="ucms_name">
+          Admin
+      </h3>
+      <div class="heading_nav">
+        <div>
+            <a href="">{{ .Admin.Name}}</a>
+        </div>
+        <div>
+            <a href="">sign out</a>
+        </div>
+      </div>
+  </div>
+ 
+
+
+
+
+  {{  template "side_bar" .}}
+
+
+    <div class="main">
+     
+        <div class="tochange">
+        
+        
+            {{ template "users_admin"}}
+            
+               
+            
+        
+        </div>
+    </div>
+
+    
+
+
+
+</body>
+</html>
+
+
+
 
     {{ define "users_admin"}}
     <div class="lectures_main">
@@ -46,7 +125,7 @@
     
         <div>
         <table>
-            <thead>
+            <thead>s
             <tr>
                 <th>First Name</th>
                 <th>Last Name</th>
@@ -57,7 +136,7 @@
             </tr>
             </thead>
             <tbody id="adminuser_list">
-                {{ range .}}
+                {{ range .Users}}
                     {{ template "admin_user_tr" .}}
                 {{ end }}
             </tbody>

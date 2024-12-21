@@ -67,6 +67,7 @@ type Questions_Out struct {
 }
 
 type Answer_Out struct {
+	UUID            string
 	Cource_UUID     string
 	Student_UUID    string
 	Cource_Name     string
@@ -924,6 +925,7 @@ func UpdateExamTaken(student_uuid, cource_name string) (bool, string) {
 	var new_attmp string
 
 	allready_taken, data_out := Read_Exam_Taken(student_uuid, cource_name)
+	var attempt_string string
 
 	if allready_taken {
 
@@ -931,10 +933,12 @@ func UpdateExamTaken(student_uuid, cource_name string) (bool, string) {
 		uuid_out := data_out.UUID
 
 		attemp_number_out, _ := strconv.Atoi(attemp_number)
-		attempt_out := attemp_number_out + 1
-		attempt_string := strconv.Itoa(attempt_out)
+		if attemp_number_out < 3 {
+			attempt_out := attemp_number_out + 1
+			attempt_string = strconv.Itoa(attempt_out)
 
-		new_attmp = attempt_string
+			new_attmp = attempt_string
+		}
 
 		stmt, err := dbconn.Prepare("UPDATE write_exam SET attemp_number = ? WHERE uuid = ?")
 

@@ -64,7 +64,7 @@ func main() {
 	router.HandleFunc("/programdetails/{id}", routes.ProgramDetails)
 	router.HandleFunc("/adminNews", routes.AdminNews)
 	router.HandleFunc("/adminMessages", routes.AdminMessagesPage)
-	router.HandleFunc("/studentedataadmin/{id}", routes.StudentProfileData)
+	router.HandleFunc("/studentedataadmin", routes.StudentProfileData)
 	router.HandleFunc("/readmessageadmin", routes.ReadMessageAdmin)
 	router.HandleFunc("/courceupdateadmin", routes.ApproveCourceUpdate)
 	router.HandleFunc("/approve", routes.ApproveProgram)
@@ -92,7 +92,9 @@ func main() {
 	router.HandleFunc("/faq", routes.FAQ)
 	router.HandleFunc("/takeexam", routes.TakeExam)
 	router.HandleFunc("/submitexam", routes.SubmitExam)
-	// router.HandleFunc("/grade_exam", routes.GradeExam)
+	router.HandleFunc("/grade_exam", routes.GradeExam)
+	router.HandleFunc("/gradeexamination", routes.SaveGrades)
+	router.HandleFunc("/examddfdea", routes.GetParticularExam)
 
 	//STUDENT PORTAL ROUTES
 	router.HandleFunc("/approvecource", routes.ApproveCource)
@@ -126,6 +128,6 @@ func main() {
 	if port == "" {
 		port = "3000"
 	}
-	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, router))
+	log.Fatal(http.ListenAndServe(":3300", router))
 
 }

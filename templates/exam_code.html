@@ -68,7 +68,7 @@
                     </tr>
                     <tr>
                         <th class="title">Duration</th>
-                        <td>{{ .ExamData.Exam_Duration}}min</td>
+                        <td id="duration">{{ .ExamData.Exam_Duration}}min</td>
                     </tr>
                 
                     <tr>
@@ -113,7 +113,7 @@
         
 
             <div style="width: 100%; height: 10vh; padding-top: 20px;">
-                <button  type="submit" class="submit_exam" style="margin-bottom: 30px;">Submit</button>
+                <button  type="submit" class="submit_exam" id="submit_btn" style="margin-bottom: 30px;">Submit</button>
 
             </div>
 
@@ -131,11 +131,28 @@
 
         second = window.secondsPassed;
         
+        
+        
         document.getElementById("sec").innerHTML = secondsPassed;
+        submit_button = document.getElementById("submit_btn");
+        timer_get = "{{ .ExamData.Exam_Duration}}";
+
+        console.log(timer_get)
+
+        hiden_count  = 0
+
+        const timerInt = parseInt(timer_get, 10);
+
+        
         
         if( window.secondsPassed == 60 ){
             window.secondsPassed = 0;
             minute ++ ;
+            hiden_count ++;
+
+            
+
+
             document.getElementById("min").innerHTML = minute;
 
 
@@ -151,14 +168,18 @@
 
 
         
-    }
+        }
 
-    window.secondsPassed = 0;
-    window.myTimer = setInterval(incrementSecond, 1000);
-    }
-    var onSubmitClick = function() {
-    window.clearInterval(window.myTimer); // always clean resources
-    // call some other function to do the submit
+        window.secondsPassed = 0;
+        window.myTimer = setInterval(incrementSecond, 1000);
+        }
+        var onSubmitClick = function() {
+        window.clearInterval(window.myTimer); // always clean resources
+        // call some other function to do the submit
+
+        if (hiden_count == timerInt){
+            submit_button.click()
+        }
     }
     </script>
 {{ end }}
