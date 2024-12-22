@@ -55,40 +55,42 @@
   {{  template "side_bar" .}}
 
 
-    <h2 class="dashboard_name">
-        News
-    </h2>
-    <hr>
-<div class="mainnewsdiv">
+    <div class="main">
+        <h2 class="dashboard_name">
+            News
+        </h2>
+        <hr>
+            <div class="mainnewsdiv">
 
-   
-    <div class="leftside">
-        <div class="navbar">
-            <div class="navitem">
-                Write
+            
+                <div class="leftside">
+                    <div class="navbar">
+                        <div class="navitem">
+                            Write
+                        </div>
+                    </div>
+                    
+                    <div id="changer">
+                    {{template "writearticle"}}
+                    </div>
+                
+                </div>
+
+                <div class="rightside" id="adminright">
+                    <h3 class="News">
+                        News Articles
+                    </h3>
+                    <ul id="newsamplelist">
+                    
+                    </ul>
+                </div>
+
             </div>
-        </div>
-        
-        <div id="changer">
-           {{template "writearticle"}}
-        </div>
-    
-    </div>
 
-    <div class="rightside" id="adminright">
-        <h3 class="News">
-            News Articles
-        </h3>
-        <ul id="newsamplelist">
-            {{ range .NewsSamples}}
-                 {{template "newssamples" .}}
-            {{ end }}
-        </ul>
     </div>
 
 
     
-</div>
 
 {{define "newssamples"}}
 
@@ -123,7 +125,7 @@
             hx-target="#newsamplelist"
             hx-swap="beforeend">
                 <input type="text" placeholder="News Title" name="title" class="articletitle">
-                <textarea name="composenews" class="writerarea" placeholder="Compose article"></textarea>
+                <textarea name="composenews" class="writerarea" placeholder="Compose article" style="margin-top: 10px; padding: 15px;"></textarea>
                 <input type="textarea" placeholder="Enter image link" name="image" class="articleinagelink">
                 <input type="textarea" placeholder="Enter Auther Name" name="auther" class="articleinagelink">
 

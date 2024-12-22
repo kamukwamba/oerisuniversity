@@ -77,7 +77,7 @@ func SaveGrades(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Route Has Been Hit: ", passed, comment)
 
-	stmt, err := dbconn.Prepare("UPDATE write exam set grade, comment, passed  where uuid = ?")
+	stmt, err := dbconn.Prepare("UPDATE write_exam set grade, comment, passed  where uuid = ?")
 
 	if err != nil {
 		fmt.Println("Prepare statement error: ", err)

@@ -39,7 +39,7 @@
       </h3>
       <div class="heading_nav">
         <div>
-            <a href="">{{ .Name}} a>
+            <a href="">{{ .Admin.Name}} <a>
         </div>
         <div>
             <a href="">sign out</a>
@@ -48,41 +48,8 @@
   </div>
  
 
-  <div class="side_bar">
-      <ul class="side_ul">
-          <li><button 
-                    hx-get="/programcards"  
-                    hx-target="#maincontaint"
-                    hx-push-url="true"
-                    class="dashbuttons">Programs</button>
-            </li>
-          <li><a  href="/acamsstudentdata?out={{ .ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 230px; height: 40px;">Students</a>
-            </li>
-          <li><button hx-get  = "/adminMessages"
-                    hx-target = "#maincontaint"
-                    hx-push-url="true"
-                    class="dashbuttons">Messages</button></li>
-
-          <li><button   hx-get = "/adminNews"
-                        hx-target ="#maincontaint"
-                        hx-push-url="true"
-                        hx-swap="innerHTML"
-                    class="dashbuttons" >News</button></li>
-                    <li><button
-                        hx-get="/get_admin_users"
-                        hx-target="#maincontaint"
-                        hx-push-url="true"
-                        class="dashbuttons">Lecturers</button></li>
-        <hr>
-          <li><button class="dashbuttons">Store</button></li>
-          
-
-      </ul>
-      
-  </div>
-
-
-
+  {{ template "side_bar" .}}
+ 
 
   <div class="main">
           <div class="containt" id="maincontaint">

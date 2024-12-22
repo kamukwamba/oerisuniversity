@@ -228,6 +228,8 @@ func AdminMessagesPage(w http.ResponseWriter, r *http.Request) {
 		Msg:   messages_out,
 	}
 
+	fmt.Println(admin_infor)
+
 	err := tpl.ExecuteTemplate(w, "messageAdmin.html", display_data)
 
 	if err != nil {

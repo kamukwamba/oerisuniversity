@@ -26,7 +26,7 @@ type AdminPage struct {
 }
 type DashData struct {
 	ACAMSTotal int
-	AdminInfo
+	Admin      AdminInfo
 }
 
 type StudentProgramList struct {
@@ -114,7 +114,7 @@ func AdminDashboard(w http.ResponseWriter, r *http.Request) {
 
 		toshow := DashData{
 			ACAMSTotal: acamscount,
-			AdminInfo:  admin_dataout,
+			Admin:      admin_dataout,
 		}
 
 		if check {
@@ -589,7 +589,6 @@ func AdminNews(w http.ResponseWriter, r *http.Request) {
 	admin_id := r.URL.Query().Get("out")
 	admin_infor := AdminData(admin_id)
 
-	fmt.Println(admin_infor)
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
 	display_data := CreatNews{
