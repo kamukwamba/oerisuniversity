@@ -59,8 +59,9 @@
 
 
 
-    <div class="assesment_box"> 
+    <div class="assesment_box" id="centeredDiv"> 
         <div style="height: 20vh; width: 100%;">
+        <button class="close-button" onclick="closeDiv()">X</button>
         <table class="assesment_table" style="margin: auto;">
             <thead>
                 <tr>
@@ -90,7 +91,12 @@
             </tbody>
             
         </table>
-
+        <script>
+            function closeDiv() {
+              const div = document.getElementById('centeredDiv');
+              div.style.display = 'none';
+            }
+          </script>
         </div>
 
         <div class="assesment_form">

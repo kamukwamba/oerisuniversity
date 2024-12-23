@@ -148,6 +148,24 @@ func DeleteAssesmentAdmin(w http.ResponseWriter, r *http.Request) {
 
 // ASSESMEENT TABLE
 
+func GradeCA(w http.ResponseWriter, r *http.Request) {
+
+	student_uuid := r.URL.Query().Get("student_uuid")
+	cource_name := r.URL.Query().Get("cource_name")
+
+	_, assesment_data := GetAssesmentData(student_uuid, cource_name)
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	err := tpl.ExecuteTemplate(w, "admin_cource_assesment", assesment_data)
+
+	if err != nil {
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
+
+}
+
 func LoadAssesmentTable() {
 	dbconn := dbcode.SqlRead().DB
 

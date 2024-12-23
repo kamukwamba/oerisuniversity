@@ -80,6 +80,7 @@ func main() {
 	router.HandleFunc("/loadform", routes.LoadAdminForm)
 	router.HandleFunc("/update_cource_data", routes.UpdateCourceData)
 	router.HandleFunc("/saveucdaata", routes.UpdateProgramDetails)
+	router.HandleFunc("/gradeca", routes.GradeCA)
 
 	router.HandleFunc("/deleteadmin", routes.DeleteAdmin)
 	router.HandleFunc("/createnews", routes.Create_News)
@@ -109,6 +110,7 @@ func main() {
 	router.HandleFunc("/studentprofileportal/{id}", routes.StudentProfilePortal)
 	router.HandleFunc("/close_assesment_div", routes.CloseAssesmentDiv)
 	router.HandleFunc("/close_admin_div", routes.CloseAdmintDiv)
+	router.HandleFunc("/error", routes.ErrorPage)
 
 	router.HandleFunc("/example", routes.Example)
 

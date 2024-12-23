@@ -376,7 +376,7 @@ func Update_Exam_Details(details Exam_Details) (bool, string) {
 		update_msg = "Exam details created successfully"
 	} else if present {
 		dbupdate := dbcode.SqlRead().DB
-		stmt, err := dbupdate.Prepare("UPDATE exam_details SET  program_name, cource_name, cource_code, duration, total_marks) where uuid = ?")
+		stmt, err := dbupdate.Prepare("UPDATE exam_details SET  program_name, cource_name, cource_code, duration, total_marks where uuid = ?")
 
 		if err != nil {
 			fmt.Println("Failed to Execute Update Query: ", err)
