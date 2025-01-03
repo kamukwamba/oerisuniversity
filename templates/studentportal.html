@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/assets/css/studentportal.css?v=3.5">
     <link rel="stylesheet" href="/assets/css/video.css?v=1.6">
-    <link rel="stylesheet" href="/assets/css/messages.css?v=2.8">
+    <link rel="stylesheet" href="/assets/css/messages.css?v=1.0">
     <link rel="stylesheet" href="/assets/css/studentdata.css?v=1.0">
     <link rel="stylesheet" href="/assets/css/cource_assesment.css?v=1.0">
 
-
+   
 
     <title>Student Dash Board</title>
     <script src="/assets/htmx.js"></script>
@@ -128,17 +128,13 @@
     </div>
 
     <div class="accountfunctions">
-        <p class="student_nav"><a  data-hx-post="/messages/{{.StInfo.UUID}}"
-            hx-target="#mainpage"
-            hx-swap="innerHTML">Messages</a></p>
+        <p class="student_nav"><a  href="/messages/{{.StInfo.UUID}}">Messages</a></p>
 
 
-        <p class="student_nav"
-            hx-target="#mainpage"
-            hx-swap="innerHTML">
-            <a data-hx-post="/studentsettings?uuid={{.StInfo.UUID}}">Profile</a></p>
+        <p class="student_nav">
+            <a href="/studentsettings?uuid={{.StInfo.UUID}}">Profile</a></p>
 
-        <p class="student_nav"><a href="/studentlogout/{{.StInfo.UUID}}">Log out</a></p>
+        <p class="student_nav"><a href="/login">Log out</a></p>
     </div>
     
 </header>
@@ -180,37 +176,7 @@
 {{end}}
 
 
-{{ define  "studentdata"}}
 
-<div class="studentdatadiv">
-
-    <div class="/">
-        <div class="info">
-            <p>First Name: {{ .First_Name}}</p>
-            <p>Last Name: {{ .Last_Name}}</p>
-            <p>Email : {{ .Email }}</p>
-            <p>Phone Number: {{ .Phone}}</p>
-
-        </div>
-
-        <div class="updatediv">
-            <!-- <button>Update Details</button> -->
-            <button
-                
-                hx-get="/getstudentdata"
-                hx-target="#studentupdate"
-                hx-swap="outerHTML">Change Password</button>
-        </div>
-
-    </div>
-
-    <div class="studentupdate" id="studentupdate">
-
-    </div>
-
-</div>
-
-{{ end }}
 
 
 {{ define "closeupdate"}}
@@ -238,20 +204,6 @@
 {{ end }}
 
 
-{{ define "testingworking" }}
-
-<div id="outmy">
-    <p>Working</p>
-</div>
-<script>
-    document.body.innerHTML = "<div hx-get='/closeupdatedata'>Get it!</div>"
-    
-  htmx.process(document.body);
-</script>
-
-
-
-{{ end }}
 
 
 

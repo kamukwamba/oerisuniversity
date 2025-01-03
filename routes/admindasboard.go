@@ -306,6 +306,42 @@ func UpdateCource(uuid, cource_name string) bool {
 
 }
 
+func DeleteCource(w http.ResponseWriter, r *http.Request) {
+
+	cource_name := r.URL.Query().Get("cource_name")
+	cource_uuid := r.URL.Query().Get("cource_uuid")
+
+	dbconn := dbcode.SqlRead().DB
+
+	stmt, err := dbconn.Prepare("Delete from cource_table where uuid = ?")
+
+	if err != nil {
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(cource_uuid)
+	if err != nil {
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+
+	}
+
+	if !DeleteAllQuestions(cource_name) {
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		fmt.Println("Failed to delete questions")
+	}
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	err = tpl.ExecuteTemplate(w, "empty_tr", nil)
+
+	if err != nil {
+		fmt.Println("Failed to delete")
+	}
+
+}
+
 func ApproveCourceUpdate(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 

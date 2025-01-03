@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 	"github.com/kamukwamba/oerisuniversity/encription"
@@ -40,7 +41,7 @@ func UpdateCourceData(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	stmt, err := dbconn.Prepare("select uuid, program_name, cource_name,cource_assesment, video_list, module,recommended_book from cource_table where uuid = ?")
+	stmt, err := dbconn.Prepare("select uuid, program_name, cource_name,cource_assesment, video_list, module,recomended_book from cource_table where uuid = ?")
 
 	if err != nil {
 		err_out := fmt.Errorf("Failed to read from DB, error out: %w", err)
@@ -60,7 +61,8 @@ func UpdateCourceData(w http.ResponseWriter, r *http.Request) {
 	err_out := tpl.ExecuteTemplate(w, "cource_data_updater", cource_data)
 
 	if err_out != nil {
-		log.Fatal(err)
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
 	}
 
 }
@@ -150,9 +152,11 @@ func GetProgramDetailsSingle(uuid_out string) CourceDataStruct {
 	return cource_data_out
 }
 
-func GetProgramDetails(program_name string) []CourceDataStruct {
+func GetProgramDetails(program_name string) ([]CourceDataStruct, bool) {
 	var cuorce_data_out_list []CourceDataStruct
 	var cource_data_out CourceDataStruct
+
+	data_present := true
 
 	get_cource_data := dbcode.SqlRead().DB
 
@@ -160,6 +164,7 @@ func GetProgramDetails(program_name string) []CourceDataStruct {
 
 	if err != nil {
 		log.Fatal(err)
+		data_present = false
 	}
 	defer statement.Close()
 
@@ -180,21 +185,26 @@ func GetProgramDetails(program_name string) []CourceDataStruct {
 		}
 
 	}
+	if len(cuorce_data_out_list) < 1 {
+		data_present = false
 
-	return cuorce_data_out_list
+	}
+
+	return cuorce_data_out_list, data_present
 }
 
 func ProgramDetails(w http.ResponseWriter, r *http.Request) {
 
 	path := r.PathValue("id")
 	fmt.Println("The Path Value", path)
+
 	var program_data ProgramDataOut
 
-	result := GetProgramDetails(path)
+	result, present := GetProgramDetails(path)
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	if len(result) >= 1 {
+	if present {
 
 		program_data = ProgramDataOut{
 			Present:      true,
@@ -204,7 +214,8 @@ func ProgramDetails(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		program_data = ProgramDataOut{
-			Present: false,
+			Present:      false,
+			Program_Name: path,
 		}
 	}
 
@@ -223,7 +234,8 @@ func CreateCourseData(w http.ResponseWriter, r *http.Request) {
 	program_name := r.URL.Query().Get("program_name")
 
 	var data_out CourceDataUpdate
-	fmt.Println("The Paameter in", program_name)
+	fmt.Println("The Parameter in: ", program_name)
+	fmt.Println("The Program in: ", program_name)
 
 	var setrout string
 
@@ -319,6 +331,17 @@ func GetStudyMaterial(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, link_out, http.StatusSeeOther)
 }
+func CleanVideoLinks(links string) string {
+	var clean_list string
+
+	list_out := strings.Split(links, "_")
+
+	if len(list_out) <= 1 {
+
+	}
+
+	return clean_list
+}
 
 func AddCourceData(w http.ResponseWriter, r *http.Request) {
 
@@ -353,7 +376,17 @@ func AddCourceData(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	err_out := tpl.ExecuteTemplate(w, "cource_data_saved", nil)
+	data_out := CourceDataStruct{
+		UUID:             create_uuid,
+		Program_Name:     program_name,
+		Cource_Name:      cource_name,
+		Book:             book_link,
+		Module:           module_link,
+		Video_List:       video_link,
+		Cource_Aseesment: assesment_link,
+	}
+
+	err_out := tpl.ExecuteTemplate(w, "cource_data_tr", data_out)
 
 	if err_out != nil {
 		log.Fatal(err)

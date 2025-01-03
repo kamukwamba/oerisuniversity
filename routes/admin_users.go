@@ -197,14 +197,12 @@ func LoadAdminForm(w http.ResponseWriter, r *http.Request) {
 
 func GetUpateAdmin(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
-	var set_template string
 	var admin_data_out AdminUser
 
 	uuid := r.URL.Query().Get("uuid")
 	admin_data_out, _ = GetAdminUsers("one", uuid)
-	set_template = "updateform"
 
-	err := tpl.ExecuteTemplate(w, set_template, admin_data_out)
+	err := tpl.ExecuteTemplate(w, "updateform", admin_data_out)
 
 	if err != nil {
 		log.Fatal(err)
@@ -216,19 +214,10 @@ func UpdateAdminUsers(w http.ResponseWriter, r *http.Request) {
 	var set_template string
 	var admin_data_out AdminUser
 
-	fmt.Println("It is not working out")
+	fmt.Println("It is not working out or not")
 
 	r.ParseForm()
 	uuid := r.URL.Query().Get("uuid")
-
-	// admin_out := AdminUser{
-	// 	UUID:       uuid,
-	// 	First_Name: encription.EncryptData(r.FormValue("first_name")),
-	// 	Last_Name:  encription.EncryptData(r.FormValue("last_name")),
-	// 	Email:      encription.EncryptData(r.FormValue("email")),
-	// 	Password:   encription.EncryptData(r.FormValue("password")),
-	// 	Auth:       encription.EncryptData(r.FormValue("auth")),
-	// }
 
 	first_name := r.FormValue("first_name")
 

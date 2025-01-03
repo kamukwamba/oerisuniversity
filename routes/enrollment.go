@@ -116,14 +116,14 @@ func CreateStudent(data StudentInfo) bool {
 	if err != nil {
 		log.Fatal(err)
 	}
-	stmt, err := entry.Prepare("insert into studentdata(uuid, first_name, last_name, phone, email, date_of_birth,marital_status,country,eduction_background,program,high_scholl_confirmation,grammer_comprihention,waiver,number_of_children,school_atteneded,major_studied,degree_obtained,current_occupetion,field_interested_in,mps_techqnique_Practiced,previouse_experince,purpose_of_enrollment,use_of_degree,reason_for_choice,method_of_incounter) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?)")
+	stmt, err := entry.Prepare("insert into studentdata(uuid, first_name, last_name, phone, email, date_of_birth,gender,marital_status,country,eduction_background,program,high_scholl_confirmation,grammer_comprihention,waiver,number_of_children,school_atteneded,major_studied,degree_obtained,current_occupetion,field_interested_in,mps_techqnique_Practiced,previouse_experince,purpose_of_enrollment,use_of_degree,reason_for_choice,method_of_incounter) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?,?)")
 
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(data.UUID, data.First_Name, data.Last_Name, data.Phone, data.Email, data.Date_Of_Birth, data.Marital_Status, data.Country, data.Education_Background, data.Program, data.High_School, data.Grammer_Confirmation, data.Waiver, data.Children, data.School_Attended, data.Major_In, data.Degree_Obtained, data.Current_Occupation, data.Field_Interested, data.Prio_Techniques, data.Previouse_Experience, data.Purpose_Of_Enrollment, data.Use_Of_Knowledge, data.Reason_For_Choice, data.Method_Of_Encounter)
+	_, err = stmt.Exec(data.UUID, data.First_Name, data.Last_Name, data.Phone, data.Email, data.Date_Of_Birth, data.Gender, data.Marital_Status, data.Country, data.Education_Background, data.Program, data.High_School, data.Grammer_Confirmation, data.Waiver, data.Children, data.School_Attended, data.Major_In, data.Degree_Obtained, data.Current_Occupation, data.Field_Interested, data.Prio_Techniques, data.Previouse_Experience, data.Purpose_Of_Enrollment, data.Use_Of_Knowledge, data.Reason_For_Choice, data.Method_Of_Encounter)
 	if err != nil {
 		ErrorPrintOut("enrollment", "CreateStudent", fmt.Sprintf("%s", err))
 		fmt.Println("PART 2: Failed to execute")
@@ -188,6 +188,17 @@ func Enrollment(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func ConvertIn(answer string) string {
+	var result string
+	if answer == "on" {
+		result = "yes"
+	} else {
+		result = "no"
+	}
+
+	return result
+}
+
 func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
@@ -202,15 +213,15 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 	phone := r.FormValue("phone_number")
 	email := r.FormValue("email")
 	dateofbirth := r.FormValue("date_of_birth")
-	gender := r.FormValue("studentsgender")
+	gender := r.FormValue("student_gender")
 	payment_type := r.FormValue("payment")
 	maritalstatus := r.FormValue("marital_status")
 	country := r.FormValue("country")
 	educationlevel := r.FormValue("education_level")
 	program := r.FormValue("program")
-	confirmdiplomer := r.FormValue("ucms_diplomer")
-	languagecomprihension := r.FormValue("launguage_comprihension")
-	waiver := r.FormValue("waiver")
+	confirmdiplomer := ConvertIn(r.FormValue("ucms_diplomer"))
+	languagecomprihension := ConvertIn(r.FormValue("launguage_comprihension"))
+	waiver := ConvertIn(r.FormValue("waiver"))
 	chidrencount := r.FormValue("children_count")
 	collegename := r.FormValue("trade_college_name")
 	collegemajor := r.FormValue("college_major")

@@ -247,6 +247,11 @@
                     </tr>
                 </thead>
 
+                {{ range .Assesment}}
+                    {{ template  "finale_grade" .}}
+
+                {{ end }}
+
                 <tbody>
                     
                 </tbody>
@@ -255,8 +260,8 @@
             {{ define "finale_grade"}}
 
                 <tr>
-                    <td> </td>
-                    <td> </td>
+                    <td>{{ .Assesment_Title }}</td>
+                    <td>{{ .Assesment_Grades}}</td>
                 </tr>
 
             {{end }}

@@ -497,6 +497,32 @@ func Create_Exam(question_in Questions_Construct) bool {
 	return result
 }
 
+func DeleteAllQuestions(cource_name string) bool {
+
+	deleted := true
+	dbconn := dbcode.SqlRead().DB
+	stmt, err := dbconn.Prepare("DELETE FROM exam_questions WHERE  cource_name = ?")
+
+	if err != nil {
+		deleted = false
+		fmt.Println("deleleting problem")
+		log.Fatal(err)
+
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(cource_name)
+
+	if err != nil {
+
+		fmt.Println("failed to delete questions")
+		deleted = false
+	}
+
+	return deleted
+}
+
 func Update_Exam(w http.ResponseWriter, r *http.Request) {
 
 }

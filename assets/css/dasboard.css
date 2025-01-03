@@ -66,6 +66,7 @@ button{
     height: 600px;
     box-sizing: border-box;
     margin-left: 20%;
+    padding-bottom: 40px;
     display: block;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -178,7 +179,7 @@ button{
 
 .dashbuttons{
     color: white;
-    width: 95%;
+    width: 90%;
     margin: 3px 10px;
     height: 40px;
     background-color: rgb(37, 0, 62);

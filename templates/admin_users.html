@@ -28,6 +28,21 @@
       .details_btn:visited:hover{
         color: rgb(32, 0, 62);
       }
+
+      .updateadmin{
+        position: fixed;
+        left: 25vw;
+        top: 30vh;
+        height: 40vh;
+        width: 70vw;
+        border-radius: 3px;
+        border: solid 1px #333;
+
+      }
+
+      .uplable{
+        color: white;
+      }
     </style>
 
   </head>
@@ -66,14 +81,17 @@
             
         
         </div>
+
+        <div class="updateadmin"  id="updateadmindiv" style="display: none;">
+
+        </div>
+       
     </div>
 
     
 
 
 
-</body>
-</html>
 
 
 
@@ -123,7 +141,7 @@
     
         <div>
         <table>
-            <thead>s
+            <thead>
             <tr>
                 <th>First Name</th>
                 <th>Last Name</th>
@@ -161,43 +179,43 @@
 
 
 
-{{ define "formtemplate"}}
+        {{ define "formtemplate"}}
 
 
 
-<form hx-post="/createadmin"
-    hx-target="#adminuser_list"
-    hx-swap="beforeend">
-    <div class="form_div">
-        <div class="segments">
-            <label for="first_name">First Name</label><br>
-            <input type="text" name="first_name" id="">
-        </div>
-        <div class="segments">
-            <label for="last_name">Last Name</label><br>
-            <input type="text" name="last_name" id="">
-        </div>
-        <div class="segments">
-            <label for="email">Email</label><br>
-            <input type="email" name="email" id="">
-        </div>
+        <form hx-post="/createadmin"
+            hx-target="#adminuser_list"
+            hx-swap="beforeend">
+            <div class="form_div">
+                <div class="segments">
+                    <label for="first_name">First Name</label><br>
+                    <input type="text" name="first_name" id="">
+                </div>
+                <div class="segments">
+                    <label for="last_name">Last Name</label><br>
+                    <input type="text" name="last_name" id="">
+                </div>
+                <div class="segments">
+                    <label for="email">Email</label><br>
+                    <input type="email" name="email" id="">
+                </div>
 
-        <div class="segments">
-            <label for="password">Password</label><br>
-            <input type="text" name="password" id="">
-        </div>
-        <div class="segments">
-            <label for="authority">User Authority</label>
-            <select name="auth" id="">
-                <option value="admin">Admin</option>
-                <option value="general">General</option>
-            </select>
-        </div>
-    </div>
-    <button type="submit" class="download">Create</button>
-</form>
+                <div class="segments">
+                    <label for="password">Password</label><br>
+                    <input type="text" name="password" id="">
+                </div>
+                <div class="segments">
+                    <label for="authority">User Authority</label>
+                    <select name="auth" id="">
+                        <option value="admin">Admin</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="download">Create</button>
+        </form>
 
-{{ end }}
+        {{ end }}
 
 {{ define "admin_user_tr"}}
     <tr id="tr{{.UUID}}">
@@ -205,14 +223,14 @@
         <td>{{ .Last_Name}}</td>
         <td>{{ .Email}}</td>
         <td>{{ .Password}}</td>
-        <td>{{.Auth}}</td> 
+        <td>{{ .Auth}}</td> 
         <td><ul class="outer">
             <li class="dropdown">
                 Edit
                 <ul class="inner" style="background-color: rgba(88, 6, 165, .4)">
                     <li><button class="download"
                         hx-post="/getupdate?uuid={{.UUID}}"
-                        hx-target="#form_holder"
+                        hx-target="#updateadmindiv"
                         hx-swap="outerHTML">Update</button></li>
                     <li><button
                         hx-post="/deleteadmin?uuid={{ .UUID}}"
@@ -229,4 +247,73 @@
 {{ end }}
 
 
+{{ define "updateform"}}
+
+
+    <div class="updateadmin" id="adminupdatediv" style="background-color: 
+    rgba(32, 0, 62, .9); 
+    border: solid 1px rgb(122, 120, 124); 
+    border-radius: 5px;">
+   
+        <div style="width: 100%; height: 30px; display: flex; margin-left: auto; margin-right: auto; justify-content: end;">
+            <button  style="
+            background-color: rgb(32, 0, 62);
+            color: white;
+            width: 50px; 
+            height: 25px;  
+            border: solid 1px rgb(32, 0, 62);" id="adminupclose" onclick="closeDiv()">X</button>
+        </div>
+        
+        <form 
+            hx-post="/updateadminuser?uuid={{.UUID}}"
+            hx-target="#tr{{.UUID}}"
+            hx-swap="outerHTML">
+
+            <div class="form_div" style="height: 90%; width: 100%;">
+                <div class="segments">
+                    <label for="first_name" class="uplable">First Name</label><br>
+                    <input type="text" name="first_name" id="" value="{{ .First_Name}}">
+                </div>
+                <div class="segments">
+                    <label for="last_name" class="uplable">Last Name</label><br>
+                    <input type="text" name="last_name" id="" value="{{ .Last_Name}}">
+                </div>
+                <div class="segments">
+                    <label for="email" class="uplable">Email</label><br>
+                    <input type="email" name="email" id="" value="{{ .Email}}">
+                </div>
+
+                <div class="segments">
+                    <label for="password" class="uplable">Password</label><br>
+                    <input type="text" name="password" id="" value="{{ .Password}}">
+                </div>
+                <div class="segments">
+                    <label for="authority" class="uplable">User Auth</label>
+                    <select name="auth" id="" >
+                        <option value="admin">Admin</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="download">Update btn</button>
+        </form>
+        
+
+    </div>
+        
+
+    <script>
+
+        function closeDiv() {
+            const div = document.getElementById('adminupdatediv');
+            div.style.display = 'none';
+        }
+        
+    </script>
+
+{{ end }}
+
+
     
+</body>
+</html>

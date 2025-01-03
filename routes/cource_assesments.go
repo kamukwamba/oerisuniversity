@@ -148,16 +148,30 @@ func DeleteAssesmentAdmin(w http.ResponseWriter, r *http.Request) {
 
 // ASSESMEENT TABLE
 
+func SaveGrade(w http.ResponseWriter, r *http.Request) {
+
+	r.ParseForm()
+
+}
+
 func GradeCA(w http.ResponseWriter, r *http.Request) {
 
 	student_uuid := r.URL.Query().Get("student_uuid")
 	cource_name := r.URL.Query().Get("cource_name")
 
-	_, assesment_data := GetAssesmentData(student_uuid, cource_name)
+	fmt.Println("Route Has Been Hit")
+
+	var data_out []AssesmentGrade
+
+	present, assesment_data := GetAssesmentData(student_uuid, cource_name)
+
+	if present {
+		data_out = assesment_data
+	}
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err := tpl.ExecuteTemplate(w, "admin_cource_assesment", assesment_data)
+	err := tpl.ExecuteTemplate(w, "admin_cource_assesment", data_out)
 
 	if err != nil {
 		http.Redirect(w, r, "/error", http.StatusSeeOther)

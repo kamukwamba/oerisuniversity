@@ -279,6 +279,34 @@ func GetStudentPrograms(student_uuid string) []string {
 	return listout
 }
 
+func StudentPortal(w http.ResponseWriter, r *http.Request) {
+
+	studentuuid := r.URL.Query().Get("student")
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+	var programdataout []AllCourceData
+	var studentinfo StudentInfo
+
+	studentprogramlist := GetStudentPrograms(studentuuid)
+
+	programdataout, present := GetStudentProgramData(studentprogramlist, studentuuid)
+	studentinfo = GetStudentAllDetails(studentuuid)
+
+	students_data := StudentCourse{
+		Available:        present,
+		StInfo:           studentinfo,
+		AllCourceDataOut: programdataout,
+	}
+
+	err := tpl.ExecuteTemplate(w, "studentportal.html", students_data)
+
+	if err != nil {
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
+
+}
+
 func ConfirmStudentLogin(w http.ResponseWriter, r *http.Request) {
 
 	// var students_data_acams ACAMS
@@ -303,12 +331,11 @@ func ConfirmStudentLogin(w http.ResponseWriter, r *http.Request) {
 
 		if confirm {
 
-			studentprogramlist := GetStudentPrograms(studentuuid)
-			fmt.Println("student programs confirm login ", studentprogramlist)
-			programdataout, present = GetStudentProgramData(studentprogramlist, studentuuid)
-			studentinfo = GetStudentAllDetails(studentuuid)
+			// Redirect with query parameters
 
-			setroute = "studentportal.html"
+			http.Redirect(w, r, fmt.Sprintf("/studentportal?student=%s", studentuuid), http.StatusSeeOther)
+
+			return
 
 		} else {
 			setroute = "loginerror.html"

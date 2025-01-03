@@ -206,7 +206,7 @@ func Messages(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err := tpl.ExecuteTemplate(w, "messagesstudent", data)
+	err := tpl.ExecuteTemplate(w, "studentmessages.html", data)
 
 	if err != nil {
 		log.Fatal("ERROR=== ", err, " ===END")
@@ -221,10 +221,12 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	var settext string
 
 	r.ParseForm()
-	email := r.FormValue("old_password")
+	uuid := r.URL.Query().Get("uuid")
+
+	fmt.Println(uuid)
 
 	dbread := dbcode.SqlRead()
-	stmt, err := dbread.DB.Prepare("select uuid, student_uuid, email, password from studentcridentials where email = ?")
+	stmt, err := dbread.DB.Prepare("select uuid, student_uuid, email, password from studentcridentials where student_uuid = ?")
 
 	if err != nil {
 
@@ -239,9 +241,8 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	var email_out string
 	var password string
 
-	err = stmt.QueryRow(email).Scan(&uuid_out, &student_uuid, &email_out, &password)
+	err = stmt.QueryRow(uuid).Scan(&uuid_out, &student_uuid, &email_out, &password)
 
-	fmt.Println("The OLD  PASSWORD OUT ", password)
 	if err != nil {
 		fmt.Println("Second err", err)
 		// log.Fatal(err)
@@ -305,7 +306,11 @@ func ChangeStudentPassword(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err := tpl.ExecuteTemplate(w, "changepassword", nil)
+	student_uuid := r.URL.Query().Get("student")
+
+	fmt.Println("Student UUID", student_uuid)
+
+	err := tpl.ExecuteTemplate(w, "changepassword", student_uuid)
 
 	if err != nil {
 		log.Fatal(err)
@@ -320,7 +325,11 @@ func StudentSettings(w http.ResponseWriter, r *http.Request) {
 
 	data_out := GetStudentAllDetails(uuid)
 
-	err := tpl.ExecuteTemplate(w, "studentdata", data_out)
+	students_data := StudentCourse{
+		StInfo: data_out,
+	}
+
+	err := tpl.ExecuteTemplate(w, "studentprofile.html", students_data)
 
 	if err != nil {
 		log.Fatal(err)

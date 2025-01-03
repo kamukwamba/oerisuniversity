@@ -3,16 +3,20 @@
 <html lang="en">
     <head>
         {{ template "head_temp"}}
+
         <style>
             .centered-div {
             position: relative;
-            width: 300px;
+            width: 50vw;
+            height: 50vh;
             padding: 20px;
             background-color: white;
             border: 1px solid #ccc;
-            border-radius: 10px;
+            border-radius: 5px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             text-align: center;
+            left: 30vh;
+            z-index: 1000;
             }
 
             .close-button {
@@ -30,8 +34,19 @@
             color: #000;
             }
 
-        </style>
+            .approve_complition{
+                width: 150px;
+                height: 30px;
+                border: solid 1px rgb(32, 0, 62);
+                border-radius: 3px;
+                background-color: rgb(32, 0, 62);
+            }
 
+            .approve_complition:hover{
+                background-color: white;
+                color: rgb(32, 0, 62);
+            }
+        </style>
     </head>
 
    
@@ -54,7 +69,7 @@
   {{  template "side_bar" .}}
 
 
-    <div class="main" style="padding: 15px;">
+    <div class="main" style="padding: 15px; height: 100vh; overflow-y: scroll;">
         
         
                   
@@ -116,17 +131,88 @@
 
             </div>
             
+            <div style="display: none;" id="centered-div">
+                
             </div>
+            
             
         </div>  
             
-        <div class=".centered-div">
-
-        </div>
+        
+        
     
     </div>
 
 
+{{ define "admin_cource_assesment"}}
+
+
+
+    <div class="centered-div" id="centered-div"> 
+        <div style="height: 20vh; width: 100%;">
+        <button class="close-button" onclick="closeDiv()">X</button>
+        <table class="assesment_table" style="margin: auto;">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Grade</th>
+                    <th>Comment</th>
+                    <th>Delete</th>
+                    
+                </tr>
+            </thead>
+                
+            
+            <tbody id="assesmentlist">
+                
+
+                {{ range .}}
+                    {{ template "grade_tr" .}}
+
+                {{ end }}
+                
+            </tbody>
+            
+        </table>
+        
+        </div>
+
+        <div class="assesment_form">
+            <form hx-post="/grade_assesment?cource_name&student_uuid" 
+                hx-target="#assesmentlist"
+                hx-swap="beforeend">
+                <div class="form_main" style="display: flex; width: 100%; height: 30%;">
+                    <div class="line" style="display: inline-block; margin-right: 10px;">
+                        <label for="title">Title</label><br>
+                        <input type="text" name="title">
+                    </div>
+                    <div class="line" style="display: inline-block; margin-right: 10px;">
+                        <label for="title">Grade</label><br>
+                        <input type="text" name="grade">
+                    </div>
+                    <div class="line" style="display: inline-block; margin-right: 10px;">
+                        <label for="title">Comment</label><br>
+                        <input type="text" name="comment">
+                    </div>
+                </div>
+
+                <div class="assesment_grade">
+                    <button class="grade" style="width: 100px; height: 30px;" type="submit">Enter Grade</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function closeDiv() {
+            const div = document.getElementById("centered-div");
+            div.style.display = 'none';
+        }
+    </script>
+
+
+
+{{ end }}
 
 
 {{define "programdata"}}
@@ -152,9 +238,13 @@
                 <tr>
                     <td></td>
                     <td>{{ .Cource_Name}}</td>
-                    <td><a href="/gradeca?student_uuid={{ .Student_UUID}}&cource_name={{ .Cource_Name}}">Grade CA</a></td>
+                    <td><a 
+                        hx-post="/gradeca?student_uuid={{ .Student_UUID}}&cource_name={{ .Cource_Name}}" 
+                        hx-target = "#centered-div" 
+                        hx-swap = "outerHTML" style="cursor: pointer;">Grade CA</a></td>
+
                     <td> <a href="/grade_exam?student_uuid={{ .Student_UUID}}&cource_name={{ .Cource_Name}}">Grade Exam</a></td>
-                    <td>Pendding</td>
+                    <td><button class="approve_complition" hx-post="/cource_complete?cource_name = {{ .Cource_Name}}&student_uuid={{ .Student_UUID}}">Approve Complete</button></td>
                     <td id="courceapprovaladmin">
                         {{ if .Approved }}
                             {{ template "cource_approved_admin" .}}

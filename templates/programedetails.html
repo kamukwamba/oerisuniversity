@@ -4,15 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/assets/css/cource_data.css">
+    <script src="/assets/htmx.js"></script>
+
 </head>
 <body>
     <div class="program_details">
     
         <div class="program_details_nav">
-            <button>Programs</button>
+           <div>
+                <h2 id="p_title">{{ .Program_Name}}</h2>
+            </div>
             <button  
-            hx-get="/create_cource_code?parameter=create&program_name={{ .Program_Name}}"  
-            hx-target="#cource_data"
+            hx-get="/create_cource_data?parameter=create&program_name={{ .Program_Name}}"  
+            hx-target="#create_cource_div"
             hx-swap="outerHTML">Add Course Data</button>
         </div>
     
@@ -44,9 +48,16 @@
                 </div>
           
         </div>
-        <div class="cource_data" id="cource_data">
+        <div class="cource_data" id="create_cource_div">
     
         </div>
+
+        <script>
+            const program_name = document.getElementById('p_title');
+            var original_text = program_name.textContent;
+            var p_name_out = original_text.toUpperCase();
+            program_name.textContent = p_name_out;
+        </script>
 
         
     </div>
@@ -75,7 +86,7 @@
             <form hx-post="/saveucdaata?uuid={{ .UUID}}"
             hx-target="#hidden_div"
             hx-swap="outerHTML">
-            <h4>Add Cource Data {{ .Program_Name}}</h4>
+            <h4>Add Cource Data {{ .Program_Name }}</h4>
             
             
             <label for="program_name">Program Name</label>
@@ -120,10 +131,7 @@
     
         <div class="create_cource_div" id="create_cource_div">
             <div class="close_div">
-                <button class="download"
-                hx-get="/close_cource_div"  
-                hx-target="#create_cource_div"
-                hx-swap="outerHTML">X</button>
+                <button class="download" onclick="closeCreate()">X</button>
     
             
             </div>
@@ -131,13 +139,13 @@
 
             <div id="the_form_div"> 
                 <form hx-post="/add_cource"
-                hx-target="#hidden_div"
-                hx-swap="outerHTML">
+                hx-target="#cource_data_table_tr"
+                hx-swap="beforeend">
                 <h4>Add Cource Data {{ .Data.Program_Name}}</h4>
                 
                 
                 <label for="program_name">Program Name</label>
-                <textarea  style="width: 100%; height: 40px; padding-inline: 5px;" id="" name="program_name" placeholder="">{{ .}}</textarea>
+                <textarea  style="width: 100%; height: 40px; padding-inline: 5px;" id="" name="program_name" placeholder="">{{ .Data.Program_Name}}</textarea>
                 
             
                 <label for="cource_name">Cource Name</label>
@@ -166,6 +174,24 @@
             <div id="hidden_div" style=" width: 100%;
             height: 30px;">
             </div>
+
+            <script>
+
+                function closeCreate() {
+                    const div = document.getElementById('create_cource_div');
+                    
+                    const newDiv = `
+                    
+                    <div class="cource_data" id="create_cource_div">
+    
+                    </div>`;
+
+                    // div.style.display = 'none';
+                    div.outerHTML = newDiv;
+                    
+                }
+                
+            </script>
 
         </div>
     
@@ -237,30 +263,77 @@
             <p>Saved</p>
         </div>
     {{ end }}
+
+  
     
     
     {{ define "cource_data_tr"}}
     
-    <tr>
-        <td>{{ .Cource_Name}}</td>
-    
-        <td>{{ .Book}}</td>
-        <td>{{ .Module}}</td>
-        <td>{{ .Video_List}}</td>
-        <td>{{ .Cource_Aseesment}}</td>
+    <tr id="tr{{.UUID}}">
+        <td class="truncate" id="c_name_clean">{{ .Cource_Name}}</td>
+
+        <td class="truncate">{{ .Book}}</td>
+        <td class="truncate">{{ .Module}}</td>
+        <td class="truncate">{{ .Video_List}}</td>
+        <td class="truncate">{{ .Cource_Aseesment}}</td>
+
         <td> <button hx-get="/create_page?uuid={{ .UUID}}&exam_present={{.Exam}}"  
             hx-target="#maincontaint"
             hx-swap="innerHTML" 
-            class="download">{{.Exam}}</button></td>
+            class="download">Exam</button>
+        </td>
     
         <td> <button hx-get="/update_cource_data?parameter=update?cource_uuid={{.UUID}}"  
                     hx-target="#cource_data"
                     hx-swap="outerHTML" 
-                    class="download">Edit Data</button></td>
+                    class="download">Edit Data</button>
+        </td>
 
-           
+
+        <td><button hx-get="/delete_cource_data?cource_uuid={{.UUID}}&cource_name={{ .Cource_Name}}"  
+            hx-target="#tr{{.UUID}}"
+            hx-swap="outerHTML" 
+            class="download">
+            Delete
+        </button>
+        </td>
     </tr>
+
+    <script>
+
+        function replaceUnderscores() {
+        const toclean = document.getElementById('c_name_clean');
+      
+        const originalText = toclean.textContent;
+
+      
+        if (originalText.includes('_')) {
+            const updatedText = originalText.replaceAll('_', ' ');
+            toclean.textContent = updatedText;
+        }
+
+        }
+
+        document.addEventListener('DOMContentLoaded', replaceUnderscores);
     
+    </script>
+    
+
+    {{ end }}
+
+    {{ define "empty_tr"}}
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+
+        </tr>
+
     {{ end }}
     
     {{ define "cource_data_update"}}
@@ -285,9 +358,12 @@
             </form>
         </div>
     {{ end }}
+
+
+    
+    
     
 </body>
-<script src="/assets/htmx.js"></script>
 
 </html>
 

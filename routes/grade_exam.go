@@ -13,6 +13,7 @@ type Grade_Data struct {
 	Exam_Data   ExamTakenStruct
 	Exam_Detail ExamDetails
 	Answers_Out []Answer_Out
+	Assesment   []AssesmentGrade
 }
 
 func GetParticularExam(w http.ResponseWriter, r *http.Request) {
@@ -110,6 +111,13 @@ func GradeExam(w http.ResponseWriter, r *http.Request) {
 	student_uuid := r.URL.Query().Get("student_uuid")
 	cource_name := r.URL.Query().Get("cource_name")
 
+	var asse_data []AssesmentGrade
+	present, assesment_data := GetAssesmentData(student_uuid, cource_name)
+
+	if present {
+		asse_data = assesment_data
+	}
+
 	if_present, attemp_out := Read_Exam_Taken(student_uuid, cource_name)
 	dbconn := dbcode.SqlRead().DB
 
@@ -158,6 +166,7 @@ func GradeExam(w http.ResponseWriter, r *http.Request) {
 			Exam_Data:   attemp_out,
 			Exam_Detail: exam_details,
 			Answers_Out: grade_answer_list,
+			Assesment:   asse_data,
 		}
 
 		tpl = template.Must(template.ParseGlob("templates/*.html"))
