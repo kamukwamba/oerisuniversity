@@ -131,8 +131,8 @@ func main() {
 	port := os.Getenv("PORT")
 
 	if port == "" {
-		port = "3000"
+		port = "8080"
 	}
-	log.Fatal(http.ListenAndServe(":3000", router))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), router))
 
 }

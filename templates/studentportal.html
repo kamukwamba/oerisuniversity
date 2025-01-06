@@ -30,26 +30,6 @@
         </div>
 
     </main>
-  
-
-    <script>
-        // jQuery
-        $(window).on('popstate', function (e) {
-            var state = e.originalEvent.state;
-            if (state !== null) {
-                console.log("Working")
-            }
-        });
-        
-        // Vanilla javascript
-        window.addEventListener('popstate', function (e) {
-            var state = e.state;
-            if (state !== null) {
-                //load content with ajax
-            }
-        });
-        </script>
-
     
    
 </body>
@@ -92,8 +72,8 @@
 {{end}}
 
 {{ define "oops"}}
-    <div class="confirmregistration">
-        <h1 class="oops_header">Oops!!</h1>
+    <div class="confirmregistration" style="padding-bottom: 15px;">
+        <h1 class="oops_header">Sorry</h1>
         <h2 >
             Sorry none of the courses you have applied for have been approved please contact the instituon for futher help
         </h2>

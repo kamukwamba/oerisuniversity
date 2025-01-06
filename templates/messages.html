@@ -4,8 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Messages</title>
-    <link rel="stylesheet" href="/assets/css/studentportal.css?v=2.1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/assets/css/studentportal.css?v=3.5">
+    <link rel="stylesheet" href="/assets/css/video.css?v=1.6">
+    <link rel="stylesheet" href="/assets/css/messages.css?v=1.0">
+    <link rel="stylesheet" href="/assets/css/studentdata.css?v=1.0">
+    <link rel="stylesheet" href="/assets/css/cource_assesment.css?v=1.0">
     <script src="/assets/htmx.js"></script>
+	<style>
+		.message_div{
+			height: 60vh;
+		}
+	</style>
 
     
 </head>
@@ -33,7 +43,7 @@
 
     {{ define "messagesstudent"}}
 
-    <div class="main">
+    <div class="main" style= "padding-bottom: 10vh;">
         <div class="message_box">
            
             <div class="messages" id="messageslist">
