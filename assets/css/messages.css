@@ -1,6 +1,6 @@
 
 .message_box{
-    height: 800vh;
+    height: 80vh;
     position: relative;
     width: 70vw;
     background-color: white;
@@ -87,6 +87,7 @@
     width: 10%;
     color: white;
     font-size: 0.9em;
+	pointer: cursor;
 }
 
 .send_message_btn:hover{
