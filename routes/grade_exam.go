@@ -18,8 +18,11 @@ type Grade_Data struct {
 
 func GetParticularExam(w http.ResponseWriter, r *http.Request) {
 
-	student_uuid := r.URL.Query().Get("kjfkjdsfhj")
-	cource_name := r.URL.Query().Get("ddfrgsd")
+	student_uuid := r.URL.Query().Get("rttse")
+	cource_name := r.URL.Query().Get("ttre")
+	
+	
+	
 
 	attempt_number := r.FormValue("attempt")
 
@@ -33,6 +36,8 @@ func GetParticularExam(w http.ResponseWriter, r *http.Request) {
 	_, cource_uuid, _ := Read_Exam(cource_name)
 	exam_details := GetExamDetails(cource_uuid)
 	_, attemp_out := Read_Exam_Taken(student_uuid, cource_name)
+	
+	attemp_out.Attemp_Number = attempt_number
 
 	query_stmt := fmt.Sprintf("select * from  %s where cource_name = ? AND attempt_number = ?", cleaned)
 
@@ -54,15 +59,25 @@ func GetParticularExam(w http.ResponseWriter, r *http.Request) {
 
 		grade_answer_list = append(grade_answer_list, grade_answer)
 	}
+	
 
 	grade_data := Grade_Data{
 		Exam_Data:   attemp_out,
 		Exam_Detail: exam_details,
 		Answers_Out: grade_answer_list,
 	}
+	
+	fmt.Println("Attempt Number: ", attempt_number, "\nData Out::::: ", grade_data)
+	
+	
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	fmt.Println(grade_data)
+	err = tpl.ExecuteTemplate(w, "grade_left", grade_data)
 
+	if err != nil {
+		http.Redirect(w, r, "/error", http.StatusSeeOther)
+		return
+	}
 }
 
 func SaveGrades(w http.ResponseWriter, r *http.Request) {

@@ -13,11 +13,20 @@
             
 
         }
+		
+		form input {
+			border:  solid 1px #333;
+			border-radius: 3px;
+		}
+		
+		form textarea{
+			border:  solid 1px #333;
+			border-radius: 3px;
+		}
 
         table{
             margin-left: auto;
             margin-right: auto;
-            margin-top: 10px;
             border-collapse: collapse;
             text-align: center;
             overflow-x: scroll;
@@ -76,18 +85,18 @@
             }
 
         .spinner {
-        display: none;
-        width: 50px;
-        height: 50px;
-        border: 5px solid #f3f3f3;
-        border-top: 5px solid #3498db;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 1000;
+			display: none;
+			width: 50px;
+			height: 50px;
+			border: 5px solid #f3f3f3;
+			border-top: 5px solid #3498db;
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			z-index: 1000;
         }
 
         @keyframes spin {
@@ -108,6 +117,8 @@
             padding: 5px;
             margin-top: 0px;
             height: 100vh;
+			overflow-y: auto;
+			padding-bottom: 60px;
 
 
         }
@@ -190,7 +201,7 @@
     
 
     <div class="main_body">
-        <div class="left_side" id="left_sides">
+        <div class="left_side" id="left_side">
 
             {{ template  "grade_left" .}}
 
@@ -203,7 +214,7 @@
 
         <div class="record_results" style="height: fit-content; padding: 10px;">
             <form 
-            hx-post = "gradeexamination?rttse={{ .Exam_Data}}"
+            hx-post = "gradeexamination?rttse={{ .Exam_Data.Student_UUID}}&ttre={{.Exam_Data.Cource_Name}}"
             hx-target="#hidden_div"
             hx-swap="outerHTML">
                 <div class="input_div">
@@ -237,7 +248,7 @@
             </div>
         </div>
 
-        <div class="assestment_table"  style="height: 40vh;">
+        <div class="assestment_table"  style="height: 40vh; border: solid 1px #333; border-radius: 3px; padding: 0px;">
             
             <table>
                 <thead class="thheads">
@@ -275,7 +286,7 @@
                 <label for="attempt" >Attempt Number</label><br>
                 <input type="text" name="attempt" style="width: 200px; margin-bottom: 5px"><br>
                 <button type="submit" class="grade_exam" 
-                hx-post = "/examddfdea?rttse={{ .Exam_Data}}" 
+                hx-post = "/examddfdea?rttse={{ .Exam_Data.Student_UUID}}&ttre={{.Exam_Data.Cource_Name}}" 
                 hx-target = "#left_side"
                 hx-target = "innerHTML"
                 hx-trigger="click" 
@@ -318,7 +329,7 @@
             </ul>
         </div>
 
-        <div class="answers" style="padding: 10px;">
+        <div class="answers" style="padding: 10px;" id="aswers_list">
             {{ range .Answers_Out}}
                 {{ template "answers_out" .}}
             {{end}}
@@ -336,8 +347,6 @@
     {{ end }}
     
     <div class="spinner"></div>
-
-
     
     
     

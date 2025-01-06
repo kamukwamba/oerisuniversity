@@ -601,7 +601,7 @@ func ACAMSStudentData(w http.ResponseWriter, r *http.Request) {
 	acamsstudents := GetACAMSStudents(admin_id)
 
 	fmt.Println("ADMIN ID::::", admin_id)
-
+	fmt.Println("The Route Has Been Hi")
 	admin_infor := AdminData(admin_id)
 
 	data_out := AdminPage{

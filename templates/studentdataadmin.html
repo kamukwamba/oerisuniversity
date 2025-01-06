@@ -6,6 +6,9 @@
     {{ template "head_temp"}}
 
     <style>
+      a {
+        cursor: pointer;
+      }
       .details_btn{
           display: block; 
           text-decoration: none; 
@@ -132,9 +135,9 @@
                 
           
                   <td>
-                    <div hx-post ="studentedataadmin/{{ .Student_UUID}}" 
-                    hx-target = "#maincontaint" class="studentdetailsbtnapprove">
-                    Details
+                    <a href="studentedataadmin?student_uuid={{ .Student_UUID}}&out={{ .Admin_ID}}" class="details_btn" style="background-color: red; text-decoration: none; 
+                    color: white;
+                    border: solid 1px white;">Details</a>
                   </div>
                   </td>
                   </tr>

@@ -607,6 +607,38 @@ func Read_Exam_Taken(uuid, cource_name string) (bool, ExamTakenStruct) {
 
 // }
 
+
+func CourceCompleted(w http.ResponseWriter, r *http.Request){
+	cource_name := r.URL.Query().Get("cource_name")
+	uuid := r.URL.Query().Get("student")
+	
+	fmt.Println(cource_name, uuid)
+	
+	id_out := CleanStudentUUID(uuid)
+	var template_name string
+	
+	
+	is_taken, _ := Read_Exam_Taken(uuid, cource_name)
+	
+	if is_taken {
+		fmt.Println(id_out)
+		template_name = "cource_complete_tag"
+	}else{
+		template_name = "cource_notcomplete_tag"
+		
+	}
+	
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+	
+	
+	err := tpl.ExecuteTemplate(w, template_name, nil)
+	
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+
 func CreatePage(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
@@ -749,6 +781,7 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
+		return
 
 	} else if display_number == 2 {
 
@@ -759,6 +792,7 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
+		return
 
 	} else if display_number == 3 {
 		err := tpl.ExecuteTemplate(w, template_name, uuid)
@@ -766,6 +800,7 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
+		return
 	}
 
 	// GET EXAM DETAILS "END"

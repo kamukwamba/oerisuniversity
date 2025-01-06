@@ -98,12 +98,11 @@
             Sorry none of the courses you have applied for have been approved please contact the instituon for futher help
         </h2>
         <div class="proceed_div btnbottom">
-            <button hx-post = "/messages/{{.StInfo.UUID}}"  
-                    hx-target = "#mainpage" 
-                    hx-swap = "innerHTML"
-                    class="proceed_btn procced_bottom">
+
+            <a class="proceed_btn procced_bottom" href="/messages/{{.StInfo.UUID}}">
                 Contact Institution
-            </button>
+            </a>
+            
         </div>
     </div>
     

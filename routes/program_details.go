@@ -26,6 +26,8 @@ type ProgramDataOut struct {
 	Present      bool
 	Program_Name string
 	ProgramData  []CourceDataStruct
+	Admin AdminInfo
+	
 }
 
 type CourceDataUpdate struct {
@@ -35,7 +37,8 @@ type CourceDataUpdate struct {
 
 func UpdateCourceData(w http.ResponseWriter, r *http.Request) {
 
-	uuid := r.URL.Query().Get("uuid")
+	uuid := r.URL.Query().Get("cource_uuid")
+	
 	dbconn := dbcode.SqlRead().DB
 	var cource_data CourceDataStruct
 
@@ -43,8 +46,10 @@ func UpdateCourceData(w http.ResponseWriter, r *http.Request) {
 
 	stmt, err := dbconn.Prepare("select uuid, program_name, cource_name,cource_assesment, video_list, module,recomended_book from cource_table where uuid = ?")
 
+	fmt.Println("Cource UUID:::::: ", uuid)
+	
 	if err != nil {
-		err_out := fmt.Errorf("Failed to read from DB, error out: %w", err)
+		err_out := fmt.Errorf("Failed to read from DB, error out ONE: %w", err)
 		fmt.Println(err_out)
 	}
 
@@ -53,7 +58,7 @@ func UpdateCourceData(w http.ResponseWriter, r *http.Request) {
 	err = stmt.QueryRow(uuid).Scan(&cource_data.UUID, &cource_data.Program_Name, &cource_data.Cource_Name, &cource_data.Cource_Aseesment, &cource_data.Video_List, &cource_data.Module, &cource_data.Book)
 
 	if err != nil {
-		err_out := fmt.Errorf("Failed to read from DB, error out: %w", err)
+		err_out := fmt.Errorf("Failed to read from DB, error out TWO: %w", err)
 
 		fmt.Println(err_out)
 	}
@@ -84,7 +89,7 @@ func UpdateProgramDetails(w http.ResponseWriter, r *http.Request) {
 
 	update := dbcode.SqlRead().DB
 
-	stmt, err := update.Prepare("UPDATE cource_table SET program_name = ?, cource_name = ? , cource_assesmentv = ?, video_list = ?,module = ?,recomended_book = ?, exam_file = ? where uuid = ? ")
+	stmt, err := update.Prepare("UPDATE cource_table SET program_name = ?, cource_name = ? , cource_assesment = ?, video_list = ?,module = ?,recomended_book = ? where uuid = ? ")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -96,8 +101,19 @@ func UpdateProgramDetails(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	
+	cource_data :=  CourceDataStruct{
+		UUID: 			  uuid,	
+		Program_Name:     program_name,
+		Cource_Name:      cource_name,
+		Cource_Aseesment: assesment_link,
+		Video_List:       video_link,
+		Module:           module_link,
+		Book:             book_link,
+		
+	}
 
-	err_out := tpl.ExecuteTemplate(w, "cource_data_saved", nil)
+	err_out := tpl.ExecuteTemplate(w, "cource_data_tr", cource_data)
 
 	if err_out != nil {
 		log.Fatal(err)
@@ -196,8 +212,13 @@ func GetProgramDetails(program_name string) ([]CourceDataStruct, bool) {
 func ProgramDetails(w http.ResponseWriter, r *http.Request) {
 
 	path := r.PathValue("id")
-	fmt.Println("The Path Value", path)
+	out := r.URL.Query().Get("out")
 
+	fmt.Println("Admin ID:::: ",out)
+
+	admin_infor := AdminData(out)
+
+	
 	var program_data ProgramDataOut
 
 	result, present := GetProgramDetails(path)
@@ -210,12 +231,15 @@ func ProgramDetails(w http.ResponseWriter, r *http.Request) {
 			Present:      true,
 			Program_Name: path,
 			ProgramData:  result,
+			Admin: admin_infor,
+			
 		}
 
 	} else {
 		program_data = ProgramDataOut{
 			Present:      false,
 			Program_Name: path,
+			Admin: admin_infor,
 		}
 	}
 

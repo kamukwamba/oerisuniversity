@@ -5,62 +5,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/assets/css/cource_data.css">
     <script src="/assets/htmx.js"></script>
+	{{ template "head_temp"}}
+	<style>
+	
+	</style>
 
 </head>
 <body>
-    <div class="program_details">
-    
-        <div class="program_details_nav">
-           <div>
-                <h2 id="p_title">{{ .Program_Name}}</h2>
-            </div>
-            <button  
-            hx-get="/create_cource_data?parameter=create&program_name={{ .Program_Name}}"  
-            hx-target="#create_cource_div"
-            hx-swap="outerHTML">Add Course Data</button>
-        </div>
-    
-        <hr>
-    
-        <div class="details">
-            <div class="cource_data_div" style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <th>Cource Name</th>
-                        <th>Book</th>
-                        <th>Module</th>
-                        <th>Videos</th>
-                        <th>Assesment</th>
-                        <th>Exam</th>
-            
-            
-                    </thead>
-                    <tbody  id="cource_data_table_tr">
+	<div class="heading">
+		  <h3 class="ucms_name">
+			  Admin
+		  </h3>
+		  <div class="heading_nav">
+			<div>
+				<a href="">{{ .Admin.Name}} </a>
+			</div>
+			<div>
+				<a href="">sign out</a>
+			</div>
+		  </div>
+	  </div>
+		 
+    {{  template "side_bar" .}}
+	
+	<div class="main">
+		<div class="program_details">
+		
+			<div class="program_details_nav">
+			   <div>
+					<h2 id="p_title">{{ .Program_Name}}</h2>
+				</div>
+				<button  
+				hx-get="/create_cource_data?parameter=create&program_name={{ .Program_Name}}"  
+				hx-target="#create_cource_div"
+				hx-swap="outerHTML">Add Course Data</button>
+			</div>
+		
+			<hr>
+		
+			<div class="details">
+				<div class="cource_data_div" style="overflow-x: auto;">
+					<table>
+						<thead>
+							<th>Cource Name</th>
+							<th>Book</th>
+							<th>Module</th>
+							<th>Videos</th>
+							<th>Assesment</th>
+							<th>Exam</th>
+				
+				
+						</thead>
+						<tbody  id="cource_data_table_tr">
 
-                        {{ if .Present }}
-                            {{ range .ProgramData }}
-                                {{ template "cource_data_tr" .}}
-                            {{ end }}
-                        {{ end }}
-                        
-                    </tbody>
-                </table>
-                </div>
-          
-        </div>
-        <div class="cource_data" id="create_cource_div">
-    
-        </div>
+							{{ if .Present }}
+								{{ range .ProgramData }}
+									{{ template "cource_data_tr" .}}
+								{{ end }}
+							{{ end }}
+							
+						</tbody>
+					</table>
+					</div>
+			  
+			</div>
+			<div class="cource_data" id="create_cource_div">
+		
+			</div>
 
-        <script>
-            const program_name = document.getElementById('p_title');
-            var original_text = program_name.textContent;
-            var p_name_out = original_text.toUpperCase();
-            program_name.textContent = p_name_out;
-        </script>
+			<script>
+				const program_name = document.getElementById('p_title');
+				var original_text = program_name.textContent;
+				var p_name_out = original_text.toUpperCase();
+				program_name.textContent = p_name_out;
+			</script>
 
-        
-    </div>
+			
+		</div>
+	
+	</div>
     
     {{ define "cource_data_close"}}
         <div class="cource_data" style="display: none;">
@@ -71,22 +94,17 @@
 
     {{ define "cource_data_updater"}}
 
-    <div class="create_cource_div" id="create_cource_div">
+    <div class="create_cource_div" id="create_update_div">
         <div class="close_div">
-            <button class="download"
-            hx-post="/close_cource_div"  
-            hx-target="#cource_data"
-            hx-swap="outerHTML">X</button>
-
-        
+            <button class="download" onclick="closeUpdater()">X</button>
         </div>
 
 
-        <div id="the_form_div"> 
-            <form hx-post="/saveucdaata?uuid={{ .UUID}}"
-            hx-target="#hidden_div"
+        <div id="the_form_div" class="the_form_div"> 
+            <form hx-post="/saveucdaata?uuid={{.UUID}}"
+            hx-target="#tr{{.UUID}}"
             hx-swap="outerHTML">
-            <h4>Add Cource Data {{ .Program_Name }}</h4>
+            <h4>Update Cource Data {{ .Program_Name }}</h4>
             
             
             <label for="program_name">Program Name</label>
@@ -110,7 +128,7 @@
             <textarea  style="width: 100%; height: 40px; padding-inline: 5px;" id="" name="assesment_link">{{ .Cource_Aseesment}}</textarea>
         
             
-            <button type="submit" class="download">Create</button>
+            <button type="submit" class="download" style ="width:200px;">Update Data</button>
         </form>
         </div>
 
@@ -119,6 +137,24 @@
         <div id="hidden_div" style=" width: 100%;
         height: 30px;">
         </div>
+		
+		<script>
+
+			function closeUpdater() {
+				const div = document.getElementById('create_update_div');
+				
+				const newDiv = `
+				
+				<div class="cource_data" id="create_cource_div">
+
+				</div>`;
+
+				// div.style.display = 'none';
+				div.outerHTML = newDiv;
+				
+			}
+			
+		</script>
 
     </div>
 
@@ -132,12 +168,10 @@
         <div class="create_cource_div" id="create_cource_div">
             <div class="close_div">
                 <button class="download" onclick="closeCreate()">X</button>
-    
-            
             </div>
 
 
-            <div id="the_form_div"> 
+            <div id="the_form_div" class="the_form_div"> 
                 <form hx-post="/add_cource"
                 hx-target="#cource_data_table_tr"
                 hx-swap="beforeend">
@@ -283,8 +317,8 @@
             class="download">Exam</button>
         </td>
     
-        <td> <button hx-get="/update_cource_data?parameter=update?cource_uuid={{.UUID}}"  
-                    hx-target="#cource_data"
+        <td> <button hx-get="/update_cource_data?cource_uuid={{.UUID}}"  
+                    hx-target="#create_cource_div"
                     hx-swap="outerHTML" 
                     class="download">Edit Data</button>
         </td>
@@ -322,7 +356,7 @@
     {{ end }}
 
     {{ define "empty_tr"}}
-        <tr>
+        <tr style="display=none">
             <td></td>
             <td></td>
             <td></td>

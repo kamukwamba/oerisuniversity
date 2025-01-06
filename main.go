@@ -96,6 +96,7 @@ func main() {
 	router.HandleFunc("/grade_exam", routes.GradeExam)
 	router.HandleFunc("/gradeexamination", routes.SaveGrades)
 	router.HandleFunc("/examddfdea", routes.GetParticularExam)
+	router.HandleFunc("/courcecompleted", routes.CourceCompleted)
 
 	//STUDENT PORTAL ROUTES
 	router.HandleFunc("/confirmlogin", routes.ConfirmStudentLogin)

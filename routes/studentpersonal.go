@@ -449,12 +449,13 @@ func CleanStudentUUID(uuid string) string {
 
 	new_uuid := strings.Split(uuid, "-")
 
-	new_string := ""
+	new_string := "st"
 
 	for _, item := range new_uuid {
 		new_string = new_string + item
 	}
 
+	fmt.Println(new_uuid)
 	return new_string
 }
 
@@ -463,6 +464,8 @@ func MakeStudentExamTable(student_uuid string) {
 	dbconn := dbcode.SqlRead().DB
 
 	new_string := CleanStudentUUID(student_uuid)
+
+	fmt.Println("The string name:::", new_string, "::")
 
 	create_table := fmt.Sprintf(`create table if not exists %s(
 		uuid blob not null,
@@ -480,6 +483,8 @@ func MakeStudentExamTable(student_uuid string) {
 		fmt.Println("Failed to create table error_one::: ", err)
 	}
 
+	defer stmt.Close()
+
 	_, err = stmt.Exec()
 
 	if err != nil {
@@ -489,8 +494,6 @@ func MakeStudentExamTable(student_uuid string) {
 	if err != nil {
 		fmt.Println("Failed to create student exam answer table error_three: ", err)
 	}
-
-	defer stmt.Close()
 
 }
 

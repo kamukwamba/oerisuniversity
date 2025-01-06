@@ -244,7 +244,11 @@
                         hx-swap = "outerHTML" style="cursor: pointer;">Grade CA</a></td>
 
                     <td> <a href="/grade_exam?student_uuid={{ .Student_UUID}}&cource_name={{ .Cource_Name}}">Grade Exam</a></td>
-                    <td><button class="approve_complition" hx-post="/cource_complete?cource_name = {{ .Cource_Name}}&student_uuid={{ .Student_UUID}}">Approve Complete</button></td>
+                    <td id="btc{{.Cource_Name}}"><button class="approve_complition" 
+						hx-post="/courcecompleted?cource_name = {{ .Cource_Name}}&student={{.Student_UUID}}" 
+						hx-target = "#btc{{.Cource_Name}}"
+						hx-swap = "innerHTML"
+						style="color: white;" >Approve Complete</button></td>
                     <td id="courceapprovaladmin">
                         {{ if .Approved }}
                             {{ template "cource_approved_admin" .}}
@@ -265,7 +269,7 @@
     </table>
     </div>
 
-
+	
     <div class="updatecourcesdatediv">
         
 
@@ -302,6 +306,26 @@
 {{end}}
 
 
+{{ define "cource_complete_tag"}}
+	<div style="color: rgb(32, 02, 62); 
+		width: 150px; 
+		border: solid 1px rgb(32, 02, 62);
+		border-radius: 3px; 
+		background-color: white;" >
+		Course Completed
+	</div>
+{{ end }}
+
+{{ define "cource_notcomplete_tag"}}
+	<div style="color: rgb(32, 02, 62); 
+		width: 150px; 
+		border: solid 1px rgb(32, 02, 62);
+		border-radius: 3px; 
+		background-color: white;" >
+		Not Complete
+	</div>
+
+{{end}}
 
 {{ define "pendding" }}
     <p class="cource_text_approval">Pendding</p>

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirmation</title>
-    <link rel="stylesheet" href="/assets/css/confirmenroll.css">
     <script src="/assets/htmx.js"></script>
     <style>
         body{
@@ -13,13 +12,79 @@
         background-size: 100% 100%;
         background-attachment:fixed;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+    }
+
+    .mainbox{
+        width: 45%;
+        height: 60vh;
+        border: 1px solid rgb(37, 0, 62);
+        border-radius: 5px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 20vh;
+        text-align: center;
+        background-color: white;
+        padding: 20px;
+    }
+
+    .mainbox h1{
+        text-align: center;
+    }
+
+    .btn1{
+        width: 150px;
+        height: 35px;
+        font-size: 1.2em;
+        background-color: rgb(37, 0, 62);
+        border: 1px solid rgb(37, 0, 62);
+        border-radius: 2px;
+        color: white;
+        text-decoration: none;
+        padding-top: 5px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .btn1:hover{
+        background-color: white;
+        
+    }
+
+    .btn1:hover a{
+        color: rgb(37, 0, 62);
+    }
+
+    .btn1 a{
+        text-decoration: none;
+        color: white;
+    }
+
+
+
+    .btn1:active{
+        background-color: rgb(37, 0, 62);
+        color: white;
+    }
+
+    .checkmark{
+        width: 100px;
+        height: 100px;
+        margin-left:auto;
+        margin-right: auto;
+        position: relative;
+        
+        
+    }
+
+    .checkmark img{
+        height: 100px;
+    }
 
     </style>
 
 </head>
 <body>
-    <div class="mainbox">
+    <div class="mainbox" style="padding: 30px;">
         <h1 class="headertext">Submited</h1>
         <div class="checkmark">
             <img src="/assets/Images/check_purple.png" alt="check_purple">
