@@ -88,6 +88,66 @@
             </div>
 
     </div>
+	
+	  <button class="openMsg" onclick="newslogOpen()">
+		<img src="/assets/images/newslogImg.png">
+	  </button>
+	
+	<div class="hidden_main">
+		 <h2 class="dashboard_name">
+            News
+        </h2>
+        <hr>
+            <div class="mainnewsdiv">
+
+            
+                <div class="leftside">
+                    <div class="navbar">
+                        <div class="navitem">
+                            Write
+                        </div>
+                    </div>
+                    
+                    <div id="changer">
+                    {{template "writearticle"}}
+                    </div>
+                
+                </div>
+
+                
+
+            </div>
+		
+	</div>
+	
+	<div class="lefthiddennews" id="lefthiddennews">
+		<div class="closeMsg">
+			<button onclick="newslogClose()"> X </button>
+		</div>
+		<div class="rightside" id="adminright">
+			<h3 class="News">
+				News Articles
+			</h3>
+			<ul id="newsamplelist">
+			
+			</ul>
+		</div>
+	
+	</div>
+	
+	<script>
+		const newslogs = document.getElementByID("lefthiddennews");
+		
+		function newslogOpen() {
+		
+			newslog.display.toggle("open");
+			
+		}
+		
+		function msglogClose(){
+			newslog.display.toggle("close");
+		}
+	</script>
 
 
     

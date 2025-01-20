@@ -5,7 +5,9 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-
+	"os"
+	"io"
+	"path/filepath"
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 	"github.com/kamukwamba/oerisuniversity/encription"
 )
@@ -23,6 +25,8 @@ type AssesmentGrade struct {
 type AssesmentOut struct {
 	Present       bool
 	AssesmentList []AssesmentGrade
+	Student_UUID string
+	Cource_Name string
 }
 
 func GetAssesmentData(student_uuid, cource_name string) (bool, []AssesmentGrade) {
@@ -71,6 +75,8 @@ func HandInAssesment(w http.ResponseWriter, r *http.Request) {
 	display_assesment := AssesmentOut{
 		Present:       present,
 		AssesmentList: assesment_data,
+		Student_UUID: student_uuid,
+		Cource_Name: cource_name,
 	}
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
@@ -154,24 +160,94 @@ func SaveGrade(w http.ResponseWriter, r *http.Request) {
 
 }
 
+
+func DownloadAssesments(w  http.ResponseWriter, r *http.Request){
+	student_uuid := r.URL.Query().Get("student_uuid")
+	cource_name := r.URL.Query().Get("cource_name")
+	pdf_filename := r.URL.Query().Get("file_name")
+	
+	dbFilePath := fmt.Sprintf("./assesmentFiles/%s/%s/%s.pdf", student_uuid, cource_name, pdf_filename)
+	
+
+	if _, err := os.Stat(dbFilePath); os.IsNotExist(err) {
+		http.Error(w, "Database file not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/octet-stream")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filepath.Base(dbFilePath)))
+
+	
+	file, err := os.Open(dbFilePath)
+	if err != nil {
+		http.Error(w, "Unable to open the file", http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	
+	_, err = io.Copy(w, file)
+	if err != nil {
+		http.Error(w, "Error writing file to response", http.StatusInternalServerError)
+		return
+	}
+}
+
+
 func GradeCA(w http.ResponseWriter, r *http.Request) {
 
 	student_uuid := r.URL.Query().Get("student_uuid")
 	cource_name := r.URL.Query().Get("cource_name")
+	
+	theString := fmt.Sprintf("assesmentFiles/%s/%s", student_uuid, cource_name)
+	filesAs, err  := listAssignments(theString)
+	
+	type FileDownload struct {
+		FileName string
+		Student_UUID string
+		Cource_Name string
+	}
+	type HandedIn struct {
+		Handed []FileDownload
+		Assesment []AssesmentGrade
+	}
+	
+	var fileData FileDownload
+	
+	var fileDataList []FileDownload
+	
+	for _,item := range filesAs{
+		fileData = FileDownload {
+			FileName: item,
+			Student_UUID: student_uuid,
+			Cource_Name: cource_name,
+		}
+		
+		fileDataList = append(fileDataList, fileData)
+		
+	}
+	
 
 	fmt.Println("Route Has Been Hit")
 
-	var data_out []AssesmentGrade
+	var data_out HandedIn
+	var data_out_list []AssesmentGrade
+	
 
 	present, assesment_data := GetAssesmentData(student_uuid, cource_name)
 
 	if present {
-		data_out = assesment_data
+		data_out_list = assesment_data
+	}
+	
+	data_out = HandedIn{
+		Handed: fileDataList,
+		Assesment: data_out_list,
 	}
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err := tpl.ExecuteTemplate(w, "admin_cource_assesment", data_out)
+	err = tpl.ExecuteTemplate(w, "cource_assesment.html", data_out)
 
 	if err != nil {
 		http.Redirect(w, r, "/error", http.StatusSeeOther)
@@ -201,4 +277,24 @@ func LoadAssesmentTable() {
 		log.Printf("%q: %s\n", create_assesment_error, create_assesment)
 	}
 
+}
+
+
+
+
+
+
+func listAssignments(dir string) ([]string, error) {
+	var pdfFiles []string
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		// Check if the file has a .pdf extension
+		if !info.IsDir() && filepath.Ext(info.Name()) == ".pdf" {
+			pdfFiles = append(pdfFiles, info.Name())
+		}
+		return nil
+	})
+	return pdfFiles, err
 }

@@ -1,0 +1,61 @@
+{{ define "adminheadertemp"}}
+
+	<div class="heading">
+      <h3 class="ucms_name">
+          Admin
+      </h3>
+      <div class="heading_nav">
+        <div>
+            <a href="">{{ .Admin.Name}} <a>
+        </div>
+        <div>
+            <a href="">sign out</a>
+        </div>
+      </div>
+	  
+	
+	</div>
+	
+	<div class="heading_hidden">
+      <h3 class="ucms_name">
+          Admin
+      </h3>
+      <div class="heading_nav">
+        <div>
+            <a href="">{{ .Admin.Name}} <a>
+        </div>
+        <div>
+            <a href="">sign out</a>
+        </div>
+      </div>
+	  
+	  <div class="navbartop">
+		
+            <a  href="/programcards?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Programs</a>
+            
+
+            
+			<a  href="/acamsstudentdata?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Students</a>
+	   
+			<a  href="/adminMessages?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Messages</a>
+
+		
+			<a  href="/adminNews?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">News</a>
+			
+   
+			<a  href="/get_admin_users?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Lecturers</a>
+		
+			<a  href="/get_matrics?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Matrics</a>
+	
+            <a  href="/get_matrics?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Store</a>
+	  </div>
+	  
+	  
+	  
+	
+	</div>
+	
+
+
+
+{{ end }}

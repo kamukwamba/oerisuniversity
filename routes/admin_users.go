@@ -20,6 +20,15 @@ type AdminUser struct {
 	Auth       string
 	Date       string
 }
+type Visited struct {
+	Date  string
+	Count string
+}
+
+type MatricsData struct {
+	Admin       AdminInfo
+	VisitedList []Visited
+}
 
 func CreatAdminUser(w http.ResponseWriter, r *http.Request) {
 
@@ -248,6 +257,28 @@ func UpdateAdminUsers(w http.ResponseWriter, r *http.Request) {
 type AdminUserData struct {
 	Admin AdminInfo
 	Users []AdminUser
+}
+
+func Matrics(w http.ResponseWriter, r *http.Request) {
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	admin_id := r.URL.Query().Get("out")
+	admin_infor := AdminData(admin_id)
+
+	metrics_data := LoadVisited()
+	data_out := MatricsData{
+		Admin:       admin_infor,
+		VisitedList: metrics_data,
+	}
+
+	fmt.Println("Currently Visited",data_out)
+	err := tpl.ExecuteTemplate(w, "metric.html", data_out)
+	if err != nil {
+		
+		fmt.Println("Matrics; Line:262; Erro: ", err)
+	}
+
 }
 
 func AdminUsers(w http.ResponseWriter, r *http.Request) {

@@ -38,119 +38,198 @@
 
    
   <body>
-    <div class="heading">
-      <h3 class="ucms_name">
-          Admin
-      </h3>
-      <div class="heading_nav">
-        <div>
-            <a href="">{{ .Admin.Name}}</a>
-        </div>
-        <div>
-            <a href="">sign out</a>
-        </div>
-      </div>
-  </div>
- 
+    {{ template "adminheadertemp" .}}
 
 
-
-
-  {{  template "side_bar" .}}
+	{{  template "side_bar" .}}
 
 
     <div class="main">
-      <h2 class="dashboard_name">
-        Students
-    </h2>
-    <hr>
-    <div class="tochange">
-      <div class="tableheader" style="height: 15vh; border-radius: 0px;">
-        <p class="programname">Award of Certificate of Attendance in Metaphysical Sciences</p>
-        <select class="programnamelist" id="">
-          <option value="">ALL</option>
-          <option value="">ACAMS</option>
-          <option value="">ACMS</option>
-          <option value="">ADMS</option>
-          <option value="">ABDMS</option>
-          <option value="">AMDMS</option>
-          <option value="">Ph.DMS</option>
-          
-      
-        </select>
-      </div> 
-      <div class="programdiv">
-        
-        <div class="table_div">
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">First Name</th>
-                <th scope="col">Last Name</th>
-                <th scope="col">Email</th>
-                <th scope="col">Applied</th>
-                <th scope="col">Paid</th>
-                <th scope="col">Payment Method</th>
-                <th scope="col">Completed</th>
-                <th scope="col">Details</th>
-              
-        
-              </tr>
-            </thead>
+		 <h2 class="dashboard_name">
+			Students
+		</h2>
+		<hr>
+		<div class="tochange">
+		  <div class="tableheader" style="height: 15vh; border-radius: 0px;">
+			<p class="programname">Award of Certificate of Attendance in Metaphysical Sciences</p>
+			<select class="programnamelist" id="">
+			  <option value="">ALL</option>
+			  <option value="">ACAMS</option>
+			  <option value="">ACMS</option>
+			  <option value="">ADMS</option>
+			  <option value="">ABDMS</option>
+			  <option value="">AMDMS</option>
+			  <option value="">Ph.DMS</option>
+			  
+		  
+			</select>
+		  </div> 
+		  <div class="programdiv">
+			
+			<div class="table_div">
+			  <table class="table">
+				<thead>
+				  <tr>
+					<th scope="col">#</th>
+					<th scope="col">First Name</th>
+					<th scope="col">Last Name</th>
+					<th scope="col">Email</th>
+					<th scope="col">Applied</th>
+					<th scope="col">Paid</th>
+					<th scope="col">Payment Method</th>
+					<th scope="col">Completed</th>
+					<th scope="col">Details</th>
+				  
+			
+				  </tr>
+				</thead>
 
-            
-            <tbody>
-              {{ range .AcamsData}}
-                {{ if .Approved}}
-                <tr>
-                  <th scope="row"></th>
-                  <td>{{ .First_Name}}</td>
-                  <td>{{ .Last_Name}}</td>
-                  <td>{{ .Email}}</td>
-                  <td>{{ .Approved}}</td>
-                  <td>{{ .Paid}}</td>
-                  <td>{{ .Payment_Method}}</td>
-                  <td>{{ .Completed}}</td>
-                
-          
-                  <td>
+				
+				<tbody>
+				  {{ range .AcamsData}}
+					{{ if .Approved}}
+					<tr>
+					  <th scope="row"></th>
+					  <td>{{ .First_Name}}</td>
+					  <td>{{ .Last_Name}}</td>
+					  <td>{{ .Email}}</td>
+					  <td>{{ .Approved}}</td>
+					  <td>{{ .Paid}}</td>
+					  <td>{{ .Payment_Method}}</td>
+					  <td>{{ .Completed}}</td>
+					
+			  
+					  <td>
 
-                    <a href="studentedataadmin?student_uuid={{ .Student_UUID}}&out={{ .Admin_ID}}" class="details_btn">Details</a>
-                
-                  </td>
-                  </tr>
-              
-                {{ else}}
-                <tr>
-                  <th scope="row"></th>
-                  <td>{{ .First_Name}}</td>
-                  <td>{{ .Last_Name}}</td>
-                  <td>{{ .Email}}</td>
-                  <td>{{ .Approved}}</td>
-                  <td>{{ .Paid}}</td>
-                  <td>{{ .Payment_Method}}</td>
-                  <td>{{ .Payment_Method}}</td>
+						<a href="studentedataadmin?student_uuid={{ .Student_UUID}}&out={{ .Admin_ID}}" class="details_btn">Details</a>
+					
+					  </td>
+					  </tr>
+				  
+					{{ else}}
+					<tr>
+					  <th scope="row"></th>
+					  <td>{{ .First_Name}}</td>
+					  <td>{{ .Last_Name}}</td>
+					  <td>{{ .Email}}</td>
+					  <td>{{ .Approved}}</td>
+					  <td>{{ .Paid}}</td>
+					  <td>{{ .Payment_Method}}</td>
+					  <td>{{ .Payment_Method}}</td>
 
-                
-          
-                  <td>
-                    <a href="studentedataadmin?student_uuid={{ .Student_UUID}}&out={{ .Admin_ID}}" class="details_btn" style="background-color: red; text-decoration: none; 
-                    color: white;
-                    border: solid 1px white;">Details</a>
-                  </div>
-                  </td>
-                  </tr>
-                
-              {{ end }}
-              {{end}}
-            </tbody>
-          </table>
-        </div>    
-          
-      </div>
+					
+			  
+					  <td>
+						<a href="studentedataadmin?student_uuid={{ .Student_UUID}}&out={{ .Admin_ID}}" class="details_btn" style="background-color: red; text-decoration: none; 
+						color: white;
+						border: solid 1px white;">Details</a>
+					  </div>
+					  </td>
+					  </tr>
+					
+				  {{ end }}
+				  {{end}}
+				</tbody>
+			  </table>
+			</div>    
+			  
+		  </div>
+		</div>
     </div>
-    </div>
+	
+	<div class="hidden_main" style="overflow-y: auto">
+	
+		 <h2 class="dashboard_name">
+			Students
+		</h2>
+		<hr>
+		<div class="tochange">
+		  <div class="tableheader" style="height: 15vh; border-radius: 0px;">
+			<p class="programname">Award of Certificate of Attendance in Metaphysical Sciences</p>
+			<select class="programnamelist" id="">
+			  <option value="">ALL</option>
+			  <option value="">ACAMS</option>
+			  <option value="">ACMS</option>
+			  <option value="">ADMS</option>
+			  <option value="">ABDMS</option>
+			  <option value="">AMDMS</option>
+			  <option value="">Ph.DMS</option>
+			  
+		  
+			</select>
+		  </div> 
+		  <div class="programdiv">
+			
+			<div class="table_div">
+			  <table class="table">
+				<thead>
+				  <tr>
+					<th scope="col">#</th>
+					<th scope="col">First Name</th>
+					<th scope="col">Last Name</th>
+					<th scope="col">Email</th>
+					<th scope="col">Applied</th>
+					<th scope="col">Paid</th>
+					<th scope="col">Payment Method</th>
+					<th scope="col">Completed</th>
+					<th scope="col">Details</th>
+				  
+			
+				  </tr>
+				</thead>
+
+				
+				<tbody>
+				  {{ range .AcamsData}}
+					{{ if .Approved}}
+					<tr>
+					  <th scope="row"></th>
+					  <td>{{ .First_Name}}</td>
+					  <td>{{ .Last_Name}}</td>
+					  <td>{{ .Email}}</td>
+					  <td>{{ .Approved}}</td>
+					  <td>{{ .Paid}}</td>
+					  <td>{{ .Payment_Method}}</td>
+					  <td>{{ .Completed}}</td>
+					
+			  
+					  <td>
+
+						<a href="studentedataadmin?student_uuid={{ .Student_UUID}}&out={{ .Admin_ID}}" class="details_btn">Details</a>
+					
+					  </td>
+					  </tr>
+				  
+					{{ else}}
+					<tr>
+					  <th scope="row"></th>
+					  <td>{{ .First_Name}}</td>
+					  <td>{{ .Last_Name}}</td>
+					  <td>{{ .Email}}</td>
+					  <td>{{ .Approved}}</td>
+					  <td>{{ .Paid}}</td>
+					  <td>{{ .Payment_Method}}</td>
+					  <td>{{ .Payment_Method}}</td>
+
+					
+			  
+					  <td>
+						<a href="studentedataadmin?student_uuid={{ .Student_UUID}}&out={{ .Admin_ID}}" class="details_btn" style="background-color: red; text-decoration: none; 
+						color: white;
+						border: solid 1px white;">Details</a>
+					  </div>
+					  </td>
+					  </tr>
+					
+				  {{ end }}
+				  {{end}}
+				</tbody>
+			  </table>
+			</div>    
+			  
+		  </div>
+		</div>
+	</div>
 
     
 

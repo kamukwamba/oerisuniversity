@@ -7,20 +7,8 @@
 
    
   <body>
-    <div class="heading">
-      <h3 class="ucms_name">
-          Admin
-      </h3>
-      <div class="heading_nav">
-        <div>
-            <a href="">{{ .Admin.Name}} </a>
-        </div>
-        <div>
-            <a href="">sign out</a>
-        </div>
-      </div>
-  </div>
- 
+   
+ {{ template "adminheadertemp" .}}
 
   {{  template "side_bar" .}}
 
@@ -168,6 +156,139 @@
         </div>
   </div>
 
+	<div class="hidden_main">
+			<h3>Programs</h3>
+			<hr>
+			<div>
+			<div class="programcard">
+                        <h5>Award of Certificate of Attendance in Metaphysical Sciences</h5>
+                        <hr>
+                        <ul>
+                            <li>Communication Skills</li>
+                            <li>Public Speaking
+                            </li>
+                            <li>Intuition</li>
+                            <li>Understanding Religions of the World</li>
+                            <li>Public Relations</li>
+                            <li>Anger Management</li>
+                            <li>Connecting With Angels</li>
+                            <li>Critical Thinking</li>
+                            <li>Financial Education</li>
+
+                        </ul>
+                        <div class="bottom-details">
+                            </span> </p>
+							<a href="/programdetails/acams?out={{ .Admin.ID}}" style="display:block; text-decoration: none;" class="btn2">Details </a>
+                            
+                            
+                        </div>
+                    </div>
+
+                    <div class="programcard">
+                        <h5>Award of Certificate in Metaphysical Sciences</h5>
+                        <hr>
+                        <ul>
+                            <li>Mindfulness
+                            </li>
+                            <li>Dreams and Dreaming
+                            </li>
+                            <li>Energy of Money</li>
+                            <li>Crystals and Gemstones</li>
+                            <li>Forgiveness</li>
+                            <li>Cleansing and Fasting </li>
+                            <li>Astrology</li>
+                            <li>African Culture and Traditions</li>
+                            <li>Transforming_personalities</li>
+
+                        </ul>
+                        <div class="bottom-details">
+                            </span> </p>
+							<a href="/programdetails/acms?out={{ .Admin.ID}}" style="display:block; text-decoration: none;" class="btn2">Details </a>
+							
+                           
+                        </div>
+                    </div>
+                    
+                    <div class="programcard">
+					
+                        <h5>Award of Diploma in Metaphysical Sciences</h5>
+                        <hr>
+                        <ul>
+                            <li>Creative_Writing</li>
+                            <li>Understanding_Miracles</li>
+                            <li>Channeling Skills</li>
+                            <li>Enneagram</li>
+                            <li>Mythology on Gods and Goddess</li>
+                            <li>Herbs</li>
+                            <li>Meditation skills</li>
+                            <li>Mantras and Mudras</li>
+                            <li>Divinations</li>
+                            <li>Basics in Research</li>
+                            <li>Understanding Propaganda</li>
+                            <li>Greate Spirituals Teacherd</li>
+                            <li>Reprogramming</li>
+                            <li>Shamanism</li>
+                            <li>Mystery Schools in the world</li>
+                            <li>Law_and_Ethics in Metaphysical Sciences</li>
+                            <li>Non Violent Communication</li>
+                        </ul>
+                        <div class="bottom-details">
+                            </span> </p>
+							<a href="/programdetails/adms?out={{ .Admin.ID}}"  style="display:block; text-decoration: none;" class="btn2">Details </a>
+						
+                        </div>
+
+                    </div>
+
+                    
+                    <div class="programcard">
+					
+                        <h5>Award of Bachelors Degree in Metaphysical Sciences</h5>
+                        <hr>
+                        <ul>
+                            <li>Causes and Core Issues in Beliefs </li>
+                            <li>Emotional Well Being </li>
+                            <li>The Art of Breathing </li>
+                            <li>Spiritual symbols and colours </li>
+                            <li>Psychic Skills </li>
+                            <li>Shadow Work </li>
+                            <li>The Craft </li>
+                            <li>Hypnosis and Beyond </li>
+                            <li>Mysterious experiences </li>
+                            <li>Manifestation skills </li>
+                            <li>Unlocking Creativity </li>
+                            <li>Transpersonal counselling </li>
+                            <li>African_Healing Arts </li>
+                            <li>Ceremonies of the World </li>
+                            <li>Mother Earth </li>
+                            <li>The_Art of Placement </li>
+                            <li>Chakras and Auras </li>
+                            <li>Transforming personalities </li>
+                            <li>Mayan Calendar </li>
+                            <li>Polarity Therapy </li>
+                            <li>Introduction To Meditation </li>
+                            <li>Health and Nutrition </li>
+                            <li>Setting up a business</li>
+                        </ul>
+                        <div class="bottom-details">
+                            </span> </p>
+							<a href="/programdetails/adbms?out={{ .Admin.ID}}" style="display:block; text-decoration: none;" class="btn2">Details </a>
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="programcard">
+                        <h5>Award of Masters Degree in Metaphysical Sciences</h5>
+                        <hr>
+                    </div>
+                    <div class="programcard">
+                        <h5>Ph.D in Metaphysical Sciences</h5>
+                        <hr>
+                    </div>
+                    
+                    
+                </div>
+	</div>
 
   </body>
 </html>

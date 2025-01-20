@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
@@ -16,6 +17,7 @@ import (
 
 type StudentInfo struct {
 	UUID                  string
+	Studennt_ID           string
 	First_Name            string
 	Last_Name             string
 	Phone                 string
@@ -116,14 +118,14 @@ func CreateStudent(data StudentInfo) bool {
 	if err != nil {
 		log.Fatal(err)
 	}
-	stmt, err := entry.Prepare("insert into studentdata(uuid, first_name, last_name, phone, email, date_of_birth,gender,marital_status,country,eduction_background,program,high_scholl_confirmation,grammer_comprihention,waiver,number_of_children,school_atteneded,major_studied,degree_obtained,current_occupetion,field_interested_in,mps_techqnique_Practiced,previouse_experince,purpose_of_enrollment,use_of_degree,reason_for_choice,method_of_incounter) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?,?)")
+	stmt, err := entry.Prepare("insert into studentdata(uuid, first_name, last_name, phone, email, date_of_birth,gender,marital_status,country,eduction_background,program,high_scholl_confirmation,grammer_comprihention,waiver,number_of_children,school_atteneded,major_studied,degree_obtained,current_occupetion,field_interested_in,mps_techqnique_Practiced,previouse_experince,purpose_of_enrollment,use_of_degree,reason_for_choice,method_of_incounter, student_id) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?,?,?)")
 
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(data.UUID, data.First_Name, data.Last_Name, data.Phone, data.Email, data.Date_Of_Birth, data.Gender, data.Marital_Status, data.Country, data.Education_Background, data.Program, data.High_School, data.Grammer_Confirmation, data.Waiver, data.Children, data.School_Attended, data.Major_In, data.Degree_Obtained, data.Current_Occupation, data.Field_Interested, data.Prio_Techniques, data.Previouse_Experience, data.Purpose_Of_Enrollment, data.Use_Of_Knowledge, data.Reason_For_Choice, data.Method_Of_Encounter)
+	_, err = stmt.Exec(data.UUID, data.First_Name, data.Last_Name, data.Phone, data.Email, data.Date_Of_Birth, data.Gender, data.Marital_Status, data.Country, data.Education_Background, data.Program, data.High_School, data.Grammer_Confirmation, data.Waiver, data.Children, data.School_Attended, data.Major_In, data.Degree_Obtained, data.Current_Occupation, data.Field_Interested, data.Prio_Techniques, data.Previouse_Experience, data.Purpose_Of_Enrollment, data.Use_Of_Knowledge, data.Reason_For_Choice, data.Method_Of_Encounter, data.Studennt_ID)
 	if err != nil {
 		ErrorPrintOut("enrollment", "CreateStudent", fmt.Sprintf("%s", err))
 		fmt.Println("PART 2: Failed to execute")
@@ -199,6 +201,48 @@ func ConvertIn(answer string) string {
 	return result
 }
 
+func CreateID() string {
+
+	var idout_final string
+	var random_number int
+	var id_out string
+	var id_out_date string
+
+	present := true
+	currentYear := time.Now().Year()
+
+	// Generate the student ID
+	//GET THE LAST ID
+	dbconn := dbcode.SqlRead().DB
+
+	for present {
+		random_number = rand.Intn(10000)
+		id_out_date = fmt.Sprintf("%d%05d", currentYear, random_number)
+
+		stmt, err := dbconn.Prepare("select student_id from studentdata where student_id = ?")
+
+		if err != nil {
+			fmt.Println(err)
+			present = false
+
+		}
+
+		defer stmt.Close()
+
+		err = stmt.QueryRow(id_out_date).Scan(&id_out)
+
+		if err != nil {
+			fmt.Println(err)
+			idout_final = id_out_date
+			present = false
+		}
+
+	}
+
+	return idout_final
+
+}
+
 func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
@@ -235,6 +279,8 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 	reasonforchossingucms := r.FormValue("reason_for_chossing_ucms")
 	methodofknowledge := r.FormValue("method_of_knowledge")
 
+	student_id := CreateID()
+
 	studentsdatain = StudentInfo{
 		UUID:                  uuid,
 		First_Name:            first_name,
@@ -262,6 +308,7 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 		Use_Of_Knowledge:      applicationofknowledge,
 		Reason_For_Choice:     reasonforchossingucms,
 		Method_Of_Encounter:   methodofknowledge,
+		Studennt_ID:           student_id,
 	}
 
 	chaeck_user := FindStudent(email)

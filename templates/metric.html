@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+   {{ template "head_temp"}}
+   
+   <style>
+	.backupbtn{
+		background-color: rgb(32, 0, 62);
+		color: white;
+		border: solid 1px rgb(32, 0, 62);
+		border-radius: 3px;
+		display: block;
+		width: 100px;
+		height: 30px;
+		margin-left: 20px;
+		margin-top: 30px;
+		text-align: center;
+		text-decoration: none;
+		
+	
+	}
+	
+	.backupbtn: hover{
+		background-color: white;
+		color:  rgb(32, 0, 62) ;
+	}
+   </style>
+    </head>
+
+   
+  <body>
+    <div class="heading">
+      <h3 class="ucms_name">
+          Admin
+      </h3>
+      <div class="heading_nav">
+        <div>
+            <a href="">{{ .Admin.Name}}</a>
+        </div>
+        <div>
+            <a href="">sign out</a>
+        </div>
+      </div>
+  </div>
+ 
+
+  {{  template "side_bar" .}}
+
+
+
+
+
+  <div class="main">
+	<h2 class="dashboard_name">
+        User Metrics
+    </h2>
+    <hr>
+    <div class="mati=rics">
+		<table style="position: relative; margin-left: 40px;">
+			<thead>
+			<tr>
+				<th>Day</th>
+				<th>Number</th>
+			</tr>
+			</thead>
+			<tbody>
+				{{ range .VisitedList}}
+					<tr>
+						<td>{{ .Date}}</td>
+						<td>{{ .Count}}</td>
+						
+					</tr>
+				{{ end }}
+			</tbody>
+		</table>
+	</div>
+	<a href="/databackup" class = "backupbtn" action="post" > Backup DataBase </a>
+  </div>
+
+
+
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

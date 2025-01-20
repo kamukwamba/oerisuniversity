@@ -5,6 +5,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/kamukwamba/oerisuniversity/dbcode"
@@ -185,13 +187,215 @@ func Create_News(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func CreateVisitorTable() {
+
+	dbconn := dbcode.SqlRead().DB
+
+	createtable := `CREATE TABLE IF NOT EXISTS visitors (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		visit_time string,
+		counter string
+	);`
+
+	stmt, err := dbconn.Prepare(createtable)
+
+	if err != nil {
+		fmt.Println("Failed to Create Visitor Table")
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec()
+
+	if err != nil {
+		fmt.Println("Failed to Execute")
+	}
+}
+
+func CheckDate(date string) (bool, string) {
+	is_present := true
+	var current_count string
+	
+	dbconn := dbcode.SqlRead().DB
+	
+	stmt, err := dbconn.Prepare("select visit_time, counter from visitors where visit_time = ?")
+	
+	if err !=  nil {
+		
+		fmt.Println("CheckDate: ", err)
+		is_present = false
+	}
+	
+	defer stmt.Close()
+	
+	var is_date string 
+
+	err  = stmt.QueryRow(date).Scan(&is_date, &current_count)
+	
+	if err != nil {
+		fmt.Println("There is not date in string ", err)
+		is_present = false
+	}
+	
+	
+
+	return is_present, current_count
+}
+
+func LoadVisited() []Visited {
+	dbconn := dbcode.SqlRead().DB
+	var data_out Visited
+	var data_out_list []Visited
+	stmt, err := dbconn.Query("select visit_time, counter from visitors")
+
+	if err != nil {
+		fmt.Println("Query Statement failed")
+	}
+
+	defer stmt.Close()
+
+	for stmt.Next() {
+		err := stmt.Scan(&data_out.Date, &data_out.Count)
+		if err != nil {
+			fmt.Println("Failed to scan")
+			log.Fatal(err)
+		}
+		data_out_list = append(data_out_list, data_out)
+
+	}
+
+	return data_out_list
+}
+
+func CreateVisitor(date string) bool {
+	year, month, day := time.Now().Date()
+	year_out := strconv.Itoa(year)
+	month_out := month.String()
+	day_out := strconv.Itoa(day)
+	
+	createnow := false
+
+	dbconn := dbcode.SqlRead().DB
+
+	data := []string{year_out, month_out, day_out}
+
+	date_out := strings.Join([]string(data), "-")
+
+	is_present, count := CheckDate(date_out)
+
+	if is_present {
+		count_out, _ := strconv.Atoi(count)
+		counter := count_out + 1
+		stmtu, err := dbconn.Prepare("Update visitors SET counter = ?  where visit_time = ?")
+
+		if err != nil {
+			fmt.Println("Prepare Failed to Load", err)
+		}
+
+		defer stmtu.Close()
+
+		_, err = stmtu.Exec(counter, date_out)
+		if err != nil {
+			fmt.Println("Failed to Update", err)
+		}
+	} else {
+
+		stmtc, err := dbconn.Prepare("insert into visitors(counter, visit_time) values(?,?)")
+
+		if err != nil {
+			fmt.Println("Prepare statement Failed", err)
+		}
+
+		defer stmtc.Close()
+
+		
+		counter := 1
+		_, err = stmtc.Exec(counter, date_out)
+		
+		if err != nil{
+			
+			fmt.Println("Filed to create new visito: ", err)
+		}
+	}
+
+
+	return createnow
+}
+
+func ClearCookies(w http.ResponseWriter, r *http.Request) {
+	dbconn := dbcode.SqlRead().DB
+
+	howMany := r.URL.Query().Get("number")
+	date := r.URL.Query().Get("date")
+
+	switch howMany {
+	case "all":
+		stmtd, err := dbconn.Prepare("delete from visited")
+
+		if err != nil {
+			fmt.Println("Pepare Failed")
+		}
+
+		defer stmtd.Close()
+
+		_, err = stmtd.Exec()
+
+		if err != nil {
+			fmt.Println("Failed to delete all session id")
+		}
+	case "date":
+		stmtd, err := dbconn.Prepare("delete from visitors where visit_time = ?")
+
+		if err != nil {
+			fmt.Println("Pepare Failed")
+		}
+
+		defer stmtd.Close()
+
+		_, err = stmtd.Exec(date)
+
+		if err != nil {
+			fmt.Println("Failed to delete all session id")
+		}
+
+	}
+
+}
+
 func HomePage(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	//debug failure to laod templates
+	year, month, day := time.Now().Date()
+	year_out := strconv.Itoa(year)
+	month_out := month.String()
+	day_out := strconv.Itoa(day)
 
-	err := tpl.ExecuteTemplate(w, "index.html", nil)
+	data := []string{year_out, month_out, day_out}
+
+	dateVisited := strings.Join([]string(data), "-")
+
+	_, err := r.Cookie("visited")
+
+	if err != nil {
+
+		http.SetCookie(w, &http.Cookie{
+			Name:    "visited",
+			Value:   dateVisited,
+			Expires: time.Now().Add(100 * 24 * time.Hour),
+		})
+		is_created := CreateVisitor(dateVisited)
+		
+		fmt.Println(is_created)
+		
+		
+
+	} else {
+		fmt.Println("Has Aleady Visited Us!!!")
+		
+	}
+
+	err = tpl.ExecuteTemplate(w, "index.html", nil)
 
 	if err != nil {
 		log.Fatal(err)

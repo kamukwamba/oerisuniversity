@@ -1,56 +1,168 @@
 
 <!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
+  <head>
+	 {{ template "head_temp"}}
+	 <style>
+	
+		.assestmentNow{
+			position: relative;
+			width: 90%;
+			height: 1000px;
+			overflow-y: auto; 
+			margin-bottom: 10px;
+			margin-left: auto;
+			margin-right: auto;
+			
+		}
+	</style>
 
-    {{ define "student_cource_assesment"}}
+    </head>
 
-        <div class="assesment_box">
+   
+	{{ template "adminheadertemp" .}}
+ 
+ 
+	
+	{{  template "side_bar" .}}
+	 <div class="main">
+		
+
+		<div class="assesment_box">
     
-            <h2 style="text-align: center;">Cource Name</h2>
+            <h2 style="text-align: center;">Cource Name Out</h2>
 
+            <div>
+				<table class="assesment_table" style="margin: auto; height: 130px;">
+					<thead>
+
+					<tr>
+						<th>Assesment Title</th>
+						<th>Grade</th>
+						<th>Comment</th>
+					</tr>
+					</thead>
+
+					<tbody>
+
+						{{ range .Assesment}}
+
+							<tr>
+								<td>{{ .Assesment_Title }}</td>
+								<td>{{ .Grade}}</td>
+								<td>{{ .Comment }}</td>
+					
+							</tr>
+
+						{{ end }}
+
+					
+				</tbody>
+				</table>
+			</div>
             
-            <table class="assesment_table" style="margin: auto;">
-                <thead>
+			
+			<div>
+				<h3>Assignments Handed In </h3>
+				{{ range .Handed}}
+					<a href="/downloadassignment?cource_name{{ .Cource_Name}}&student_uuid{{ .Student_UUID}}&file_name{{.FileName}}>{{.FileName}}</a>
+				{{ end }}
+			</div>
 
-                <tr>
-                    <th>Assesment Title</th>
-                    <th>Grade</th>
-                    <th>Comment</th>
-                </tr>
-                </thead>
-
-                <tbody>
-
-                    {{ range .AssesmentList}}
-
-                        <tr>
-                            <td>{{ .Assesment_Title }}</td>
-                            <td>{{ .Grade}}</td>
-                            <td>{{ .Comment }}</td>
-                
-                        </tr>
-
-                    {{ end }}
-
-                
-            </tbody>
-
-            </table>
-            <div style="display: none;">
-                <form action="">
-                    <input type="file"><br>
-                    <button type="submit">Submit</button>
-                </form>
+            <div>
+                <form enctype="multipart/form-data" 
+				hx-post = "assesmentsubmit?cource_name={{ .Cource_Name}}&uuid={{ .Student_UUID}}" 
+				hx-target="#filesaved"
+				hx-swap = "innerHTML"
+				action="/upload" method="post">
+				<input type="file" name="file" accept=".pdf">
+				<input type="submit" value="Upload" style="width: 100px; height: 25px; padding-top: 4px;">  
+				</form>
             </div>
+			
+			<div id="filesaved"> 
+			
+			</div>
         </div>
 
 
-    {{ end }}
+    
+		
+	 </div>
+	  
+	  <div class="hidden_main" style="overflow-x: scroll">
+		
+
+        <div class="assesment_box">
+    
+            <h2 style="text-align: center;">Cource Name Out</h2>
+
+            <div>
+				<table class="assesment_table" style="margin: auto; height: 130px;">
+					<thead>
+
+					<tr>
+						<th>Assesment Title</th>
+						<th>Grade</th>
+						<th>Comment</th>
+					</tr>
+					</thead>
+
+					<tbody>
+
+						{{ range .Assesment}}
+
+							<tr>
+								<td>{{ .Assesment_Title }}</td>
+								<td>{{ .Grade}}</td>
+								<td>{{ .Comment }}</td>
+					
+							</tr>
+
+						{{ end }}
+
+					
+				</tbody>
+			</div>
+            </table>
+			<div>
+				<h3>Assignments Handed In </h3>
+				{{ range .Handed}}
+					<a href="/downloadassignment?cource_name{{ .Cource_Name}}&student_uuid{{ .Student_UUID}}&file_name{{.FileName}}>{{.FileName}}</a>
+				{{ end }}
+			</div>
+            <div>
+                <form enctype="multipart/form-data" 
+				hx-post = "assesmentsubmit?cource_name={{ .Cource_Name}}&uuid={{ .Student_UUID}}" 
+				hx-target="#filesaved"
+				hx-swap = "innerHTML"
+				action="/upload" method="post">
+				<input type="file" name="file" accept=".pdf">
+				<input type="submit" value="Upload" style="width: 100px; height: 25px; padding-top: 4px;">  
+			</form>
+            </div>
+			
+			<div id="filesaved"> 
+			
+			</div>
+        </div>
+
+	  </div>
+	  
+	
+	{{ define "fileduploaded"}}
+		
+		 <p class="issaved" hx-trigger="load" >
+            File Uploaded Succesfully
+        </p>
+        <script>
+            setTimeout(() => {
+                document.querySelector('.issaved').remove();
+            }, 2000);
+            </script>
+	
+	{{ end }}
 
 
 

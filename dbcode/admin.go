@@ -2,10 +2,44 @@ package dbcode
 
 import (
 	"database/sql"
-
+	"os"
 	"fmt"
 	"log"
+	"io"
+	"path/filepath"
+	"net/http"
 )
+
+func BackUpData(w http.ResponseWriter, r *http.Request){
+
+	
+	dbFilePath := "./data/ucms.db"
+
+	if _, err := os.Stat(dbFilePath); os.IsNotExist(err) {
+		http.Error(w, "Database file not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/octet-stream")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filepath.Base(dbFilePath)))
+
+	
+	file, err := os.Open(dbFilePath)
+	if err != nil {
+		http.Error(w, "Unable to open the file", http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	
+	_, err = io.Copy(w, file)
+	if err != nil {
+		http.Error(w, "Error writing file to response", http.StatusInternalServerError)
+		return
+	}
+	
+}
+
 
 type AdminInfo struct {
 	ID         string
@@ -144,7 +178,8 @@ func LoadDB() {
 												purpose_of_enrollment text, 
 												use_of_degree text, 
 												reason_for_choice text, 
-												method_of_incounter text);
+												method_of_incounter text,
+												student_id text);
 		`
 
 	programvideosname := `create table if not exists programvideos ( 

@@ -58,22 +58,41 @@ button{
     
 }
 
+.hidden_div{
+
+    position: fixed;
+    display: none;
+    top: 70px;
+    left: 0;
+    height: 100vh;
+    width: 20%;
+    background-color: rgba(37, 0, 62, .8);
+    box-shadow: -10px 0 10px rgba(0, 0, 0, 0.2);
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    padding: 10px;
+    float: left;
+}
+
+
+
+
+
+
 .main{
     
     position: fixed;
     top: 70px;
     width: 80%;
-    height: 600px;
+    height: 650px;
     box-sizing: border-box;
     margin-left: 20%;
-    padding-bottom: 40px;
+    padding-bottom: 70px;
     display: block;
     overflow-y: scroll;
     overflow-x: hidden;
-   
-    
-    
-
 }
 
 
@@ -91,7 +110,7 @@ button{
 
 .containt{
     margin: 10px;
-    padding: 5%;
+    padding: 10px;
 }
 
 .dashboard_name{
@@ -227,8 +246,9 @@ button{
     display:inline-grid;
     grid-template-columns: auto auto auto;
     grid-gap: 5px 5px;
-    overflow-y: hidden;
+    overflow-y: auto;
     width: 100%;
+    padding-bottom: 40px;
     
  
 }
@@ -433,10 +453,10 @@ table .student_not_accepted{
   
   /* Handle */
   ::-webkit-scrollbar-thumb {
-    background: rgb(37, 0, 62);
+    background: rgba(37, 0, 62, .7);
   }
   
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
-    background: pink;
+    background: #333;
   }

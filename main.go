@@ -9,6 +9,8 @@ import (
 
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 	"github.com/kamukwamba/oerisuniversity/routes"
+	
+	
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -33,7 +35,7 @@ func main() {
 	routes.LoadExamTable()
 	routes.LoadAdminUsers()
 	routes.LoadAssesmentTable()
-
+	routes.CreateVisitorTable()
 	fmt.Println("::SERVER STARTED::")
 
 	router := http.NewServeMux()
@@ -81,10 +83,17 @@ func main() {
 	router.HandleFunc("/saveucdaata", routes.UpdateProgramDetails)
 	router.HandleFunc("/gradeca", routes.GradeCA)
 	router.HandleFunc("/delete_cource_data", routes.DeleteCource)
+	router.HandleFunc("/get_matrics", routes.Matrics)
 
 	router.HandleFunc("/deleteadmin", routes.DeleteAdmin)
 	router.HandleFunc("/createnews", routes.Create_News)
 	router.HandleFunc("/curiculum", routes.Curiculum)
+	router.HandleFunc("/databackup", dbcode.BackUpData)
+	router.HandleFunc("/downloadassignment", routes.DownloadAssesments)
+	
+	
+	
+	
 
 	//EXAM
 	router.HandleFunc("/create_page", routes.CreatePage)
@@ -114,6 +123,7 @@ func main() {
 	router.HandleFunc("/close_assesment_div", routes.CloseAssesmentDiv)
 	router.HandleFunc("/close_admin_div", routes.CloseAdmintDiv)
 	router.HandleFunc("/error", routes.ErrorPage)
+	router.HandleFunc("/assesmentsubmit", routes.UploadAssesment)
 
 	router.HandleFunc("/example", routes.Example)
 

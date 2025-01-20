@@ -130,13 +130,12 @@ type StudentCourse struct {
 
 func ValidateSudent(email_in, password_in string) (bool, string) {
 	isstudent := true
-	dbread := dbcode.SqlRead()
-	stmt, err := dbread.DB.Prepare("select uuid, student_uuid, email, password from studentcridentials where email = ?")
+	dbread := dbcode.SqlRead().DB
+	stmt, err := dbread.Prepare("select uuid, student_uuid, email, password from studentcridentials where email = ?")
 
 	if err != nil {
 		isstudent = false
-		fmt.Println("First err")
-		log.Fatal(err)
+		fmt.Println("First err", err)
 	}
 
 	defer stmt.Close()
@@ -145,14 +144,19 @@ func ValidateSudent(email_in, password_in string) (bool, string) {
 	var student_uuid string
 	var email string
 	var password string
+	
+	fmt.Println("Email: ",email_in)
+	fmt.Println("Password: ", password_in)
 
 	err = stmt.QueryRow(email_in).Scan(&uuid, &student_uuid, &email, &password)
 
 	if err != nil {
-		fmt.Println("Second err")
+		fmt.Println(":Second err this is the err: ", err)
 		// log.Fatal(err)
 		isstudent = false
 	}
+	
+	fmt.Println(uuid, student_uuid, email, email, password)
 
 	if password_in != password {
 		isstudent = false
