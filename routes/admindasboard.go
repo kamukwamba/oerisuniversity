@@ -618,10 +618,12 @@ func ACAMSStudentData(w http.ResponseWriter, r *http.Request) {
 
 type CreatNews struct {
 	Admin AdminInfo
+	AllNews []NewsStruct
 }
 
 func AdminNews(w http.ResponseWriter, r *http.Request) {
 
+	_, all := ReadNews("o", "many")
 	admin_id := r.URL.Query().Get("out")
 	admin_infor := AdminData(admin_id)
 
@@ -629,9 +631,12 @@ func AdminNews(w http.ResponseWriter, r *http.Request) {
 
 	display_data := CreatNews{
 		Admin: admin_infor,
+		AllNews: all,
 	}
 
 	err := tpl.ExecuteTemplate(w, "NewsAdminCreate.html", display_data)
+	
+	fmt.Println("All The News: ", all)
 
 	if err != nil {
 		log.Fatal(err)

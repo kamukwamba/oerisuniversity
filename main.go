@@ -90,6 +90,7 @@ func main() {
 	router.HandleFunc("/curiculum", routes.Curiculum)
 	router.HandleFunc("/databackup", dbcode.BackUpData)
 	router.HandleFunc("/downloadassignment", routes.DownloadAssesments)
+
 	
 	
 	

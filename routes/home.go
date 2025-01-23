@@ -142,9 +142,11 @@ func Create_News(w http.ResponseWriter, r *http.Request) {
 	title := r.FormValue("title")
 	image_link := r.FormValue("image")
 	story := r.FormValue("story")
+	
+	fmt.Println("Story: ", story)
 
 	uuid := encription.Generateuudi()
-	student_create, err := create_news.Begin()
+	
 	date := fmt.Sprintf("%s", time.Now().Local())
 
 	data_out := NewsStruct{
@@ -155,14 +157,11 @@ func Create_News(w http.ResponseWriter, r *http.Request) {
 		Story:      story,
 	}
 
-	if err != nil {
-		fmt.Println("not working")
-	}
 
-	stmt, err := student_create.Prepare("insert into news (uuid, title,auther, image, story, date) values (?,?,?,?,?,?)")
+	stmt, err := create_news.Prepare("insert into news (uuid, title,auther, image, story, date) values (?,?,?,?,?,?)")
 
 	if err != nil {
-		fmt.Println("failed to insert")
+		fmt.Println("failed to insert", err)
 	}
 
 	defer stmt.Close()
@@ -172,15 +171,13 @@ func Create_News(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("failed to create")
 	}
 
-	err = student_create.Commit()
+	
 
-	if err != nil {
-		fmt.Println("failed to commit")
-	}
+
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err = tpl.ExecuteTemplate(w, "", data_out)
+	err = tpl.ExecuteTemplate(w, "newssamples", data_out)
 
 	if err != nil {
 		log.Fatal(err)

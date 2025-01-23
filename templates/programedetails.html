@@ -12,19 +12,7 @@
 
 </head>
 <body>
-	<div class="heading">
-		  <h3 class="ucms_name">
-			  Admin
-		  </h3>
-		  <div class="heading_nav">
-			<div>
-				<a href="">{{ .Admin.Name}} </a>
-			</div>
-			<div>
-				<a href="">sign out</a>
-			</div>
-		  </div>
-	  </div>
+	{{ template "adminheadertemp" .}}
 		 
     {{  template "side_bar" .}}
 	
@@ -84,6 +72,60 @@
 		</div>
 	
 	</div>
+	
+	<div class="hidden_main" style="overflow-x: scroll">
+	
+		<div class="program_details">
+		
+			<div class="program_details_nav">
+			   <div>
+					<h2 id="p_title">{{ .Program_Name}}</h2>
+				</div>
+				<button  
+				hx-get="/create_cource_data?parameter=create&program_name={{ .Program_Name}}"  
+				hx-target="#create_cource_div"
+				hx-swap="outerHTML">Add Course Data</button>
+			</div>
+		
+			<hr>
+		
+			<div class="details">
+				<div class="cource_data_div" style="overflow-x: auto;">
+					<table>
+						<thead>
+							<th>Cource Name</th>
+							<th>Book</th>
+							<th>Module</th>
+							<th>Videos</th>
+							<th>Assesment</th>
+							<th>Exam</th>
+				
+				
+						</thead>
+						<tbody  id="cource_data_table_tr">
+
+							{{ if .Present }}
+								{{ range .ProgramData }}
+									{{ template "cource_data_tr" .}}
+								{{ end }}
+							{{ end }}
+							
+						</tbody>
+					</table>
+					</div>
+			  
+			</div>
+			<div class="cource_data" id="create_cource_div">
+		
+			</div>
+
+			<script>
+				const program_name = document.getElementById('p_title');
+				var original_text = program_name.textContent;
+				var p_name_out = original_text.toUpperCase();
+				program_name.textContent = p_name_out;
+			</script>
+	  </div>
     
     {{ define "cource_data_close"}}
         <div class="cource_data" style="display: none;">

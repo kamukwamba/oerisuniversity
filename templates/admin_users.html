@@ -49,25 +49,13 @@
 
    
   <body>
-    <div class="heading">
-      <h3 class="ucms_name">
-          Admin
-      </h3>
-      <div class="heading_nav">
-        <div>
-            <a href="">{{ .Admin.Name}}</a>
-        </div>
-        <div>
-            <a href="">sign out</a>
-        </div>
-      </div>
-  </div>
+    
  
 
+	{{ template "adminheadertemp" .}}
 
 
-
-  {{  template "side_bar" .}}
+	{{  template "side_bar" .}}
 
 
     <div class="main">
@@ -87,6 +75,17 @@
         </div>
        
     </div>
+	
+	<div class="hidden_main" style="overflow-x: scroll">
+		
+		<h2 class="dashboard_name">
+			Lecturera
+		</h2>
+		<hr>
+		<div style="width: 100%; overflow-x: auto; font-size: 0.8em;">
+		 {{ template "users_admin" .}}
+		</div>
+	 </div>
 
     
 
@@ -104,12 +103,12 @@
       
         
                 
-        <div class="outer_div" id="form_holder">
+        <div class="outer_div" id="form_holder" style="height: 30vh;">
 
             <form hx-post="/createadmin"
                 hx-target="#adminuser_list"
                 hx-swap="beforeend">
-                <div class="form_div">
+                <div class="form_div" style="height: 25vh;">
                     <div class="segments">
                         <label for="first_name">First Name</label><br>
                         <input type="text" name="first_name" id="">
@@ -139,7 +138,7 @@
             </form>
         </div>
     
-        <div>
+        <div style="min-height: 60vh;  padding-bottom: 30px; overflow: auto;">
         <table>
             <thead>
             <tr>
@@ -314,6 +313,6 @@
 {{ end }}
 
 
-    
+   
 </body>
 </html>

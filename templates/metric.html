@@ -29,22 +29,10 @@
 
    
   <body>
-    <div class="heading">
-      <h3 class="ucms_name">
-          Admin
-      </h3>
-      <div class="heading_nav">
-        <div>
-            <a href="">{{ .Admin.Name}}</a>
-        </div>
-        <div>
-            <a href="">sign out</a>
-        </div>
-      </div>
-  </div>
+    {{ template "adminheadertemp" .}}
  
 
-  {{  template "side_bar" .}}
+	{{  template "side_bar" .}}
 
 
 
@@ -55,7 +43,7 @@
         User Metrics
     </h2>
     <hr>
-    <div class="mati=rics">
+    <div class="matrics">
 		<table style="position: relative; margin-left: 40px;">
 			<thead>
 			<tr>
@@ -76,6 +64,34 @@
 	</div>
 	<a href="/databackup" class = "backupbtn" action="post" > Backup DataBase </a>
   </div>
+  
+	<div class="hidden_main" style="overflow-x: scroll">
+		
+		<h2 class="dashboard_name">
+			User Metrics
+		</h2>
+		<hr>
+		<div class="matrics">
+			<table style="position: relative; margin-left: 40px;">
+				<thead>
+				<tr>
+					<th>Day</th>
+					<th>Number</th>
+				</tr>
+				</thead>
+				<tbody>
+					{{ range .VisitedList}}
+						<tr>
+							<td>{{ .Date}}</td>
+							<td>{{ .Count}}</td>
+							
+						</tr>
+					{{ end }}
+				</tbody>
+			</table>
+		</div>
+		<a href="/databackup" class = "backupbtn" action="post" > Backup DataBase </a>
+	</div>
 
 
 

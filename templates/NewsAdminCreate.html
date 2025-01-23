@@ -34,20 +34,7 @@
 
    
   <body>
-    <div class="heading">
-      <h3 class="ucms_name">
-          Admin
-      </h3>
-      <div class="heading_nav">
-        <div>
-            <a href="">{{ .Admin.Name}}</a>
-        </div>
-        <div>
-            <a href="">sign out</a>
-        </div>
-      </div>
-  </div>
- 
+   {{ template "adminheadertemp" .}}
 
 
 
@@ -81,35 +68,63 @@
                         News Articles
                     </h3>
                     <ul id="newsamplelist">
+					{{ range .AllNews}}
+						{{ template "newssamples" .}}
+					
+					{{ end }}
                     
                     </ul>
                 </div>
 
             </div>
+			
+			<div id="newsSavedPrt" style="position: relative; height; 49px; display: none;">
+				
+			</div>
 
     </div>
 	
-	  <button class="openMsg" onclick="newslogOpen()">
-		<img src="/assets/images/newslogImg.png">
-	  </button>
+	 
 	
 	<div class="hidden_main">
-		 <h2 class="dashboard_name">
-            News
-        </h2>
+		 <button onclick=msglogOpen()  class="openMsg">
+			News
+		  </button>
+		<h2 class="dashboard_name" style="padding-left: 60px">
+			News
+		</h2>
         <hr>
-            <div class="mainnewsdiv">
+            <div class="mainnewsdiv" style="margin-bottom: 100px; width: 100%;">
 
             
-                <div class="leftside">
-                    <div class="navbar">
-                        <div class="navitem">
+                <div class="leftside" style="width: 100%;">
+                    <div class="navbar"  style="width: 100%;">
+                        <div class="navitem" >
                             Write
                         </div>
                     </div>
                     
-                    <div id="changer">
-                    {{template "writearticle"}}
+                    <div id="changer" style="width: 100%; margin-left: auto; margin-right: auto;">
+						<div class="writearticle" style="padding-bottom: 30px;">
+						
+							<div class="writer" style="margin-left: auto; margin-right: auto;">
+								<form hx-post="/createnews"
+								hx-target="#newsamplelist"
+								hx-swap="beforeend">
+									<input type="text" placeholder="News Title" name="title" class="articletitle">
+									<textarea name="composenews" class="writerarea" placeholder="Compose article" style="margin-top: 10px; padding: 15px; height: 70vh;"></textarea>
+									<input type="textarea" placeholder="Enter image link" name="image" class="articleinagelink">
+									<input type="textarea" placeholder="Enter Auther Name" name="auther" class="articleinagelink">
+
+
+									<div class="savearticlediv">
+										<button type="submit" class="savearticle">Save Article</button>
+									</div>
+									
+								</form>
+							</div>
+							
+						</div>
                     </div>
                 
                 </div>
@@ -120,56 +135,69 @@
 		
 	</div>
 	
-	<div class="lefthiddennews" id="lefthiddennews">
-		<div class="closeMsg">
-			<button onclick="newslogClose()"> X </button>
-		</div>
-		<div class="rightside" id="adminright">
-			<h3 class="News">
-				News Articles
-			</h3>
-			<ul id="newsamplelist">
-			
-			</ul>
-		</div>
 	
+	
+	 <div class="hiddenmsglog" id="hiddenmsglog">
+		<div class="closeMsg" style="height: 45px; padding: 3px;">
+			<button onclick="msglogClose()"> X </button>
+		</div id="newsamplelist" style="background-color: white; width: 100%; height: 100vh;">
+		
+			 <ul id="newsamplelist" style="list-style: none; padding: 0px;" >
+					{{ range .AllNews}}
+						{{ template "newssamples" .}}
+					
+					{{ end }}
+                    
+            </ul>
+			
+			
+		</div>
 	</div>
-	
+	  
 	<script>
-		const newslogs = document.getElementByID("lefthiddennews");
 		
-		function newslogOpen() {
 		
-			newslog.display.toggle("open");
-			
-		}
-		
-		function msglogClose(){
-			newslog.display.toggle("close");
-		}
+		function msglogOpen(){
+			const msglogs = document.getElementById('hiddenmsglog')
+			   msglogs.style.display = 'block'
+			   console.log("open side");
+		  }
+
+		  function msglogClose(){
+			   const msglogs = document.querySelector('.hiddenmsglog')
+			   msglogs.style.display = 'none'
+			   console.log("open side");
+		  }
 	</script>
 
 
+
+{{ define "newsSavedPrt"}}
+	<div id="newsSavedPrt" style="position: relative; height; 49px; display: flex;">
+				
+	</div>
+
+{{ end }}
     
 
 {{define "newssamples"}}
 
     <div class="newssample" style="background-image: url('{{.Image_Link }}'); 
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;">
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-position: center;
+		margin-left: 0px;">
         <div class="spacefiller">
+		{{ .Auther}}
             
         </div>
         <div class="newssummary">
 
             <p class="summarytext">{{ .Story}}</p>
             <div class="viewupdatedelete">
-                <button class="summarybtn view">view</button>
-                
-                <button class="summarybtn update">update</button>
-
-                <button class="summarybtndelete">delete</button>
+			
+				<a href="/viewnews" class="summarybtn view" style="text-align: center; text-decoration: none;"> View</a>
+				<a href="/viewnews" class="summarybtndelete" style="text-align: center; text-decoration: none;" > Delete</a>
 
             </div>
         </div>
@@ -179,13 +207,13 @@
 
 {{define "writearticle"}}
 
-    <div class="writearticle">
+    <div class="writearticle" style="padding-bottom: 30px;">
         <div class="writer">
             <form hx-post="createnews"
             hx-target="#newsamplelist"
             hx-swap="beforeend">
                 <input type="text" placeholder="News Title" name="title" class="articletitle">
-                <textarea name="composenews" class="writerarea" placeholder="Compose article" style="margin-top: 10px; padding: 15px;"></textarea>
+				<textarea name="story"  cols="90" rows="15" style="margin-top: 20px; padding: 5px;"></textarea>
                 <input type="textarea" placeholder="Enter image link" name="image" class="articleinagelink">
                 <input type="textarea" placeholder="Enter Auther Name" name="auther" class="articleinagelink">
 

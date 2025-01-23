@@ -17,7 +17,10 @@
 	  </div>
 	  
 	  <div class="hidden_main" style="overflow-x: scroll">
-		<h2 class="dashboard_name">
+		<button onclick=msglogOpen()  class="openMsg">
+			Msg
+		  </button>
+		<h2 class="dashboard_name" style="padding-left: 60px">
 			Messages
 		</h2>
 		<hr>
@@ -35,15 +38,13 @@
 	  
 	  </div>
 	  
-	  <button class="openMsg" onclick="msglogOpen()">
-		<img src="/assets/images/messageImg.png">
-	  </button>
+	
 	 
 		
 
 	  
 	  <div class="hiddenmsglog" id="hiddenmsglog">
-		<div class="closeMsg">
+		<div class="closeMsg" style="height: 45px; padding: 3px;">
 			<button onclick="msglogClose()"> X </button>
 		</div>
 		
@@ -53,17 +54,19 @@
 	  </div>
 	  
 	<script>
-		const msglogs = document.getElementByID("hiddenmsglog");
 		
-		function msglogOpen() {
 		
-			msglog.display.toggle("open");
-			
-		}
-		
-		function msglogClose(){
-			msglog.display.toggle("close");
-		}
+		function msglogOpen(){
+			const msglogs = document.getElementById('hiddenmsglog')
+			   msglogs.style.display = 'block'
+			   console.log("open side");
+		  }
+
+		  function msglogClose(){
+			   const msglogs = document.querySelector('.hiddenmsglog')
+			   msglogs.style.display = 'none'
+			   console.log("open side");
+		  }
 	</script>
 
   </body>
