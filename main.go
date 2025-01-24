@@ -90,6 +90,7 @@ func main() {
 	router.HandleFunc("/curiculum", routes.Curiculum)
 	router.HandleFunc("/databackup", dbcode.BackUpData)
 	router.HandleFunc("/downloadassignment", routes.DownloadAssesments)
+	router.HandleFunc("/deletestuden", routes.DeleteStudent)
 
 	
 	
@@ -144,6 +145,6 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), router))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", port), router))
 
 }

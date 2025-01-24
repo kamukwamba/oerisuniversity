@@ -33,6 +33,74 @@ type StudentProgramList struct {
 	Program_Name string
 }
 
+func DeleteStudentInfo(uuid string) bool{
+
+	var examtable = fmt.Sprintf("st%s", uuid)
+	var deleted = true
+	var tables = []string{"studentdata", "studentcridentials"}
+	dbconn := dbcode.SqlRead().DB
+	
+	for item :=  range(tables){
+	
+		var preparestmt = fmt.Sprintf("DELETE FROM %s WHERE uuid = ?", item)
+	
+		stmt, err := dbconn.Prepare(preparestmt)
+	
+		if err != nil {
+			fmt.Println("failed to prepare delete: ", err)
+			deleted =  false
+		
+		}
+		
+		defer stmt.Close()
+		
+		_, err = stmt.Exec(uuid)
+		
+		if err != nil {
+			fmt.Println("failed to delete: ", err)
+			deleted = false
+		}
+		
+	
+	}
+	
+	
+	query := fmt.Sprintf("DROP TABLE IF EXISTS %s;", examtable)
+
+	// Execute the SQL query
+	_, err := dbconn.Exec(query)
+	if err != nil {
+		fmt.Errorf("error dropping table %q: %w", examtable, err)
+		deleted = false
+	}
+	
+	return deleted
+
+
+}
+
+
+func DeleteStudent(w http.ResponseWriter, r *http.Request){
+
+	uuid := r.URL.Query().Get(".uuid")
+	
+	
+	
+	
+	success := DeleteStudentInfo(uuid)
+	
+	
+	if success {
+		w.WriteHeader(http.StatusOK)
+		
+	}else{
+		http.Error(w, "Failed to delete item", http.StatusInternalServerError)
+		return
+	
+	}
+
+}
+
 func AdminData(uuid string) AdminInfo {
 	var admin_info AdminInfo
 	dbconn := dbcode.SqlRead().DB

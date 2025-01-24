@@ -51,19 +51,7 @@
 
    
   <body>
-    <div class="heading" style="display: flex; justify-content: space-between;">
-      <h3 class="ucms_name" style="justify-content: start;">
-          Admin
-      </h3>
-      <div class="heading_nav" style="justify-content: end;">
-        <div>
-            <a href="">{{ .Admin.Name}}</a>
-        </div>
-        <div>
-            <a href="">sign out</a>
-        </div>
-      </div>
-  </div>
+     {{ template "adminheadertemp" .}}
  
 
   {{  template "side_bar" .}}
@@ -119,21 +107,22 @@
             <hr>
             
             
-            <div class="program_details">
-                
-                    
-                    {{ range .AllCourceDataOut }} 
-                        {{ template "programdata" .}}
-                    {{ end }}
+				<div class="program_details">
+					
+						
+						{{ range .AllCourceDataOut }} 
+							{{ template "programdata" .}}
+						{{ end }}
 
-                
-                    <div style="height: 50px; width: 100px;"></div>
+					
+						<div style="height: 50px; width: 100px;"></div>
 
-            </div>
-            
-            <div style="display: none;" id="centered-div">
-                
-            </div>
+				</div>
+				
+				<div style="display: none;" id="centered-div">
+					
+				</div>
+			</div>
             
             
         </div>  
@@ -142,6 +131,77 @@
         
     
     </div>
+	
+	<div class="hidden_main" style="overflow-x: scroll; overflow-y: auto; padding-bottom: 40px;">
+		<div class="tochange">
+            <div class="student_name_details">
+                <p>{{ .StInfo.First_Name}} {{ .StInfo.Last_Name}}</p>
+            </div>
+            <hr>
+            <div class="student_personal_information">
+                
+                <p>Phone Number: <span class="student_info">{{ .StInfo.Phone}}</span></p>
+                <p>Email: <span class="student_info">{{ .StInfo.Email}}</span></p>
+                <p>Date of Birtth: <span class="student_info">{{ .StInfo.Date_Of_Birth}}</p>
+                <p>Gender:<span class="student_info"> {{ .StInfo.Gender}}</span></p>
+                <p>Marital Status: <span class="student_info"> {{ .StInfo.Marital_Status}}</span></p>
+                <p>Education background: <span class="student_info"> {{ .StInfo.Education_Background}}</span></p>
+                <p>Program: <span class="student_info">{{ .StInfo.Program}}</span></p>
+                <p>High School Confirmation: <span class="student_info"></span> {{ .StInfo.High_School}}</span></p>
+                <p>Grammer Confirmation: <span class="student_info">{{ .StInfo.Grammer_Confirmation}}</span></p>
+                <p>Waiver:<span class="student_info">{{ .StInfo.Waiver}}</span></p>
+                <p>Children: <span class="student_info">{{ .StInfo.Children}}</span></p>
+                <p>School Attended:<span class="student_info">{{ .StInfo.School_Attended}}</span></p>
+                <p>Program Studied:<span class="student_info">{{ .StInfo.Major_In}}</span></p>
+                <p>Degre Obtained: <span class="student_info">{{ .StInfo.Degree_Obtained}}</span></p>
+                <p>Current Occupation:<span class="student_info"> {{ .StInfo.Current_Occupation}}</span></p>
+                <p>Field of interested in: <span class="student_info">{{ .StInfo.Field_Interested}}</span></p>
+                <p>Prio Techniques Studied:<span class="student_info">{{ .StInfo.Prio_Techniques}}</span> </p>
+                <p>Previous Experience: <span class="student_info">{{ .StInfo.Previouse_Experience}}</span></p>
+                <p>Purpose of enrollment: <span class="student_info">{{ .StInfo.Purpose_Of_Enrollment}}</span></p>
+                <p>Use of Knowledge odtained: <span class="student_info">{{ .StInfo.Use_Of_Knowledge}}</span></p>
+                <p>Reason for chosing UCMS:<span class="student_info">{{ .StInfo.Reason_For_Choice}}</span> </p>
+                <p>How did they find out about UCMS:<span class="student_info">{{ .StInfo.Method_Of_Encounter}}</span> </p>
+            
+            </div>
+            <div class="update_div">
+              
+                <div class="delete_btn" 
+					hx-post = "/deletestuden?uuid={{ .StInfo.UUID}}"
+					hx-confirm="Are you sure you want to delete this item?" 
+					hx-on="htmx:afterRequest: window.location.href = document.referrer"
+					hx-target="this">
+                    <p>Delete Student Profile</p>
+                </div>
+            </div>
+            <hr>
+            
+            <div class="student_programs">
+            <h5>Programs Applied For</h5>
+            <hr>
+            
+            
+				<div class="program_details">
+					
+						
+						{{ range .AllCourceDataOut }} 
+							{{ template "programdata" .}}
+						{{ end }}
+
+					
+						<div style="height: 50px; width: 100px;"></div>
+
+				</div>
+				
+				<div style="display: none;" id="centered-div">
+					
+				</div>
+			</div>
+            
+            
+        </div> 
+	  
+	 </div>
 
 
 {{ define "admin_cource_assesment"}}
@@ -247,8 +307,7 @@
                     <td id="btc{{.Cource_Name}}"><button class="approve_complition" 
 						hx-post="/courcecompleted?cource_name = {{ .Cource_Name}}&student={{.Student_UUID}}" 
 						hx-target = "#btc{{.Cource_Name}}"
-						hx-swap = "innerHTML"
-						style="color: white;" >Approve Complete</button></td>
+						hx-swap = "innerHTML" >Approve Complete</button></td>
                     <td id="courceapprovaladmin">
                         {{ if .Approved }}
                             {{ template "cource_approved_admin" .}}
