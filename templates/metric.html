@@ -43,7 +43,7 @@
         User Metrics
     </h2>
     <hr>
-    <div class="matrics">
+    <div class="matrics" style="padding-bottom: 70px;">
 		<table style="position: relative; margin-left: 40px;">
 			<thead>
 			<tr>
@@ -62,7 +62,46 @@
 			</tbody>
 		</table>
 	</div>
+	
+	<div class="matrics">
+		<h4>Create Email To Use As School Email Account</h4>
+	
+		<div class="outer_div" id="form_holder" style="height: 30vh;">
+
+            <form hx-post="/createadminemail"
+                hx-target="#schoolemail"
+                hx-swap="beforeend">
+                <div class="form_div" style="height: 25vh;">
+                    <div class="segments">
+                        <label for="first_name">Email</label><br>
+                        <input type="text" name="email" style="width:350px; padding: 5px;">
+                    </div>
+                    <div class="segments">
+                        <label for="last_name">Password</label><br>
+                        <input type="text" name="password" class="">
+                    </div>
+                   
+                </div>
+                <button type="submit" class="download">Create</button>
+            </form>
+        </div>
+		<table style="position: relative; margin-left: 40px;">
+			<thead>
+			<tr>
+				<th>Email</th>
+				<th>Password</th>
+			</tr>
+			</thead>
+			<tbody id="schoolemail">
+				
+					{{ template "schoolemail" .}}
+				
+			</tbody>
+		</table>
+	</div>
 	<a href="/databackup" class = "backupbtn" action="post" > Backup DataBase </a>
+	
+	
   </div>
   
 	<div class="hidden_main" style="overflow-x: scroll">
@@ -96,6 +135,28 @@
 
 
   </body>
+  
+  
+  {{define "schoolemail"}}
+	<tr>
+		<td>{{ .SenderData.Email}}</td>
+		<td>{{ .SenderData.Password}}</td>
+		<td><button class="delete" 
+		hx-post="/deleteschool?uuid = {{ .SenderData.UUID}}" 
+		hx-target = "#schoolemail"
+		hx-swap = "outterHTML" >Delete</button></td>
+		
+	</tr>
+  {{end}}
+  
+  {{define "schoolemailpresent"}}
+	<tr>
+		<td>Only One Institution email is allowed at any one time delete current eamil to add a new one</td>
+	</tr>
+  {{end}}
+  
+  
+  
 </html>
 
 

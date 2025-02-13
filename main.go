@@ -36,7 +36,8 @@ func main() {
 	routes.LoadAdminUsers()
 	routes.LoadAssesmentTable()
 	routes.CreateVisitorTable()
-	fmt.Println("::SERVER STARTED::")
+	routes.CreateEmailSenderTem()
+	fmt.Println("::SERVER STARTED::PORT::8080")
 
 	router := http.NewServeMux()
 
@@ -84,6 +85,7 @@ func main() {
 	router.HandleFunc("/gradeca", routes.GradeCA)
 	router.HandleFunc("/delete_cource_data", routes.DeleteCource)
 	router.HandleFunc("/get_matrics", routes.Matrics)
+	router.HandleFunc("/deleteschool", routes.DeleteEmail)
 
 	router.HandleFunc("/deleteadmin", routes.DeleteAdmin)
 	router.HandleFunc("/createnews", routes.Create_News)
@@ -91,6 +93,7 @@ func main() {
 	router.HandleFunc("/databackup", dbcode.BackUpData)
 	router.HandleFunc("/downloadassignment", routes.DownloadAssesments)
 	router.HandleFunc("/deletestuden", routes.DeleteStudent)
+	router.HandleFunc("/createadminemail", routes.CreateEmailData)
 
 	
 	

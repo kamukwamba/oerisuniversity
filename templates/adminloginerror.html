@@ -30,6 +30,25 @@
 
         
      }
+	 
+	
+	.adminlogInput{
+	
+		width: 100%;
+		height: 30px;
+		border: solid 1px rgb(32, 0, 61);
+		border-radius: 3px;
+		margin-bottom: 15px;
+	}
+	
+	
+	.input_width{
+		position: relative;
+		width: 95%;
+		margin: auto;
+		padding: auto;
+		
+	}
     </style>
 
     <title>Administration</title>
@@ -48,13 +67,14 @@
         </div>
         
         <form action="/admindashboard" method="POST">
-            <div class="input_width">
-                
-            <input class="ctinput" type="email" name="email" required placeholder="Email">
+             <div class="input_width">
+            <label>Admin Email</label>
+            <input class="adminlogInput" type="email" name="email" required placeholder="Email">
             </div>
             <div class="input_width">
-                
-            <input class="ctinput" type="password" name="password" required placeholder="Password"><br>
+            <label>Password</label>
+            
+            <input class="adminlogInput" type="password" name="password" required placeholder="Password"><br>
             </div>
             
             <div class="subbtn">

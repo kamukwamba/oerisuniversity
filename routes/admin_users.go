@@ -28,6 +28,7 @@ type Visited struct {
 type MatricsData struct {
 	Admin       AdminInfo
 	VisitedList []Visited
+	SenderData ApplicationApprovedSender
 }
 
 func CreatAdminUser(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +57,7 @@ func CreatAdminUser(w http.ResponseWriter, r *http.Request) {
 	first_name := r.FormValue("first_name")
 	last_name := r.FormValue("last_name")
 	email := r.FormValue("email")
-	password := r.FormValue("password")
+	password,_ := HashPassword(r.FormValue("password"))
 	auth := r.FormValue("auth")
 
 	fmt.Println(first_name, last_name, email, password, auth)
@@ -267,9 +268,15 @@ func Matrics(w http.ResponseWriter, r *http.Request) {
 	admin_infor := AdminData(admin_id)
 
 	metrics_data := LoadVisited()
+	
+	
+	data_sender,_ := GetEmailData()
+	fmt.Println("the data is out:  ",data_sender)
 	data_out := MatricsData{
 		Admin:       admin_infor,
 		VisitedList: metrics_data,
+		SenderData: data_sender,
+		
 	}
 
 	fmt.Println("Currently Visited",data_out)

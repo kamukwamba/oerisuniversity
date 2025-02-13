@@ -79,13 +79,11 @@ func CreateStudentCridentials(studentdate StudentCridentials) bool {
 	}
 
 	uuid := encription.Generateuudi()
-	//RETRIEVE ENCRIPTION CODE
-	// student_uuid := encription.EncryptData(studentdate.StudentUUID)
-	// student_email := encription.EncryptData(studentdate.Email)
-	// student_password := encription.EncryptData(studentdate.Password)
+	
 	student_uuid := studentdate.StudentUUID
 	student_email := studentdate.Email
-	student_password := studentdate.Password
+	securepassword, _ :=  HashPassword(studentdate.Password)
+	student_password := securepassword
 
 	stmt, err := cridentials.Prepare("insert into studentcridentials(uuid, student_uuid, email,password) values(?,?,?,?)")
 
@@ -354,6 +352,12 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 			}
 
 			addedtoacams := CreateACAMS(acams_data, payment_type)
+		
+	
+			err := SendEmail(email)
+			if err != nil {
+				fmt.Println("Error sending email:", err)
+			}
 
 			if addedtoacams {
 				SendEMAIL()

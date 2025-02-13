@@ -157,10 +157,14 @@ func ValidateSudent(email_in, password_in string) (bool, string) {
 	}
 	
 	fmt.Println(uuid, student_uuid, email, email, password)
-
-	if password_in != password {
+	
+	
+	compareHashedKeys :=  CheckPassword(password, password_in)
+	
+	if compareHashedKeys != true{
 		isstudent = false
 	}
+
 
 	return isstudent, student_uuid
 
