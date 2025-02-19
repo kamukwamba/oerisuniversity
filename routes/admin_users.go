@@ -74,7 +74,7 @@ func CreatAdminUser(w http.ResponseWriter, r *http.Request) {
 	_, err = stmt.Exec(uuid, first_name, last_name, email, password, auth, date)
 
 	if err != nil {
-		fmt.Println("failed to insert into admin user")
+		fmt.Println("failed to insert into admin user", err)
 	}
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
