@@ -274,6 +274,47 @@ func Listify(question_a, question_b string) ([]QuestionStruct, []QuestionStruct)
 	return question_list_a, question_list_b
 }
 
+func ReadQuestions(cource_name string)([]Questions_Construct, bool){
+	questions_present := true
+	get_exam := dbcode.SqlRead().DB
+	var queOut Questions_Construct
+	var question_structure_list []Questions_Construct
+
+	stmt, err := get_exam.Query("select uuid, section, cource_uuid,cource_name,question, answer from exam_questions where cource_name = ?", cource_name)
+
+	if err != nil {
+		log.Fatal("Failed to get exam questions: ", err)
+		questions_present = false
+	}
+
+	
+
+	defer stmt.Close()
+
+	for stmt.Next() {
+		err = stmt.Scan(&queOut.UUID, &queOut.Section,&queOut.Cource_UUID ,&queOut.Cource_Name, &queOut.Question,&queOut.Answer)
+
+		if err != nil {
+			fmt.Println("failed to query row: ", err)
+			break
+		} else {
+				question_structure_list = append(question_structure_list, question_structure)
+		}
+	}
+
+	if err = stmt.Err(); err != nil {
+		fmt.Println("stmt scan failed, error out: ", err)
+		questions_present = false
+	}
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return question_structure_list, questions_present
+
+}
+
 func Read_Exam(cource_name string) ([]Question_Structure, string, bool) {
 
 	questions_present := true
@@ -534,9 +575,7 @@ func DeleteAllQuestions(cource_name string) bool {
 	return deleted
 }
 
-func Update_Exam(w http.ResponseWriter, r *http.Request) {
 
-}
 
 func Delete_Exam(w http.ResponseWriter, r *http.Request) {
 
@@ -638,6 +677,90 @@ func CourceCompleted(w http.ResponseWriter, r *http.Request){
 }
 
 
+func SaveQuestionUpdates(w http.ResponseWriter, r *http.Request){
+
+	r.ParseForm
+
+	uuid := r.PathValue("uuid")
+	section := r.PathValue("section")
+	dbread  := dbcode.SqlRead().DB
+	var question string
+	var answer string
+
+	type UpdateOut struct{
+		Question_UUID string
+		Question string
+		Answer string
+
+	}
+	var dataOut UpdateOut
+	var templateOut string 
+
+	switch section {
+		case "A":
+			question = r.FormValue("question_a")
+			answer = r.FormValue("answer")
+
+			stmt, err := dbread.Prepare("UPDATE exam_questions SET question = ?, answer = ? WHERE UUID = ?")
+
+			if err != nil {
+				fmt.Println("FAILED PREPARE UPDATE FOR SECTION A:: ", err)
+			}
+
+			defer stmt.Close()
+
+
+			_, err = stmt.Exec(question, answer, uuid)
+
+			if err != nil {
+				fmt.Println("FAILED TO UPDATE: ", err)
+
+			}
+			data_out = UpdateOut{
+				Question_UUID: uuid,
+				Question: question,
+				Answer: answer,
+			}
+
+			templateOut = "question_section_a"
+
+
+		case "B":
+			question = r.FormValue("question_b")
+			
+
+			stmt, err := dbread.Prepare("UPDATE exam_questions SET question = ?  WHERE UUID = ?")
+
+			if err != nil {
+				fmt.Println("FAILED PREPARE UPDATE FOR SECTION A:: ", err)
+			}
+
+			defer stmt.Close()
+
+
+			_, err = stmt.Exec(question, uuid)
+
+			if err != nil{
+				fmt.Println("FAILED TO UPDATE:: ", err)
+			}
+			data_out = UpdateOut{
+				Question_UUID: uuid,
+				Question: question,
+				
+			}
+
+			templateOut = "question_section_b"
+
+	}
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+	err := tpl.ExecuteTemplate(w, templateOut, data_out)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func CreatePage(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
@@ -652,7 +775,7 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 	type ExamOut struct {
 		Present     bool
 		Cource_Data CourceDataStruct
-		ExamData    []Question_Structure
+		ExamData    []Questions_Structure
 		CourceNameFm string
 	}
 
@@ -660,13 +783,12 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 
 	cource_name_out := get_program_data.Cource_Name
 	formatCourceName := Clean(cource_name_out)
-	//Get Program Details to use when creating a database entry
-	result_out_list, _, _ := Read_Exam(cource_name_out)
 	
-	fmt.Println("The Questions Out:::: ", result_out_list)
+	
+
 	if exam_value == "true" {
 
-		result_out, _, _ := Read_Exam(cource_name_out)
+		result_out, _ := ReadQuestions(cource_name_out)
 		
 		fmt.Println("uestions Are Present")
 		to_show = ExamOut{
@@ -1221,12 +1343,66 @@ func AddExamDetails(w http.ResponseWriter, r *http.Request) {
 
 func UpdateQuestion(w http.ResponseWriter, r *http.Request){
 
-	questionUuid := r.PathValue("qustion_uuid")
+	uuid := r.PathValue("qustion_uuid")
 
-
+	var question Questions_Construct
 	dbread := dbcode.SqlRead().DB
 
-	stmt, err := dbread.Prepare("SELECT uuid, section, cource_uuid, cource_name,question, answer WHERE uuid = ?")
+	stmt, err := dbread.Prepare("SELECT uuid, section, cource_uuid, cource_name,question, answer FROM exam_questions  WHERE uuid = ?")
+
+	if err != nil{
+		fmt.Println("FAILED TO PREPARE STATEMENT FOR SELECT:: ", err)
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(uuid).Scan(&question.UUID, &question.Section,&question.Cource_UUID, &question.Cource_Name, &question.Question, &question.Question)
+
+	if err != nil {
+		fmt.Println("FAILED TO GET QUESTION DATA")
+	}
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	fmt.Println(template_name)
+
+	err := tpl.ExecuteTemplate(w, "updateTextArea", question)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+
+
+}
+
+func DeleteQuestion(w http.ResponseWriter, r *http.Request){
+	uuid := r.PathValue("question_uuid")
+
+	dbread := dbcode.SqlRead().DB
+	stmt, err := dbread.Prepare("DELETE FROM exam_questions WHERE uuid = ?")
+
+	if err != nil {
+		fmt.Println("FAILED TO CREATE PREPARE DELETE STATEMENT: ", err)
+
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(uuid)
+
+
+	if err != nil{
+		fmt.Println("FAILED TO DELETE: ", err)
+	}
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	err := tpl.ExecuteTemplate(w, "empty_div_none", nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func AddExam(w http.ResponseWriter, r *http.Request) {
@@ -1317,7 +1493,7 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 				Details_Messages: "",
 				Questions:        question_content}
 
-			template_name = "questions_out_a"
+			template_name = "questions_out_a_two"
 			check_exampresent := UpdateExamEntered(cource_uuid)
 
 		}

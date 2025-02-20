@@ -113,6 +113,7 @@ func main() {
 	router.HandleFunc("/courcecompleted", routes.CourceCompleted)
 	router.HandleFunc("/updatequestion", routes.UpdateQuestion)
 	router.HandleFunc("/deletequestion", routes.DeleteQuestion)
+	router.HandleFunc("/saveUpdateQuestion", routes.SaveQuestionUpdates)
 
 
 	//STUDENT PORTAL ROUTES
