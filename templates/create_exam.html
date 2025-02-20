@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <link rel="stylesheet" href="/assets/css/cource_data.css">
+    <script src="/assets/htmx.js"></script>
+	{{ template "head_temp"}}
     
     <title>Create Exam</title>
 
@@ -15,32 +18,45 @@
             border: solid 1px rgb(32, 0, 62);
             
         }
+		
+		.leftDiv{
+			width: 60%;
+			height: 100vh;
+			display: inline;
+		}
+		
+		.rightDiv{
+			width: 40%;
+			height: 100vh;
+			display: inline;
+			overflow-y: auto;
+			padding-bottom: 30px;
+		
+		}
+		
+		.mainQuestionDiv{
+			width: 100%;
+			min-height: 100vh;
+			overflow-y: auto;
+			display: flex;
+			background: "rad";
+		
+		}
 
     </style>
 </head>
 
 
 
-{{ define "create_exam_template"}}
+
 <body>
-    <div class="main_div">
-        <button 
-        class="create_button"
-        hx-get = "/programdetails/acams"
-        hx-target = "#maincontaint">
-        
-        Details
-    </button>
-
-    <h3 class="h3_heading">{{ .Cource_Data.Cource_Name}}</h3>
+    <h3 class="h3_heading" style="text-decoration: none;">{{ .CourceNameFm}}</h3>
+	
     <div class="questions">
-        
-
-
 
         {{ if .Present }}
 
-        <div class="section_a">
+        <div class="rightDiv">
             <div id="question_list" class="section_a_question">
                 
 
@@ -61,18 +77,17 @@
 
 
         {{ else }}
-        <div class="section_a">
-            <div id="question_list" class="section_a_question">
+        <div class="mainQuestionDiv" >
+            <div id="question_list" class="leftDiv">
                 
 
             </div>
             
         
-            <div>
+            <div class="rightDiv">
             <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{.Cource_Data.UUID}}&section=A"
                     hx-target="#question_list"
                     hx-swap="beforeend">
-                <label for="question" class="compose">Compose Question</label><br>
 
                 <div style="background-color: rgb(32, 0, 62); padding: 5px; margin-bottom:5px;">
                     <label for="answer"  class="compose" style=" color: white;">Section A</label><br>
@@ -100,7 +115,7 @@
                 <div style="background-color: rgb(32, 0, 62); padding: 5px; margin-bottom:5px;">
                     <label for="answer"  class="compose" style=" color: white;">Section B</label><br>
                 </div>
-                <textarea name="question_b"  class="question_div_one" style="font-size: 1em; padding:5px;">Enter section B qustion here  one at a time.
+                <textarea name="question_b" id="questionSectionB" class="question_div_one" style="font-size: 1em; padding:5px;">Enter section B qustion here  one at a time.
                 </textarea>
 
                 <button type="submit" class="create_button">Save</button>
@@ -135,19 +150,17 @@
             </form>
         </div>
 
-        <div id="details_saved" style="width: 100%; height: 45px; background-color: rgb(32, 0, 62);">
-            
-        </div>
+        
         </div>
 
 
         {{ end }}
         
     </div>
-    </div>
+    
 </body>
 
-{{ end }}
+
 
 </html>
 
@@ -204,10 +217,25 @@
             <button class="delete">Delete</button>
         </div>
         <div>
-            <p>{{ .Section}}</p>
             <p>{{.Question}}</p>
         </div>
         </div>
+    
+  
+{{ end }}
+
+
+{{ define "question_section_a"}}
+    
+    <div class="question" id="id{{.UUID}}">
+        <div class="edit_question">
+            <button hx-get="updatequestion?qustion_uuid={{.UUID}}" hx-targate="#questionSectionA" hx-swap="innerHTML" class="update">Update</button>
+            <button class="delete" hx-get="deletequestion?qustion_uuid={{.UUID}}" hx-targate="#id{{.UUID}}" hx-swap="outerHTML"  >Delete</button>
+        </div>
+        <div>
+            <p>{{.Question}}</p>
+        </div>
+    </div>
     
   
 {{ end }}

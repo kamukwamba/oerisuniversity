@@ -211,10 +211,12 @@ func GetProgramDetails(program_name string) ([]CourceDataStruct, bool) {
 
 func ProgramDetails(w http.ResponseWriter, r *http.Request) {
 
+	fmt.Println("Button Has Been Presseds")
+
 	path := r.PathValue("id")
 	out := r.URL.Query().Get("out")
 
-	fmt.Println("Admin ID:::: ",out)
+	
 
 	admin_infor := AdminData(out)
 

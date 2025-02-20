@@ -8,6 +8,11 @@
 	{{ template "head_temp"}}
 	<style>
 	
+		.hovera: hover{
+			color: rgb(32, 0, 62);
+		
+		}
+	
 	</style>
 
 </head>
@@ -353,10 +358,8 @@
         <td class="truncate">{{ .Video_List}}</td>
         <td class="truncate">{{ .Cource_Aseesment}}</td>
 
-        <td> <button hx-get="/create_page?uuid={{ .UUID}}&exam_present={{.Exam}}"  
-            hx-target="#maincontaint"
-            hx-swap="innerHTML" 
-            class="download">Exam</button>
+        <td> 
+			<a href="/create_page?uuid={{.UUID}}&exam_present={{.Exam}}" style="text-decoration: none; color: white" class="download hovera">Exam</a>
         </td>
     
         <td> <button hx-get="/update_cource_data?cource_uuid={{.UUID}}"  
