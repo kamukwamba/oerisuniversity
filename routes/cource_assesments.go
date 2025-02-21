@@ -81,7 +81,7 @@ func HandInAssesment(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err := tpl.ExecuteTemplate(w, "student_cource_assesment", display_assesment)
+	err := tpl.ExecuteTemplate(w, "cource_assesment", display_assesment)
 
 	if err != nil {
 		log.Fatal(err)
