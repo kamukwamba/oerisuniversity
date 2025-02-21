@@ -21,13 +21,17 @@
 		
 		.leftDiv{
 			width: 60%;
-			height: 100vh;
+			min-height: 100vh;
+            max-height: fit-content;
 			display: inline;
+            position: sticky;
+            top: 0px;
 		}
 		
 		.rightDiv{
 			width: 40%;
-			height: 100vh;
+			min-height: 100vh;
+            max-height: fit-content;
 			display: inline;
 			overflow-y: auto;
 			padding-bottom: 30px;
@@ -43,6 +47,35 @@
 		
 		}
 
+        .update{
+            width: 100px;
+            height: 30px;
+            background-color: rgb(32, 0, 62);
+            border: solid 1px rgb(32, 0, 62);
+            border-radius: 3px;
+            color: white;
+        }
+
+        .update:hover {
+            color: rgb(32, 0, 62);
+            background-color: white;
+        }
+
+        .deleteCt{
+            width: 100px;
+            height: 30px;
+            background-color: darkred;
+            border: solid 1px darkred;
+            border-radius: 3px;
+            color: white;
+            margin-left: 4px;
+        }
+
+        .deleteCt:hover{
+            color: darkred;
+            background-color: white;
+        }
+
     </style>
 </head>
 
@@ -57,14 +90,27 @@
         {{ if .Present }}
 
         <div class="mainQuestionDiv" >
-            <div id="question_list" class="leftDiv">
+            <div id="question_list" class="leftDiv" style="padding: 20px;">
                 {{range .ExamData}}
-                    {{ if .Section "A"}}
+
+                    {{if eq .Section "A" }}
+        
                         {{ template "question_section_a" .}}
+
                     {{ else }}
 
-                        {{template "question_section_a" .}}
+
+                        {{ template "question_section_b" .}}
+
+
                     {{ end }}
+
+
+                        
+                
+
+                        
+                
 
                 {{ end }}
                 
@@ -74,11 +120,11 @@
         
             <div class="rightDiv">
                 <div id="sectionAID">
-                    {{ template "sectionACreate" }}
+                    {{ template "sectionACreate" .}}
                 </div>
                 <!-- SECTION B QUESTIONS -->
                 <div id="sectionBID">
-                {{ template "sectionBCreate"}}
+                {{ template "sectionBCreate" .}}
                 </div>
                 <!-- EXAM FINE DETAILS  -->
 
@@ -114,7 +160,7 @@
 
         {{ else }}
         <div class="mainQuestionDiv" >
-            <div id="question_list" class="leftDiv">
+            <div id="question_list" class="leftDiv" style="padding: 20px; ">
                 
 
             </div>
@@ -122,11 +168,11 @@
         
             <div class="rightDiv">
                 <div id="sectionAID">
-                    {{ template "sectionACreate"}}
+                    {{ template "sectionACreate" .}}
                 </div>
             <!-- SECTION B QUESTIONS -->
                 <div id="sectionBID">
-                    {{ template "sectionBCreate"}}
+                    {{ template "sectionBCreate" .}}
                 </div>
 
             <!-- EXAM FINE DETAILS  -->
@@ -230,15 +276,13 @@
 {{ define "sectionAUpdate"}}
     
     <form hx-post="/saveUpdateQuestion?&uuid={{.UUID}}&section=A"
-                    hx-target="#question_list"
+                    hx-target="#id{{.UUID}}"
                     hx-swap="outerHTML">
 
                 <div style="background-color: rgb(32, 0, 62); padding: 5px; margin-bottom:5px;">
                     <label for="answer"  class="compose" style=" color: white;">Section A</label><br>
                 </div>
                 <textarea type="text" class="question_div_one" style="font-size: 1em; padding:5px;" name="question_a" id="" >{{ .Question}}
-                
-                    
                 </textarea><br>
 
                 <h4>Enter Answer</h4>
@@ -248,7 +292,7 @@
                 <input type="radio" id="B" name="answer" value="false" class="radio_btn" style="height:20px; width:20px; vertical-align: middle;"><br>
 
 
-                <button type="submit" class="create_button" style="margin-top: 5px;">Save</button>
+                <button type="submit" class="create_button" style="margin-top: 10px; width: 120px">Update Question</button>
             </form>
 
 {{ end }}
@@ -256,17 +300,16 @@
 
 {{ define "sectionBUpate"}}
 
-    <form hx-post="/saveUpdateQuestion?uuid={{ .UUID}}&section=B"
-            hx-target="#id{{ .UUID}}"
+    <form hx-post="/saveUpdateQuestion?uuid={{.UUID}}&section=B"
+            hx-target="#id{{.UUID}}"
             hx-swap="outerHTML">
                 <div style="background-color: rgb(32, 0, 62); padding: 5px; margin-bottom:5px;">
                     <label for="answer"  class="compose" style=" color: white;">Section B</label><br>
                 </div>
-                <textarea name="question_b" id="questionSectionB" class="question_div_one" style="font-size: 1em; padding:5px;">
-                    {{ .Question }}
+                <textarea name="question_b" id="questionSectionB" class="question_div_one" style="font-size: 1em; padding:5px;">{{ .Question }}
                 </textarea>
 
-                <button type="submit" class="create_button">Update Question</button>
+                <button type="submit" class="create_button" style="width: 120px; padding-top: 10px;">Update Question</button>
 
 
     </form>
@@ -292,8 +335,8 @@
     
     <div class="question" id="id{{.UUID}}">
         <div class="edit_question">
-            <button hx-get="updatequestion?qustion_uuid={{.Question_UUID}}" hx-target="#questionSectionA" hx-swap="innerHTML" class="update">Update</button>
-            <button class="delete" hx-get="deletequestion?qustion_uuid={{.Question_UUID}}" hx-target="#id{{.Question_UUID}}" hx-swap="outerHTML"  >Delete</button>
+            <button hx-get="/updatequestion?qustion_uuid={{.UUID}}&section=B" hx-target="#sectionBID" hx-swap="innerHTML" class="update">Update</button>
+            <button class="deleteCt" hx-get="/deletequestion?qustion_uuid={{.UUID}}" hx-target="#id{{.UUID}}" hx-swap="outerHTML"  >Delete</button>
         </div>
         <div>
              <p>{{ .Question}}</p>
@@ -308,8 +351,8 @@
     
     <div class="question" id="id{{.UUID}}">
         <div class="edit_question">
-            <button hx-get="updatequestion?qustion_uuid={{.Question_UUID}}" hx-target="#questionSectionA" hx-swap="innerHTML" class="update">Update</button>
-            <button class="delete" hx-get="deletequestion?qustion_uuid={{.Question_UUID}}" hx-target="#id{{.Question_UUID}}" hx-swap="outerHTML">Delete</button>
+            <button hx-get="/updatequestion?qustion_uuid={{.UUID}}&section=A" hx-target="#sectionAID" hx-swap="innerHTML" class="update">Update</button>
+            <button class="deleteCt" hx-get="/deletequestion?qustion_uuid={{.UUID}}" hx-target="#id{{.UUID}}" hx-swap="outerHTML">Delete</button>
         </div>
         <div>
             <p>{{.Question}}</p>

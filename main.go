@@ -94,6 +94,7 @@ func main() {
 	router.HandleFunc("/downloadassignment", routes.DownloadAssesments)
 	router.HandleFunc("/deletestuden", routes.DeleteStudent)
 	router.HandleFunc("/createadminemail", routes.CreateEmailData)
+	
 
 	
 	
