@@ -116,16 +116,16 @@ func CreateEmailData(w http.ResponseWriter, r *http.Request){
 		
 		
 		data_out := ApplicationApprovedSender{
-		UUID: uuid,
-		Email: email,
-		Password: password,
+				UUID: uuid,
+				Email: email,
+				Password: password,
 		
 		}
 	
 		
 		//debug failure to laod templates
 
-		err = tpl.ExecuteTemplate(w, "schoolemail", data_out)
+		err = tpl.ExecuteTemplate(w, "schoolemailCreate", data_out)
 
 		if err != nil {
 			log.Fatal(err)
@@ -153,7 +153,9 @@ func CreateEmailData(w http.ResponseWriter, r *http.Request){
 
 func DeleteEmail(w http.ResponseWriter, r *http.Request){
 
-	uuid :=  r.PathValue("uuid")
+	uuid :=  r.URL.Query().Get("uuid")
+
+	fmt.Println("UUID OUT: ", uuid)
 	
 	dbconn := dbcode.SqlRead().DB
 	stmt, err := dbconn.Prepare("Delete from  messengerData where uuid = ?")

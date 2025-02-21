@@ -88,6 +88,13 @@ type Questions_Construct struct {
 	Question_Number int
 }
 
+type ExamOut struct {
+		Present     bool
+		Cource_Data CourceDataStruct
+		ExamData    []Questions_Construct
+		CourceNameFm string
+	}
+
 type CreateExamResponse struct {
 	Details_Messages string
 	Questions        Questions_Construct
@@ -193,10 +200,11 @@ func Clean(str string) string {
 	str_out := strings.Trim(str, "_")
 	var join_string string
 	
-	for item := range str_out{
+	fmt.Println(str_out)
+	
 		
-		join_string = fmt.Sprintf(" %s ", str_out)
-	}
+	join_string = fmt.Sprintf(" %s ", str_out)
+
 	capitalised := ToUpperCase(join_string)
 
 	return capitalised
@@ -272,6 +280,47 @@ func Listify(question_a, question_b string) ([]QuestionStruct, []QuestionStruct)
 	}
 
 	return question_list_a, question_list_b
+}
+
+func ReadQuestions(cource_name string)([]Questions_Construct, bool){
+	questions_present := true
+	get_exam := dbcode.SqlRead().DB
+	var queOut Questions_Construct
+	var question_structure_list []Questions_Construct
+
+	stmt, err := get_exam.Query("select uuid, section, cource_uuid,cource_name,question, answer from exam_questions where cource_name = ?", cource_name)
+
+	if err != nil {
+		log.Fatal("Failed to get exam questions: ", err)
+		questions_present = false
+	}
+
+	
+
+	defer stmt.Close()
+
+	for stmt.Next() {
+		err = stmt.Scan(&queOut.UUID, &queOut.Section,&queOut.Cource_UUID ,&queOut.Cource_Name, &queOut.Question,&queOut.Answer)
+
+		if err != nil {
+			fmt.Println("failed to query row: ", err)
+			break
+		} else {
+				question_structure_list = append(question_structure_list, queOut)
+		}
+	}
+
+	if err = stmt.Err(); err != nil {
+		fmt.Println("stmt scan failed, error out: ", err)
+		questions_present = false
+	}
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return question_structure_list, questions_present
+
 }
 
 func Read_Exam(cource_name string) ([]Question_Structure, string, bool) {
@@ -395,7 +444,7 @@ func Update_Exam_Details(details Exam_Details) (bool, string) {
 
 		defer stmt.Close()
 
-		_, err = stmt.Exec(details.Program_Name, details.Cource_Name, details.Cource_Code, details.Duration, details.Total_Marks)
+		_, err = stmt.Exec(details.Program_Name, details.Cource_Name, details.Cource_Code, details.Duration, details.Total_Marks, uuid)
 
 		if err != nil {
 			fmt.Println("Failed To Update Exam Details: ", err)
@@ -457,7 +506,7 @@ func Create_Exam_Details(details Exam_Details) (bool, string) {
 	return saved_succesfully, message_out
 }
 
-func Create_Exam(question_in Questions_Construct) (bool, uuid) {
+func Create_Exam(question_in Questions_Construct) (bool, string) {
 	result := true
 	create_exam := dbcode.SqlRead().DB
 
@@ -534,9 +583,7 @@ func DeleteAllQuestions(cource_name string) bool {
 	return deleted
 }
 
-func Update_Exam(w http.ResponseWriter, r *http.Request) {
 
-}
 
 func Delete_Exam(w http.ResponseWriter, r *http.Request) {
 
@@ -638,37 +685,131 @@ func CourceCompleted(w http.ResponseWriter, r *http.Request){
 }
 
 
+func SaveQuestionUpdates(w http.ResponseWriter, r *http.Request){
+
+	r.ParseForm()
+
+	
+
+	uuid := r.URL.Query().Get("uuid")
+	section := r.URL.Query().Get("section")
+
+	dbread  := dbcode.SqlRead().DB
+	var question string
+	var answer string
+
+	type UpdateOut struct{
+		UUID string
+		Question string
+		Answer string
+
+	}
+	var data_out UpdateOut
+	var templateOut string 
+
+	switch section {
+		case "A":
+			question = r.FormValue("question_a")
+			answer = r.FormValue("answer")
+
+			stmt, err := dbread.Prepare("UPDATE exam_questions SET question = ?, answer = ? WHERE UUID = ?")
+
+			if err != nil {
+				fmt.Println("FAILED PREPARE UPDATE FOR SECTION A:: ", err)
+			}
+
+			defer stmt.Close()
+
+
+			_, err = stmt.Exec(question, answer, uuid)
+
+			if err != nil {
+				fmt.Println("FAILED TO UPDATE: ", err)
+
+			}
+			data_out = UpdateOut{
+				UUID: uuid,
+				Question: question,
+				Answer: answer,
+			}
+
+			templateOut = "question_section_a"
+
+
+		case "B":
+			question = r.FormValue("question_b")
+			
+
+			stmt, err := dbread.Prepare("UPDATE exam_questions SET question = ?  WHERE UUID = ?")
+
+			if err != nil {
+				fmt.Println("FAILED PREPARE UPDATE FOR SECTION A:: ", err)
+			}
+
+			defer stmt.Close()
+
+
+			_, err = stmt.Exec(question, uuid)
+
+			if err != nil{
+				fmt.Println("FAILED TO UPDATE:: ", err)
+			}
+			data_out = UpdateOut{
+				UUID: uuid,
+				Question: question,
+				
+			}
+
+			templateOut = "question_section_b"
+
+	}
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+	err := tpl.ExecuteTemplate(w, templateOut, data_out)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func CreatePage(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
 	program_data := r.URL.Query().Get("uuid")
-	exam_value := r.URL.Query().Get("exam_present")
-	fmt.Println(exam_value)
-	get_program_data := GetProgramDetailsSingle(program_data)
+	var exam_value string
 	
-	// fmt.Printf("UUID: %s\n", program_data)
 
+	get_program_data := GetProgramDetailsSingle(program_data)
+	fmt.Println("Program UUID: ", program_data)
+	
+	dbread := dbcode.SqlRead().DB
 
-	type ExamOut struct {
-		Present     bool
-		Cource_Data CourceDataStruct
-		ExamData    []Question_Structure
-		CourceNameFm string
+	stmt, err := dbread.Prepare("SELECT exam_file FROM cource_table WHERE uuid = ?")
+	if err != nil {
+		fmt.Println("FAILED TO GET EAM VALUE")
 	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(program_data).Scan(&exam_value)
+
+	if err != nil {
+		fmt.Println("FAILED TO GET EXAM VALUE")
+	}
+	
 
 	var to_show ExamOut
 
 	cource_name_out := get_program_data.Cource_Name
+	fmt.Println("The Program Name: ", cource_name_out)
 	formatCourceName := Clean(cource_name_out)
-	//Get Program Details to use when creating a database entry
-	result_out_list, _, _ := Read_Exam(cource_name_out)
 	
-	fmt.Println("The Questions Out:::: ", result_out_list)
-	if exam_value == "true" {
+	
 
-		result_out, _, _ := Read_Exam(cource_name_out)
+	if exam_value == "true"{
+
+		result_out, _ := ReadQuestions(cource_name_out)
 		
-		fmt.Println("uestions Are Present")
+		
 		to_show = ExamOut{
 			Present:     true,
 			Cource_Data: get_program_data,
@@ -685,7 +826,7 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	err := tpl.ExecuteTemplate(w, "create_exam.html", to_show)
+	err = tpl.ExecuteTemplate(w, "create_exam.html", to_show)
 
 	if err != nil {
 		log.Fatal(err)
@@ -1110,49 +1251,32 @@ func SubmitExam(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func UpdateExamEntered(uuid string) bool{
-
+func UpdateExamEntered(uuid string){
+	fmt.Println("WHAT  THE FUCL IS GOING")
 	update_saved := true 
 	dbread := dbcode.SqlRead().DB
-	var present string
+	
+	
+	stmt, err := dbread.Prepare("UPDATE cource_table SET exam_file = ? WHERE uuid = ?")
 
-	//CHECK IF UPDATED
-
-	stmt, err := dbread.Prepare("SELECT exam_file  FROM cource_table WHER uuid = ?")
-
-	if err != nil {
-
-		fmt.Println("SELECT FAILED IN PREPARE STATEMENT: ", err)
+	if err != nil{
+		fmt.Println("FAILED TO LOAD COURCE TABLE:: ", err)
+		update_saved = false
+	
 	}
-
+	
 	defer stmt.Close()
-
-	err = stmt.QueryRow(uuid).Scan(&present)
-
-	if(present == "false"){
-		stmt, err = dbread.Prepare("UPDATE cource_table SET exam_file = ? WHERE uuid = ?")
 	
-		if err != nil{
-			fmt.Println("FAILED TO LOAD COURCE TABLE:: ", err)
-			update_saved = false
-		
-		}
-		
-		defer stmt.Close()
-		
-		_, err = stmt.Execute(uuid, true)
-		if err != nil {
-			fmt.Println("FIALED TO MAKE UPDATE::: ", err)
-			update_saved = false
-		}
-
-	}else{
-		update_saved = true
+	_, err = stmt.Exec("true", uuid)
+	if err != nil {
+		fmt.Println("FIALED TO MAKE UPDATE::: ", err)
+		update_saved = false
 	}
+
+	
+	fmt.Println("WHAT  THE FUCL IS GOING", update_saved)
 	
 	
-	
-	return update_saved
 }
 
 func AddExamDetails(w http.ResponseWriter, r *http.Request) {
@@ -1221,12 +1345,79 @@ func AddExamDetails(w http.ResponseWriter, r *http.Request) {
 
 func UpdateQuestion(w http.ResponseWriter, r *http.Request){
 
-	questionUuid := r.PathValue("qustion_uuid")
-
-
+	uuid := r.URL.Query().Get("qustion_uuid")
+	section := r.URL.Query().Get("section")
+	var updateTextArea string
+	var question Questions_Construct
 	dbread := dbcode.SqlRead().DB
 
-	stmt, err := dbread.Prepare("SELECT uuid, section, cource_uuid, cource_name,question, answer WHERE uuid = ?")
+
+	fmt.Println("THE UUID IS OUT:: ", uuid)
+	stmt, err := dbread.Prepare("SELECT uuid, section, cource_uuid, cource_name,question, answer FROM exam_questions  WHERE uuid = ?")
+
+	if err != nil{
+		fmt.Println("FAILED TO PREPARE STATEMENT FOR SELECT:: ", err)
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(uuid).Scan(&question.UUID, &question.Section,&question.Cource_UUID, &question.Cource_Name, &question.Question, &question.Answer)
+
+	if err != nil {
+		fmt.Println("FAILED TO GET QUESTION DATA", err)
+	}
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	fmt.Println("The Section: ", section)
+	switch section{
+		case "A":
+			updateTextArea = "sectionAUpdate"
+		case "B":
+			updateTextArea = "sectionBUpate"
+	}
+
+	fmt.Println("THE QUESTION:::",question.Question)
+
+	err = tpl.ExecuteTemplate(w, updateTextArea, question)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+
+
+}
+
+func DeleteQuestion(w http.ResponseWriter, r *http.Request){
+	
+
+	uuid := r.URL.Query().Get("qustion_uuid")
+	fmt.Println("THE UUID: ", uuid)
+	dbread := dbcode.SqlRead().DB
+	stmt, err := dbread.Prepare("DELETE FROM exam_questions WHERE uuid = ?")
+
+	if err != nil {
+		fmt.Println("FAILED TO CREATE PREPARE DELETE STATEMENT: ", err)
+
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(uuid)
+
+
+	if err != nil{
+		fmt.Println("FAILED TO DELETE: ", err)
+	}
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	err = tpl.ExecuteTemplate(w, "empty_div_none", nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func AddExam(w http.ResponseWriter, r *http.Request) {
@@ -1235,25 +1426,27 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 
 	question_section := r.URL.Query().Get("section")
 	var is_present bool
-	var number int
+	var number string
 
 	
 
-	fmt.Println("Section Letter: ", question_section)
 	
-	var exam_responce CreateExamResponse
+	
+	var exam_responce Questions_Construct
 
 	var template_name string
 
-	program_name := r.URL.Query().Get("program_name")
+	
 	cource_name := r.URL.Query().Get("cource_name")
 	cource_uuid := r.URL.Query().Get("uuid")
 	exam_time := r.FormValue("exam_time")
-	exam_code := r.FormValue("exam_code")
+	
 
-	fmt.Println("Cource UUID: ", cource_uuid)
+	
 
 	exam_time_out, _ := strconv.Atoi(exam_time)
+
+	fmt.Println(exam_time_out)
 
 	
 	is_present, number = Question_Count(cource_uuid)
@@ -1270,12 +1463,13 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 		if len(answers) < 1 {
 			answers = "false"
 		}
+
 		var question_content Questions_Construct
 
 		if is_present {
 
 			number_out, _ := strconv.Atoi(number)
-			fmt.Println("Present", number_out)
+			
 
 			question_content = Questions_Construct{
 				Cource_UUID:     cource_uuid,
@@ -1286,15 +1480,17 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 				Question_Number: number_out + 1,
 			}
 
-			saved, quuid := Create_Exam(question_content)
-
+			_, quuid := Create_Exam(question_content)
+			UpdateExamEntered(cource_uuid)
+			fmt.Println("Fuck")
 			question_content.UUID = quuid
 
-			exam_responce = CreateExamResponse{
-				Details_Messages: "",
-				Questions:        question_content}
+			exam_responce = question_content
 
-			template_name = "questions_out_a"
+			fmt.Println(exam_responce)
+
+			template_name = "question_section_a"
+			
 
 		} else {
 
@@ -1309,17 +1505,17 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 				Question_Number: number_out,
 			}
 
-			saved, quuid := Create_Exam(question_content)
+			_, quuid := Create_Exam(question_content)
+			UpdateExamEntered(cource_uuid)
+			
 
 			question_content.UUID = quuid
 
-			exam_responce = CreateExamResponse{
-				Details_Messages: "",
-				Questions:        question_content}
-
-			template_name = "questions_out_a"
-			check_exampresent := UpdateExamEntered(cource_uuid)
-
+			exam_responce = question_content
+			fmt.Println(exam_responce.UUID)
+				
+			template_name = "question_section_a"
+			
 		}
 
 	case "B":
@@ -1340,15 +1536,16 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 				Question_Number: number_out + 1,
 			}
 
-			saved, quuid := Create_Exam(question_content)
+			_, quuid := Create_Exam(question_content)
+			UpdateExamEntered(cource_uuid)
+			fmt.Println("Fuck")
 
 			question_content.UUID = quuid
 
-			exam_responce = CreateExamResponse{
-				Details_Messages: "",
-				Questions:        question_content}
+			exam_responce = question_content
 
-			template_name = "questions_out_b"
+			template_name = "question_section_b"
+			
 
 		} else {
 
@@ -1361,17 +1558,16 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 				Question_Number: number_out,
 			}
 
-			saved, quuid := Create_Exam(question_content)
-
+			_, quuid := Create_Exam(question_content)
+			UpdateExamEntered(cource_uuid)
+			fmt.Println("Fuck")
 			question_content.UUID = quuid
 
-			exam_responce = CreateExamResponse{
-				Details_Messages: "",
-				Questions:        question_content}
+			exam_responce = question_content
 
-			template_name = "questions_out_b"
+			template_name = "question_section_b"
 
-			check_exampresent := UpdateExamEntered(cource_uuid)
+			
 		}
 
 	}

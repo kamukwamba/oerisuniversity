@@ -383,7 +383,7 @@ func AddCourceData(w http.ResponseWriter, r *http.Request) {
 	assesment_link := r.FormValue("assesment_link")
 
 	create_uuid := encription.Generateuudi()
-	exam := false
+	exam := "false"
 
 	fmt.Println(program_name, cource_name, book_link, module_link, video_link, assesment_link)
 

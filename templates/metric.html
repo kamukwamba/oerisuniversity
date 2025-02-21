@@ -24,6 +24,27 @@
 		background-color: white;
 		color:  rgb(32, 0, 62) ;
 	}
+
+	.deleteCt2{
+		width: 90px;
+		height: 30px;
+		color: white;
+		background-color: darkred;
+		border: solid 1px darkred;
+		border-radius: 3px;
+	}
+
+	.deleteCt2:hover{
+		color: darkred;
+		background-color: white;
+	}
+
+	.lableCt{
+		width: 250px;
+		height: 30px;
+		padding-left: 2px;
+		border: solid 1px rgb(32, 0, 62);
+	}
    </style>
     </head>
 
@@ -72,13 +93,13 @@
                 hx-target="#schoolemail"
                 hx-swap="beforeend">
                 <div class="form_div" style="height: 25vh;">
-                    <div class="segments">
+                    <div class="segments" style="width: fit-content;">
                         <label for="first_name">Email</label><br>
-                        <input type="text" name="email" style="width:350px; padding: 5px;">
+                        <textarea  name="email" class="lableCt"></textarea>
                     </div>
-                    <div class="segments">
+                    <div class="segments" style="width: fit-content; padding-left: 5px;">
                         <label for="last_name">Password</label><br>
-                        <input type="text" name="password" class="">
+                        <textarea name="password" class="lableCt"></textarea>
                     </div>
                    
                 </div>
@@ -93,8 +114,10 @@
 			</tr>
 			</thead>
 			<tbody id="schoolemail">
-				
+
+					
 					{{ template "schoolemail" .}}
+
 				
 			</tbody>
 		</table>
@@ -141,10 +164,11 @@
 	<tr>
 		<td>{{ .SenderData.Email}}</td>
 		<td>{{ .SenderData.Password}}</td>
-		<td><button class="delete" 
-		hx-post="/deleteschool?uuid = {{ .SenderData.UUID}}" 
+
+		<td><button class="deleteCt2" 
+		hx-post="/deleteschool?uuid={{.SenderData.UUID}}" 
 		hx-target = "#schoolemail"
-		hx-swap = "outterHTML" >Delete</button></td>
+		hx-swap = "outterHTML" style="width: 90px; height: 30px;">Delete</button></td>
 		
 	</tr>
   {{end}}
@@ -155,7 +179,17 @@
 	</tr>
   {{end}}
   
-  
+  {{define "schoolemailCreate"}}
+	<tr>
+		<td>{{ .Email}}</td>
+		<td>{{ .Password}}</td>
+		<td><button class="deleteCt2" 
+		hx-post="/deleteschool?uuid={{.UUID}}" 
+		hx-target = "#schoolemail"
+		hx-swap = "outterHTML" style="width: 90px; height: 30px;">Delete</button></td>
+		
+	</tr>
+  {{end}}
   
 </html>
 

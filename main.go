@@ -94,6 +94,7 @@ func main() {
 	router.HandleFunc("/downloadassignment", routes.DownloadAssesments)
 	router.HandleFunc("/deletestuden", routes.DeleteStudent)
 	router.HandleFunc("/createadminemail", routes.CreateEmailData)
+	
 
 	
 	
@@ -113,6 +114,7 @@ func main() {
 	router.HandleFunc("/courcecompleted", routes.CourceCompleted)
 	router.HandleFunc("/updatequestion", routes.UpdateQuestion)
 	router.HandleFunc("/deletequestion", routes.DeleteQuestion)
+	router.HandleFunc("/saveUpdateQuestion", routes.SaveQuestionUpdates)
 
 
 	//STUDENT PORTAL ROUTES

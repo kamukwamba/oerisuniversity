@@ -80,6 +80,7 @@ func DeleteStudentInfo(uuid string) bool{
 }
 
 
+
 func DeleteStudent(w http.ResponseWriter, r *http.Request){
 
 	uuid := r.URL.Query().Get(".uuid")
