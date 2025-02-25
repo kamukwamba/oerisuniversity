@@ -24,9 +24,8 @@
 </head>
 <body>
     {{ if .AlreadyTaken }}
-        
-        
-
+    
+        {{ template "write_div" .}}
     {{ else }}
         {{ template "write_div" .}}
 
@@ -131,10 +130,39 @@
 
     <script>
         var hr = 0;
-    var minute = 0;
-    var second = 0;
+        var minute = 0;
+        var second = 0;
+        hiden_count  = 0
+
+        timer_get = "{{.ExamData.Exam_Duration}}";
+
+
+        const timerInt = parseInt(timer_get, 10);
+
+
+        const timerDuration =1000 * timerInt;
+
+
+        function submitFormAndRedirect() {
+            document.getElementById('myForm').submit();
+
+        }
+
+  
+        function updateTimerDisplay(seconds) {
+            document.getElementById('timer').innerText = `Form will be submitted in ${seconds} seconds...`;
+        }
+
+        window.location.href = "/submitexam?cource_uuid={{.Cource_UUIDOut}}&student_uuid={{ .Student_UUID}}&cource_name={{ .Cource_Name_Two}}&attempt_out = {{ .Attempt_Out}}";
+
+       
+        setTimeout(submitFormAndRedirect, timerDuration);
+    
+
+
+
     window.onload = function() {
-    var incrementSecond = function () {
+        var incrementSecond = function () {
         window.secondsPassed += 1;
 
         second = window.secondsPassed;
@@ -157,37 +185,31 @@
             window.secondsPassed = 0;
             minute ++ ;
             hiden_count ++;
-
-            
-
-
             document.getElementById("min").innerHTML = minute;
-
-
         }
 
         if (minute == 60){
             minute = 0;
             hr ++ ;
-            document.getElementById("hr").innerHTML = hr;
-
-        }
-
-
-
-        
+            document.getElementById("hr").innerHTML = hr;}
         }
 
         window.secondsPassed = 0;
         window.myTimer = setInterval(incrementSecond, 1000);
         }
         var onSubmitClick = function() {
-        window.clearInterval(window.myTimer); // always clean resources
-        // call some other function to do the submit
+        window.clearInterval(window.myTimer); 
 
-        if (hiden_count == timerInt){
-            submit_button.click()
+        function submitFormAndRedirect() {
+        
+            document.getElementById('myForm').submit();
+
         }
+
+        function updateTimerDisplay(seconds) {
+            document.getElementById('timer').innerText = `Form will be submitted in ${seconds} seconds...`;
+        }
+
     }
     </script>
 {{ end }}
@@ -205,7 +227,7 @@
 
         {{ if eq .Section "A"}}
             <div>
-                <p class="section_question">{{ .Question_Number}}. {{ .Question}}</p>
+                <p class="section_question">{{ .Question}}</p>
                 <label for="true" style="font-weight: bold; padding: 10px">True</label>
                 <input type="radio" name="{{ .Question_UUID}}" value="true">
                 <label for="false" style="font-weight: bold;">False</label>
@@ -224,7 +246,7 @@
 
         {{ if eq .Section "B"}}
             <div>
-                <p class="section_question">{{ .Question_Number}}.{{ .Question}}</p>
+                <p class="section_question">{{ .Question}}</p>
                 <textarea name="{{ .Question_Number }}"  name="{{ .Question_UUID}}" class="section_b_answer" style="padding: 10px;"></textarea>
                 
             </div>

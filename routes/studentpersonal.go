@@ -455,7 +455,7 @@ func CleanStudentUUID(uuid string) string {
 		new_string = new_string + item
 	}
 
-	fmt.Println(new_uuid)
+	
 	return new_string
 }
 

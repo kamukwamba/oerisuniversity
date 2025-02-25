@@ -85,15 +85,20 @@ func SaveGrades(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 	dbconn := dbcode.SqlRead().DB
-	uuid := r.URL.Query().Get("rttse")
+	
+	cource_name := r.URL.Query().Get("rttcn")
+	student_uuid := r.URL.Query().Get("rttsu")
 
-	total_marks := r.FormValue("total")
+
+
+	grade := r.FormValue("total")
 	passed := r.FormValue("passed")
 	comment := r.FormValue("comment")
+	grading := "false"
 
-	fmt.Println("Route Has Been Hit: ", passed, comment)
+	fmt.Println("Route Has Been Hit: ", cource_name, student_uuid)
 
-	stmt, err := dbconn.Prepare("UPDATE write_exam set grade = ?, comment = ?, passed = ?  where uuid = ?")
+	stmt, err := dbconn.Prepare("UPDATE write_exam SET grade = ?, comment = ?, passed = ?, grading = ? WHERE student_uuid = ? AND cource_name = ?")
 
 	if err != nil {
 		fmt.Println("Prepare statement error: ", err)
@@ -101,10 +106,10 @@ func SaveGrades(w http.ResponseWriter, r *http.Request) {
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(uuid, total_marks, comment, passed)
+	_, err = stmt.Exec(grade, comment, passed, grading,student_uuid, cource_name)
 
 	if err != nil {
-		fmt.Println("failed to update")
+		fmt.Println("failed to update", err)
 	}
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
@@ -118,10 +123,39 @@ func SaveGrades(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func CurrentAttemp(cource_name, studentuuid string) string{
+
+	dbread := dbcode.SqlRead().DB
+	var numberStr string 
+	
+
+	getQuery := fmt.Sprintf("SELECT attempt_number FROM %s WHERE cource_name = ?", studentuuid)
+
+	stmt, err := dbread.Prepare(getQuery)
+
+	if err != nil {
+		fmt.Println("PREPARE STATEMENT FAILED", err)
+	}
+
+	defer stmt.Close()
+	err = stmt.QueryRow(studentuuid).Scan(&numberStr)
+
+	if err != nil {
+		fmt.Println("EXECUTION FAILED", err)
+	}
+
+	
+
+	return numberStr
+
+}
+
 func GradeExam(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Cource grade Triggerd")
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+
 
 	student_uuid := r.URL.Query().Get("student_uuid")
 	cource_name := r.URL.Query().Get("cource_name")
@@ -147,6 +181,8 @@ func GradeExam(w http.ResponseWriter, r *http.Request) {
 
 		cleaned := CleanStudentUUID(student_uuid)
 
+
+
 		_, cource_uuid_out, _ := Read_Exam(cource_name)
 
 		exam_details := GetExamDetails(cource_uuid_out)
@@ -156,6 +192,8 @@ func GradeExam(w http.ResponseWriter, r *http.Request) {
 		query_string := fmt.Sprintf("select * from %s", cleaned)
 
 		stmt, err := dbconn.Query(query_string)
+
+		attemptnumber := CurrentAttemp(cource_name,cleaned)
 
 		if err != nil {
 			fmt.Println("Failed to initialize prepare statement: ", err)
@@ -169,7 +207,15 @@ func GradeExam(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				fmt.Println("Failed to obtain scan: ", err)
 			}
-			grade_answer_list = append(grade_answer_list, grade_answer)
+			attmpstr := grade_answer.Attemp_Number
+
+			fmt.Println(attmpstr)
+			fmt.Println("Att Number:",attemptnumber)
+			
+			if(attemptnumber == attmpstr){
+			grade_answer_list = append(grade_answer_list, grade_answer)}
+			
+
 
 		}
 

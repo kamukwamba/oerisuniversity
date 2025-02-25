@@ -76,6 +76,14 @@
             background-color: white;
         }
 
+        .program_details{
+            position: relative;
+            width: 100%;
+            height: fit-content;
+            padding-bottom: 20px;
+            padding-top: 20px;
+
+        }
     </style>
 </head>
 
@@ -90,7 +98,13 @@
         {{ if .Present }}
 
         <div class="mainQuestionDiv" >
+
+            
             <div id="question_list" class="leftDiv" style="padding: 20px;">
+
+                <div class="program_details">
+                    {{ template "examdetails" .}}
+                </div>
                 {{range .ExamData}}
 
                     {{if eq .Section "A" }}
@@ -105,12 +119,6 @@
 
                     {{ end }}
 
-
-                        
-                
-
-                        
-                
 
                 {{ end }}
                 
@@ -153,14 +161,19 @@
                 </form>
             </div>
 
-        
+            <div id="details_saved" style="display: none;">
+            </div>
         </div>
 
 
 
         {{ else }}
         <div class="mainQuestionDiv" >
+           
             <div id="question_list" class="leftDiv" style="padding: 20px; ">
+                <div class="program_details">
+                    {{ template "examdetails" .}}
+                </div>
                 
 
             </div>
@@ -204,7 +217,8 @@
             </form>
             </div>
 
-        
+            <div id="details_saved" style="display: none;">
+            </div>
         </div>
 
 
@@ -219,6 +233,72 @@
 </html>
 
 
+{{ define "examdetailsC" }}
+    <div class="exam_details">
+            <table>
+                <tbody>
+                    <tr>
+                        <th class="title">Program</th>
+                        <td>{{ .Program_Name}}</td>
+                    </tr>
+                    <tr>
+                        <th class="title">Cource Name</th>
+                        <td>{{ .Cource_Name}}</td>
+
+                    </tr>
+                    <tr>
+                        <th class="title">Cource Code</th>
+                        <td>{{ .Cource_Code }}</td>
+                    </tr>
+                    <tr>
+                        <th class="title">Duration</th>
+                        <td id="duration">{{ .Exam_Duration}}min</td>
+                    </tr>
+                
+                    <tr>
+                        <th class="title">Total  Marks</th>
+                        <td>{{ .Total_Marks}}</td>
+                    </tr>
+                </tbody>
+            </table>
+    
+        </div>
+
+{{ end }}
+
+
+{{ define "examdetails"}}
+    <div class="exam_details">
+            <table>
+                <tbody>
+                    <tr>
+                        <th class="title">Program</th>
+                        <td>{{ .ExamDetails.Program_Name}}</td>
+                    </tr>
+                    <tr>
+                        <th class="title">Cource Name</th>
+                        <td>{{ .ExamDetails.Cource_Name}}</td>
+
+                    </tr>
+                    <tr>
+                        <th class="title">Cource Code</th>
+                        <td>{{ .ExamDetails.Cource_Code }}</td>
+                    </tr>
+                    <tr>
+                        <th class="title">Duration</th>
+                        <td id="duration">{{ .ExamDetails.Exam_Duration}}min</td>
+                    </tr>
+                
+                    <tr>
+                        <th class="title">Total  Marks</th>
+                        <td>{{ .ExamDetails.Total_Marks}}</td>
+                    </tr>
+                </tbody>
+            </table>
+    
+        </div>
+    
+{{ end }}
 
 
 {{ define "details_saved_temp"}}

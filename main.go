@@ -86,6 +86,7 @@ func main() {
 	router.HandleFunc("/delete_cource_data", routes.DeleteCource)
 	router.HandleFunc("/get_matrics", routes.Matrics)
 	router.HandleFunc("/deleteschool", routes.DeleteEmail)
+	router.HandleFunc("/downloadfile", routes.AdminDownLoadAsignment)
 
 	router.HandleFunc("/deleteadmin", routes.DeleteAdmin)
 	router.HandleFunc("/createnews", routes.Create_News)

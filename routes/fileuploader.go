@@ -7,25 +7,90 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"fmt"
 )
 
+
+func AdminDownLoadAsignment(w http.ResponseWriter, r *http.Request){
+
+	uuid := r.URL.Query().Get("uuid")
+	cource_name := r.URL.Query().Get("cource_name")
+	file_name := r.URL.Query().Get("file_name")
+
+	dbFilePath := fmt.Sprintf("assesmentFiles/%s/%s/%s", uuid, cource_name, file_name)
+
+	if _, err := os.Stat(dbFilePath); os.IsNotExist(err) {
+		http.Error(w, "Database file not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/octet-stream")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filepath.Base(dbFilePath)))
+
+	
+	file, err := os.Open(dbFilePath)
+	if err != nil {
+		http.Error(w, "Unable to open the file", http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	
+	_, err = io.Copy(w, file)
+	if err != nil {
+		http.Error(w, "Error writing file to response", http.StatusInternalServerError)
+		return
+	}
+}
+
+func ReadStudentAssesments(uuid, cource_name string) []string{
+	
+
+	var filesList []string
+
+	stID := CleanStudentUUID(uuid)
+
+	parts := []string{"assesmentFiles", stID, cource_name}
+	result := strings.Join(parts, "/")
+
+	
+	files, err := os.ReadDir(result)
+
+	if err != nil {
+		fmt.Println("FAILED TO READ FILES", err)
+		
+	}
+
+	for _, file :=  range files{
+		filesList = append(filesList, file.Name())
+	}
+
+
+	return filesList
+
+}
+
+
 func UploadAssesment(w http.ResponseWriter, r *http.Request) {
-	// Ensure the request method is POST.
+	
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
 	// Parse the multipart form.
-	err := r.ParseMultipartForm(10 << 20) // Limit upload size to 10 MB.
+	err := r.ParseMultipartForm(10 << 20) 
 	if err != nil {
 		http.Error(w, "Failed to parse form", http.StatusInternalServerError)
 		return
 	}
 
-	// Retrieve the file from the form.
+	
 	student_uuid := r.URL.Query().Get("uuid")
 	cource_name := r.URL.Query().Get("cource_name")
+
+	stID := CleanStudentUUID(student_uuid)
+	
 
 	file, handler, err := r.FormFile("file")
 	if err != nil {
@@ -42,7 +107,7 @@ func UploadAssesment(w http.ResponseWriter, r *http.Request) {
 
 	// Create the destination file.
 
-	parts := []string{"assesmentFiles", student_uuid, cource_name}
+	parts := []string{"assesmentFiles", stID, cource_name}
 	result := strings.Join(parts, "/")
 
 	savePath := filepath.Join(result, handler.Filename)

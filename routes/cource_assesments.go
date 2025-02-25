@@ -24,9 +24,10 @@ type AssesmentGrade struct {
 
 type AssesmentOut struct {
 	Present       bool
-	AssesmentList []AssesmentGrade
+	Assesment []AssesmentGrade
 	Student_UUID string
 	Cource_Name string
+	StInfo StudentInfo
 }
 
 func GetAssesmentData(student_uuid, cource_name string) (bool, []AssesmentGrade) {
@@ -69,19 +70,23 @@ func HandInAssesment(w http.ResponseWriter, r *http.Request) {
 
 	student_uuid := r.URL.Query().Get("student_uuid")
 	cource_name := r.URL.Query().Get("cource_name")
+	studentdata := GetStudentAllDetails(student_uuid)
 
 	present, assesment_data := GetAssesmentData(student_uuid, cource_name)
 
 	display_assesment := AssesmentOut{
 		Present:       present,
-		AssesmentList: assesment_data,
-		Student_UUID: student_uuid,
+		Assesment: assesment_data,
+		StInfo:      studentdata,
 		Cource_Name: cource_name,
+		Student_UUID: student_uuid,
+
+		
 	}
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err := tpl.ExecuteTemplate(w, "cource_assesment", display_assesment)
+	err := tpl.ExecuteTemplate(w, "handInAsignments.html", display_assesment)
 
 	if err != nil {
 		log.Fatal(err)
@@ -193,16 +198,7 @@ func DownloadAssesments(w  http.ResponseWriter, r *http.Request){
 	}
 }
 
-
-func GradeCA(w http.ResponseWriter, r *http.Request) {
-
-	student_uuid := r.URL.Query().Get("student_uuid")
-	cource_name := r.URL.Query().Get("cource_name")
-	
-	theString := fmt.Sprintf("assesmentFiles/%s/%s", student_uuid, cource_name)
-	filesAs, err  := listAssignments(theString)
-	
-	type FileDownload struct {
+type FileDownload struct {
 		FileName string
 		Student_UUID string
 		Cource_Name string
@@ -211,6 +207,15 @@ func GradeCA(w http.ResponseWriter, r *http.Request) {
 		Handed []FileDownload
 		Assesment []AssesmentGrade
 	}
+func GradeCA(w http.ResponseWriter, r *http.Request) {
+
+	student_uuid := r.URL.Query().Get("student_uuid")
+	cource_name := r.URL.Query().Get("cource_name")
+	
+	theString := fmt.Sprintf("assesmentFiles/%s/%s", student_uuid, cource_name)
+	filesAs, err  := listAssignments(theString)
+	
+	
 	
 	var fileData FileDownload
 	
@@ -247,7 +252,7 @@ func GradeCA(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err = tpl.ExecuteTemplate(w, "cource_assesment.html", data_out)
+	err = tpl.ExecuteTemplate(w, "admin_cource_assesment", data_out)
 
 	if err != nil {
 		http.Redirect(w, r, "/error", http.StatusSeeOther)

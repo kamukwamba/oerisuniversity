@@ -34,10 +34,9 @@
                         <td><a href="/getstudymaterial?cource_name={{ .Cource_Name}}&material_type=module">Module</a></td>
                         
                         <td> <a class = "watch_video_link" href="/watchvideo?cource_name={{ .Cource_Name}}">Watch</a></td>
-                        <td ><a  
-                            data-hx-post="/handinassesment?cource_name={{ .Cource_Name}}&student_uuid={{ .Student_UUID}}"
-                            hx-target="#mainpage"
-                            hx-swap="innerHTML" style="cursor: pointer;">Open</a></td>
+                        
+                        <td ><a  href="/handinassesment?cource_name={{.Cource_Name}}&student_uuid={{ .Student_UUID}}"
+                            style="cursor: pointer;">Submit</a></td>
 
                         <td><a href="/takeexam?cource_name={{ .Cource_Name}}&uuid={{ .Student_UUID}}">Write</a></td>
                         <td id="approval">

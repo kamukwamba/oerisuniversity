@@ -32,9 +32,9 @@
 
             <div class="videolist">
 
-                {{ range .VideoList .}}
+                {{ range .VideoList}}
 
-                    {{ template "video_list"}}
+                    {{ template "video_list" .}}
                 {{ end }}
         
             

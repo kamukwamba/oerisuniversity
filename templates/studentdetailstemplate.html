@@ -5,8 +5,9 @@
         {{ template "head_temp"}}
 
         <style>
-            .centered-div {
-            position: relative;
+            .centered_div {
+            position: fixed;
+            top: 30vh;
             width: 50vw;
             height: 50vh;
             padding: 20px;
@@ -54,7 +55,7 @@
      {{ template "adminheadertemp" .}}
  
 
-  {{  template "side_bar" .}}
+    {{  template "side_bar" .}}
 
 
     <div class="main" style="padding: 15px; height: 100vh; overflow-y: scroll;">
@@ -119,9 +120,7 @@
 
 				</div>
 				
-				<div style="display: none;" id="centered-div">
-					
-				</div>
+				
 			</div>
             
             
@@ -130,6 +129,10 @@
         
         
     
+    </div>
+
+    <div style="display: none;" id="centered_div">
+                    
     </div>
 	
 	<div class="hidden_main" style="overflow-x: scroll; overflow-y: auto; padding-bottom: 40px;">
@@ -208,7 +211,7 @@
 
 
 
-    <div class="centered-div" id="centered-div"> 
+    <div class="centered_div" id="centered_div"> 
         <div style="height: 20vh; width: 100%;">
         <button class="close-button" onclick="closeDiv()">X</button>
         <table class="assesment_table" style="margin: auto;">
@@ -261,6 +264,26 @@
                 </div>
             </form>
         </div>
+
+
+        <div class="listStudentHaded">
+            {{ range .Handed}}
+                <div class="thefilediv">
+
+                    <div class="namefile">
+                        {{ .FileName}}
+                    </div>
+                    <div class="actionfile">
+                        <a href="/downloadfile?cource_name={{.Coure_Name}}&student_uuid={{.Student_UUID}}">{{ .FileName}}</a>
+                        <button class="deleteCt2">Delete</button>
+                    </div>    
+                
+                </div>
+
+            {{ end }}
+
+        <div>
+
     </div>
 
     <script>
@@ -299,8 +322,8 @@
                     <td></td>
                     <td>{{ .Cource_Name}}</td>
                     <td><a 
-                        hx-post="/gradeca?student_uuid={{ .Student_UUID}}&cource_name={{ .Cource_Name}}" 
-                        hx-target = "#centered-div" 
+                        hx-post="/gradeca?student_uuid={{.Student_UUID}}&cource_name={{.Cource_Name}}" 
+                        hx-target = "#centered_div" 
                         hx-swap = "outerHTML" style="cursor: pointer;">Grade CA</a></td>
 
                     <td> <a href="/grade_exam?student_uuid={{ .Student_UUID}}&cource_name={{ .Cource_Name}}">Grade Exam</a></td>

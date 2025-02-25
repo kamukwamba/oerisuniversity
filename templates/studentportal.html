@@ -13,6 +13,28 @@
 
     <title>Student Dash Board</title>
     <script src="/assets/htmx.js"></script>
+    <style>
+        .hiddenAssesments{
+            position: fixed;
+            top: 100px;
+            width: 50vw;
+            height: 50vh;
+            border: solid 1px darkgray;
+            border-radius: 5px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .closeBtn1{
+            width: 30px;
+            height: 30px;
+            color: white;
+            background-color: rgb(32, 0, 62);
+            border: solid 1px rgb(32, 0, 62);
+        }
+        .closeBtn1:hover{
+            color: rgb(32, 0, 62);
+        }
+    </style>
 </head>
 <body>
     {{template "HeaderStudent" .}}
@@ -25,11 +47,21 @@
         {{ end}}
         
 
-        <div class="hidden" id="hidden">
-
-        </div>
+       
 
     </main>
+
+    <script >
+   
+    const myDiv = document.getElementById('hidden');
+    const hideDivBtn = document.getElementById('closeBTN');
+
+    
+    hideDivBtn.addEventListener('click', () => {
+      myDiv.style.display = 'none'; // Set display to none
+    });
+  
+    </script>
     
    
 </body>
