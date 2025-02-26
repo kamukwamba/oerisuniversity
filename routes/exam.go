@@ -819,6 +819,10 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func ExtraChance(w http.ResponseWriter, r *http.Request){
+
+}
+
 func TakeExam(w http.ResponseWriter, r *http.Request) {
 
 	
@@ -851,10 +855,13 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 	var gradding string
 	fmt.Println("POINT ONE: ")
 
-	// CHECK IF STUDENT STILL HAS ATTEMPTS TO WRITE EXAM "START"
+	
 	if if_taken {
-		fmt.Println("POINT TWO")
+		
 		attemped_number, _ = strconv.Atoi(result_out.Attemp_Number)
+		
+
+
 		write_exam_uuid = result_out.UUID
 		passed = result_out.Passed
 		gradding = result_out.Gradding
@@ -872,27 +879,31 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 			return
 
 		}else{
-			fmt.Println("POINT FOUR")
+			
 
 			if passed == "true" {
-				fmt.Println("POINT FIVE")
+				
 				template_name = "exam_passed.html"
-				display_number = 2
+			
 
-			} else if passed == "failed" || passed == "" {
-				fmt.Println("POINT SIX")
+			} else{
+				
+
+				
 				if attemped_number > 3 || open_period > 7 {
-					template_name = "exam_failed.html"
-					display_number = 3
-				} else {
-					fmt.Println("POINT SEVEN")
-					template_name = "exam_code.html"
-					display_number = 1
-					if attemped_number <= 3 {
-						_, attempt_out = UpdateExamTaken(true, uuid, cource_name, attemped_number)
+					display_number = attemped_number;
+				
 
-						attemped_number, _ = strconv.Atoi(attempt_out)
-					}
+				} else {
+					
+					template_name = "exam_code.html"
+					fmt.Println("Hitting the passed failed less than 3")
+					
+					_, attempt_out = UpdateExamTaken(true, uuid, cource_name, attemped_number)
+				
+					attemped_number, _ = strconv.Atoi(attempt_out)
+					display_number = attemped_number
+
 
 				}
 
@@ -910,9 +921,7 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	// CHECK IF STUDENT STILL HAS ATTEMPTS TO WRITE EXAM "END"
-
-	// GET EXAM QUESTIONS "START"
+	
 	get_exam_questions, cource_uuid_out, questiions_present := Read_Exam(cource_name)
 
 
@@ -920,7 +929,7 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 
 	cource_name_out := cource_name
 
-	if display_number == 1 {
+	if display_number <= 3 {
 		display_data := DisplayExam{
 			AlreadyTaken:      false,
 			Qusetions_Present: questiions_present,
@@ -936,20 +945,6 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate") 
 		w.Header().Set("Pragma", "no-cache") 
 		w.Header().Set("Expires", "0") 
-			err := tpl.ExecuteTemplate(w, template_name, display_data)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-		return
-
-	} else if display_number == 2 {
-
-		display_data := result_out
-		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate") 
-		w.Header().Set("Pragma", "no-cache") 
-		w.Header().Set("Expires", "0") 
-
 		err := tpl.ExecuteTemplate(w, template_name, display_data)
 
 		if err != nil {
@@ -957,22 +952,15 @@ func TakeExam(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 
-	} else if display_number == 3 {
-		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate") 
-		w.Header().Set("Pragma", "no-cache") 
-		w.Header().Set("Expires", "0") 
-		err := tpl.ExecuteTemplate(w, template_name, uuid)
+	} else if ( display_number > 3 ){
+		
+		err := tpl.ExecuteTemplate(w, "exam_failed.html", nil)
 
 		if err != nil {
 			log.Fatal(err)
 		}
 		return
 	}
-
-
-
-
-	
 
 }
 
@@ -1171,33 +1159,42 @@ func UpdateExamTaken(is_taken bool, student_uuid string, cource_name string, att
 	var new_attmp string
 	var attempt_string string
 
+
+
 	if is_taken {
 
-	
+		
 		uuid_out := student_uuid
-		fmt.Println("IS TAKEN ")
 		attemp_number_out := attemped_number
 		if attemp_number_out < 3 {
 			attempt_out := attemp_number_out + 1
 			attempt_string = strconv.Itoa(attempt_out)
 
 			new_attmp = attempt_string
-		}
-
-		stmt, err := dbconn.Prepare("UPDATE write_exam SET attemp_number = ? WHERE uuid = ?")
+			stmt, err := dbconn.Prepare("UPDATE write_exam SET attemp_number = ? WHERE student_uuid = ? AND cource_name = ?")
 
 	
-		if err != nil {
-			fmt.Println("Failed to update write exam::::: ", err)
+			if err != nil {
+				fmt.Println("PREPARE STATEMENT FAILED ", err)
+			}
+
+			defer stmt.Close()
+
+			_, err = stmt.Exec(new_attmp, uuid_out,cource_name)
+
+			if err != nil {
+				fmt.Println("FAILED TO UPDATE THE EXAM DETAILS", err)
+			}
+		}else{
+			attempt_string = strconv.Itoa(4)
+
+			new_attmp = attempt_string
+
+
 		}
 
-		defer stmt.Close()
-
-		_, err = stmt.Exec(attempt_string, uuid_out)
-
-		if err != nil {
-			fmt.Println("Failed to update write exam two::::: ", err)
-		}
+		
+		
 
 	} else {
 
@@ -1207,11 +1204,12 @@ func UpdateExamTaken(is_taken bool, student_uuid string, cource_name string, att
 		grade := ""
 		comment := ""
 		passed := ""
+		grading := "false"
 		date := time.Now().Format("2017.09.07")
 
 		new_attmp = strconv.Itoa(attemped_number)
 
-		stmt, err := dbconn.Prepare("insert into write_exam(uuid, student_uuid, cource_name,attemp_number, first_attempted, open_period,grade,comment,passed, date) values(?,?,?,?,?,?,?,?,?,?)")
+		stmt, err := dbconn.Prepare("insert into write_exam(uuid, student_uuid, cource_name,attemp_number, first_attempted, open_period, grade,comment,passed,grading, date) values(?,?,?,?,?,?,?,?,?,?,?)")
 
 		if err != nil {
 			fmt.Println("Failed to insert into write_exam one: ", err)
@@ -1219,7 +1217,7 @@ func UpdateExamTaken(is_taken bool, student_uuid string, cource_name string, att
 
 		defer stmt.Close()
 
-		_, err = stmt.Exec(uuid, student_uuid, cource_name, attemped_number, first_attempted, open_period, grade, comment, passed, date)
+		_, err = stmt.Exec(uuid, student_uuid, cource_name, attemped_number, first_attempted, open_period, grade, comment, passed,grading, date)
 
 		if err != nil {
 			fmt.Println("Failed to insert into write_exam two:", err)
@@ -1716,8 +1714,7 @@ func LoadExamTable() {
 		comment text,
 		passed bool,
 		grading text,
-		date text
-		)`
+		date text)`
 
 	_, take_exam_error := exam_code.Exec(take_exam)
 	if create_exam_error != nil {

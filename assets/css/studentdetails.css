@@ -12,14 +12,6 @@
 }
 
 
-.cource_approve{
-    border: solid 1px rgb(32, 0, 67);
-    color: rgb(32, 0, 67);
-    background-color: white;
-    border-radius: 3px;
-    cursor: pointer;
-    width: 80px;
-}
 
 
 .cource_text_approval{

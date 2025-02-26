@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"io"
+	"time"
 	"path/filepath"
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 	"github.com/kamukwamba/oerisuniversity/encription"
@@ -30,11 +31,24 @@ type AssesmentOut struct {
 	StInfo StudentInfo
 }
 
+
+type FileDownload struct {
+		FileName string
+		Student_UUID string
+		Cource_Name string
+	}
+type HandedIn struct {
+	Cource_Name string
+	Student_UUID string
+	FileDir []FileDirectory
+	Assesment []AssesmentGrade
+}
+
 func GetAssesmentData(student_uuid, cource_name string) (bool, []AssesmentGrade) {
 	dbconn := dbcode.SqlRead().DB
 
 	var present bool
-	stmt, err := dbconn.Query("select uuid, student_uuid,cource_name,title, grade, comment, date from assesmenttable")
+	stmt, err := dbconn.Query("SELECT uuid, student_uuid,cource_name,title, grade, comment, date FROM assesmenttable WHERE cource_name = ? AND student_uuid = ?", cource_name, student_uuid)
 
 	if err != nil {
 		fmt.Println("Failed to launch prepare statment: ", err)
@@ -56,9 +70,9 @@ func GetAssesmentData(student_uuid, cource_name string) (bool, []AssesmentGrade)
 
 		present = true
 
-		if assesment_out.Student_UUID == student_uuid && assesment_out.Cource_Name == cource_name {
-			assesment_out_list = append(assesment_out_list, assesment_out)
-		}
+		
+		assesment_out_list = append(assesment_out_list, assesment_out)
+		
 
 	}
 
@@ -102,21 +116,22 @@ func GradeAssesment(w http.ResponseWriter, r *http.Request) {
 	assesment_title := r.FormValue("title")
 	grade := r.FormValue("grade")
 	comment := r.FormValue("comment")
+	date := time.Now()
 
 	dbconn := dbcode.SqlRead().DB
 
-	stmt, err := dbconn.Prepare("insert into assesmenttable (uuid, student_uuid,cource_name,title, grade, comment, date ) values(?,?,?,?,?,?,?)")
+	stmt, err := dbconn.Prepare("INSERT INTO assesmenttable (uuid, student_uuid,cource_name,title, grade, comment, date ) values(?,?,?,?,?,?,?)")
 
 	if err != nil {
-		fmt.Println("Prepare statment failed to load error: ", err)
+		fmt.Println("PREPARE STATEMENT FAILED:  ", err)
 	}
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(uuid, student_uuid, cource_name, assesment_title, grade, comment)
+	_, err = stmt.Exec(uuid, student_uuid, cource_name, assesment_title, grade, comment, date)
 
 	if err != nil {
-		fmt.Println("")
+		fmt.Println("PREPARE STATEMENT FAILED: ", err)
 	}
 
 	display_assesment := AssesmentGrade{
@@ -198,42 +213,17 @@ func DownloadAssesments(w  http.ResponseWriter, r *http.Request){
 	}
 }
 
-type FileDownload struct {
-		FileName string
-		Student_UUID string
-		Cource_Name string
-	}
-	type HandedIn struct {
-		Handed []FileDownload
-		Assesment []AssesmentGrade
-	}
+
 func GradeCA(w http.ResponseWriter, r *http.Request) {
 
 	student_uuid := r.URL.Query().Get("student_uuid")
 	cource_name := r.URL.Query().Get("cource_name")
-	
-	theString := fmt.Sprintf("assesmentFiles/%s/%s", student_uuid, cource_name)
-	filesAs, err  := listAssignments(theString)
-	
-	
-	
-	var fileData FileDownload
-	
-	var fileDataList []FileDownload
-	
-	for _,item := range filesAs{
-		fileData = FileDownload {
-			FileName: item,
-			Student_UUID: student_uuid,
-			Cource_Name: cource_name,
-		}
-		
-		fileDataList = append(fileDataList, fileData)
-		
-	}
-	
 
-	fmt.Println("Route Has Been Hit")
+	var present bool
+	var fileDirOut []FileDirectory
+	
+	present, fileDirOut = ListFileDirectories(student_uuid, cource_name)
+
 
 	var data_out HandedIn
 	var data_out_list []AssesmentGrade
@@ -246,17 +236,21 @@ func GradeCA(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	data_out = HandedIn{
-		Handed: fileDataList,
+		Cource_Name: cource_name,
+		Student_UUID: student_uuid,
+		FileDir: fileDirOut,
 		Assesment: data_out_list,
 	}
 
+	fmt.Println(data_out)
+
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err = tpl.ExecuteTemplate(w, "admin_cource_assesment", data_out)
+	err := tpl.ExecuteTemplate(w, "admin_cource_assesment", data_out)
 
 	if err != nil {
-		http.Redirect(w, r, "/error", http.StatusSeeOther)
-		return
+		fmt.Println("Ther Was a Problem", err)
+		
 	}
 
 }

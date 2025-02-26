@@ -331,7 +331,7 @@ func ACAMSCount() int {
 func GetStudentAllDetails(uuid string) StudentInfo {
 	dbread := dbcode.SqlRead()
 
-	stmt, err := dbread.DB.Prepare("select  uuid, first_name, last_name, phone, email, date_of_birth,marital_status,country,eduction_background,program,high_scholl_confirmation,grammer_comprihention,waiver,number_of_children,school_atteneded,major_studied,degree_obtained,current_occupetion,field_interested_in,mps_techqnique_Practiced,previouse_experince,purpose_of_enrollment,use_of_degree,reason_for_choice,method_of_incounter from studentdata where uuid = ?")
+	stmt, err := dbread.DB.Prepare("select  uuid, first_name, last_name, phone, email, date_of_birth,gender,marital_status,country,eduction_background,program,high_scholl_confirmation,grammer_comprihention,waiver,number_of_children,school_atteneded,major_studied,degree_obtained,current_occupetion,field_interested_in,mps_techqnique_Practiced,previouse_experince,purpose_of_enrollment,use_of_degree,reason_for_choice,method_of_incounter from studentdata where uuid = ?")
 
 	if err != nil {
 		fmt.Println("the student uuid", uuid)
@@ -341,7 +341,7 @@ func GetStudentAllDetails(uuid string) StudentInfo {
 
 	var data StudentInfo
 
-	err = stmt.QueryRow(uuid).Scan(&data.UUID, &data.First_Name, &data.Last_Name, &data.Phone, &data.Email, &data.Date_Of_Birth, &data.Marital_Status, &data.Country, &data.Education_Background, &data.Program, &data.High_School, &data.Grammer_Confirmation, &data.Waiver, &data.Children, &data.School_Attended, &data.Major_In, &data.Degree_Obtained, &data.Current_Occupation, &data.Field_Interested, &data.Prio_Techniques, &data.Previouse_Experience, &data.Purpose_Of_Enrollment, &data.Use_Of_Knowledge, &data.Reason_For_Choice, &data.Method_Of_Encounter)
+	err = stmt.QueryRow(uuid).Scan(&data.UUID, &data.First_Name, &data.Last_Name, &data.Phone, &data.Email, &data.Date_Of_Birth, &data.Gender,&data.Marital_Status, &data.Country, &data.Education_Background, &data.Program, &data.High_School, &data.Grammer_Confirmation, &data.Waiver, &data.Children, &data.School_Attended, &data.Major_In, &data.Degree_Obtained, &data.Current_Occupation, &data.Field_Interested, &data.Prio_Techniques, &data.Previouse_Experience, &data.Purpose_Of_Enrollment, &data.Use_Of_Knowledge, &data.Reason_For_Choice, &data.Method_Of_Encounter)
 
 	if err != nil {
 		log.Fatal(err)

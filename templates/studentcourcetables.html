@@ -82,19 +82,19 @@
     
 
 {{define "cource_apply_btn"}}
-    <buttton
+    <button
 
     hx-post = "/approvecource?uuid={{ .UUID}}&cource_name={{ .Cource_Name}}"
     hx-swap = "outerHTML"
-    class="cource_apply_btn">Apply</button>
+    class="cource_apply_btn" style="width: 80px; height: 25px;">Apply</button>
 {{ end }}
 
 {{ define "cource_applied_btn"}}
-    <button  class="cource_approved">Applied</button>
+    <button  class="cource_approved" style="width: 80px; height: 25px;">Applied</button>
 {{ end }}
 
 {{ define "cource_approved"}}
-   <button  class="cource_approved">Approved</button>
+   <button  class="cource_approved" style="width: 80px; height: 25px;">Approved</button>
 {{end}}
 
 

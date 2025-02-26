@@ -2,8 +2,6 @@
 		
 	 	{{ define "adminGradeAssesments"}}
 		<div class="assesment_box">
-    
-            
 
             <div>
 				<table class="assesment_table" style="margin: auto; height: 130px;">
@@ -53,7 +51,7 @@
 				</form>
             </div>
 			
-			<div id="filesaved"> 
+			<div id="filesaved" class="fileuploaded" style="width: 100%; margin: 5px; height: 50px;"> 
 			
 			</div>
         </div>
@@ -111,6 +109,18 @@
 
 {{ end }}
 
+
+{{ define "fileuploaded"}}
+	<div class="saved" hx-trigger="load" >
+            File Uploaded Successffuly
+        </div>
+        <script>
+            setTimeout(() => {
+                document.querySelector('.fileuploaded').remove();
+            }, 2000);
+         </script>
+
+{{ end }}
 
 
 

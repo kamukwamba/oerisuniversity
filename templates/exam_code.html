@@ -23,13 +23,10 @@
     
 </head>
 <body>
-    {{ if .AlreadyTaken }}
     
-        {{ template "write_div" .}}
-    {{ else }}
-        {{ template "write_div" .}}
-
-    {{ end }}
+    
+    {{ template "write_div" .}}
+    
 
 
 
@@ -140,11 +137,12 @@
         const timerInt = parseInt(timer_get, 10);
 
 
-        const timerDuration =1000 * timerInt;
+        const timerDuration = 1000 * timerInt * 60;
 
 
         function submitFormAndRedirect() {
-            document.getElementById('myForm').submit();
+            //document.getElementById('myForm').submit();
+            window.location.href = "/submitexam?cource_uuid={{.Cource_UUIDOut}}&student_uuid={{ .Student_UUID}}&cource_name={{ .Cource_Name_Two}}&attempt_out = {{ .Attempt_Out}}";
 
         }
 
@@ -153,7 +151,7 @@
             document.getElementById('timer').innerText = `Form will be submitted in ${seconds} seconds...`;
         }
 
-        window.location.href = "/submitexam?cource_uuid={{.Cource_UUIDOut}}&student_uuid={{ .Student_UUID}}&cource_name={{ .Cource_Name_Two}}&attempt_out = {{ .Attempt_Out}}";
+        
 
        
         setTimeout(submitFormAndRedirect, timerDuration);
@@ -195,6 +193,7 @@
         }
 
         window.secondsPassed = 0;
+
         window.myTimer = setInterval(incrementSecond, 1000);
         }
         var onSubmitClick = function() {

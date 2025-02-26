@@ -13,11 +13,20 @@ import (
 
 func AdminDownLoadAsignment(w http.ResponseWriter, r *http.Request){
 
-	uuid := r.URL.Query().Get("uuid")
+	uuid := r.URL.Query().Get("student_uuid")
 	cource_name := r.URL.Query().Get("cource_name")
 	file_name := r.URL.Query().Get("file_name")
+	
+	fmt.Println(uuid)
+	fmt.Println(cource_name)
+	fmt.Println(file_name)
+
+
 
 	dbFilePath := fmt.Sprintf("assesmentFiles/%s/%s/%s", uuid, cource_name, file_name)
+
+
+	fmt.Println("The Download path",dbFilePath)
 
 	if _, err := os.Stat(dbFilePath); os.IsNotExist(err) {
 		http.Error(w, "Database file not found", http.StatusNotFound)
@@ -93,6 +102,12 @@ func UploadAssesment(w http.ResponseWriter, r *http.Request) {
 	
 
 	file, handler, err := r.FormFile("file")
+
+	fileName := handler.Filename
+
+	CreateFileDirectory(cource_name, student_uuid, fileName)
+
+
 	if err != nil {
 		http.Error(w, "Failed to retrieve file", http.StatusBadRequest)
 		return

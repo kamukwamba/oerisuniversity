@@ -128,17 +128,14 @@ func CurrentAttemp(cource_name, studentuuid string) string{
 	dbread := dbcode.SqlRead().DB
 	var numberStr string 
 	
-
-	getQuery := fmt.Sprintf("SELECT attempt_number FROM %s WHERE cource_name = ?", studentuuid)
-
-	stmt, err := dbread.Prepare(getQuery)
+	stmt, err := dbread.Prepare("SELECT attemp_number FROM write_exam WHERE cource_name = ? AND student_uuid = ?")
 
 	if err != nil {
 		fmt.Println("PREPARE STATEMENT FAILED", err)
 	}
 
 	defer stmt.Close()
-	err = stmt.QueryRow(studentuuid).Scan(&numberStr)
+	err = stmt.QueryRow(cource_name,studentuuid).Scan(&numberStr)
 
 	if err != nil {
 		fmt.Println("EXECUTION FAILED", err)
@@ -193,7 +190,7 @@ func GradeExam(w http.ResponseWriter, r *http.Request) {
 
 		stmt, err := dbconn.Query(query_string)
 
-		attemptnumber := CurrentAttemp(cource_name,cleaned)
+		attemptnumber := CurrentAttemp(cource_name, student_uuid)
 
 		if err != nil {
 			fmt.Println("Failed to initialize prepare statement: ", err)
@@ -209,8 +206,6 @@ func GradeExam(w http.ResponseWriter, r *http.Request) {
 			}
 			attmpstr := grade_answer.Attemp_Number
 
-			fmt.Println(attmpstr)
-			fmt.Println("Att Number:",attemptnumber)
 			
 			if(attemptnumber == attmpstr){
 			grade_answer_list = append(grade_answer_list, grade_answer)}

@@ -5,7 +5,24 @@
         {{ template "head_temp"}}
 
         <style>
+            .cource_approve{
+            border: solid 1px rgb(32, 0, 67);
+            color: rgb(32, 0, 67);
+            background-color: white;
+            border-radius: 3px;
+            cursor: pointer;
+            height: 35;
+            width: 100px;
+            margin-right: 5px;
+            }
+
+        .cource_approve:hover{
+            background-color: rgb(32, 0, 62);
+            color: white;
+            }
+
             .centered_div {
+            overflow-y: auto;
             position: fixed;
             top: 30vh;
             width: 50vw;
@@ -16,23 +33,28 @@
             border-radius: 5px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             text-align: center;
-            left: 30vh;
+            left: 50vh;
             z-index: 1000;
+            
             }
 
             .close-button {
             position: absolute;
+            width: 50px;
+            height: 30px;
+            background-color: rgb(32, 0, 62);
+            border: solid 1px rgb(32, 0, 62);
             top: 10px;
             right: 10px;
-            background: none;
-            border: none;
             font-size: 18px;
             cursor: pointer;
             color: #888;
+            margin-bottom: 5px;
             }
 
             .close-button:hover {
-            color: #000;
+                color: rgb(32, 0, 62);
+                background-color: white;
             }
 
             .approve_complition{
@@ -40,12 +62,37 @@
                 height: 30px;
                 border: solid 1px rgb(32, 0, 62);
                 border-radius: 3px;
-                background-color: rgb(32, 0, 62);
+                background-color: white;
+                color: rgb(32, 0, 62);
+;
             }
 
             .approve_complition:hover{
+                background-color: rgb(32, 0, 62);
+                color: white;
+            }
+            .deleteCt2{
+                width: 100px;
+                height: 30px;
+                border: solid 1px darkred;
+
+                background-color: darkred;
+                border-radius: 3px;
+                color: white;
+            }
+
+            .deleteCt2:hover{
+                color: darkred;
                 background-color: white;
-                color: rgb(32, 0, 62);
+            }
+
+            .approved{
+                background-color: rgb(32, 0, 62);
+                border: solid 1px rgb(32, 0, 62);
+                border-radius: 3px;
+                height: 35px;
+                color: white;
+                margin-right: 5px;
             }
         </style>
     </head>
@@ -212,36 +259,36 @@
 
 
     <div class="centered_div" id="centered_div"> 
-        <div style="height: 20vh; width: 100%;">
+
         <button class="close-button" onclick="closeDiv()">X</button>
-        <table class="assesment_table" style="margin: auto;">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Grade</th>
-                    <th>Comment</th>
-                    <th>Delete</th>
+        <div style="width: 100%;">
+            
+            <table class="assesment_table" style="margin: auto; height: 10vh; margin-bottom: 40px;">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Grade</th>
+                        <th>Comment</th>
+                        <th>Delete</th>
+                        
+                    </tr>
+                </thead>
                     
-                </tr>
-            </thead>
                 
-            
-            <tbody id="assesmentlist">
+                <tbody id="assesmentlist">
+                    
+
+                    {{ range .Assesment}}
+                        {{ template "grade_tr" .}}
+
+                    {{ end }}
+                    
+                </tbody>
                 
+            </table>
 
-                {{ range .}}
-                    {{ template "grade_tr" .}}
-
-                {{ end }}
-                
-            </tbody>
-            
-        </table>
-        
-        </div>
-
-        <div class="assesment_form">
-            <form hx-post="/grade_assesment?cource_name&student_uuid" 
+            <hr>
+            <form hx-post="/grade_assesment?cource_name={{.Cource_Name}}&student_uuid={{.Student_UUID}}" 
                 hx-target="#assesmentlist"
                 hx-swap="beforeend">
                 <div class="form_main" style="display: flex; width: 100%; height: 30%;">
@@ -259,38 +306,44 @@
                     </div>
                 </div>
 
-                <div class="assesment_grade">
+                <div class="assesment_grade" style="width: 100%; display: flex; justify-content: end; height: 40px;">
                     <button class="grade" style="width: 100px; height: 30px;" type="submit">Enter Grade</button>
                 </div>
             </form>
         </div>
-
-
-        <div class="listStudentHaded">
-            {{ range .Handed}}
+        <div class="listStudentHaded" style="display: flex; justify-content: start;">
+            
+            {{ range .FileDir}}
                 <div class="thefilediv">
-
-                    <div class="namefile">
-                        {{ .FileName}}
-                    </div>
                     <div class="actionfile">
-                        <a href="/downloadfile?cource_name={{.Coure_Name}}&student_uuid={{.Student_UUID}}">{{ .FileName}}</a>
-                        <button class="deleteCt2">Delete</button>
+                        <a href="/downloadfile?cource_name={{.Cource_Name}}&student_uuid={{.Student_UUID}}&file_name={{.File_Name}}">{{ .File_Name}}</a>
+                        
+                        <button class="deleteCt2" >Delete</button>
                     </div>    
-                
                 </div>
 
             {{ end }}
 
-        <div>
+        </div>
 
     </div>
 
     <script>
+
         function closeDiv() {
-            const div = document.getElementById("centered-div");
-            div.style.display = 'none';
-        }
+                const div = document.getElementById('centered_div');
+                
+                const newDiv = `
+                
+                <div class="centered_div" id="centered_div" style="display: none;">
+
+                </div>`;
+
+               
+                div.outerHTML = newDiv;
+                
+            }
+       
     </script>
 
 
@@ -309,7 +362,7 @@
             <th>Course Name</th>
             <th>Continouse Assesment</th>
             <th>Exam</th>
-            <th>Completed</th>
+            <th>Supplimentary</th>
             <th>Approval</th>
 
             
@@ -328,9 +381,9 @@
 
                     <td> <a href="/grade_exam?student_uuid={{ .Student_UUID}}&cource_name={{ .Cource_Name}}">Grade Exam</a></td>
                     <td id="btc{{.Cource_Name}}"><button class="approve_complition" 
-						hx-post="/courcecompleted?cource_name = {{ .Cource_Name}}&student={{.Student_UUID}}" 
+						hx-post="/courcecompleted?cource_name = {{.Cource_Name}}&student={{.Student_UUID}}" 
 						hx-target = "#btc{{.Cource_Name}}"
-						hx-swap = "innerHTML" >Approve Complete</button></td>
+						hx-swap = "innerHTML" style="height: fit-content;" >Approve Supplimentary</button></td>
                     <td id="courceapprovaladmin">
                         {{ if .Approved }}
                             {{ template "cource_approved_admin" .}}
@@ -414,8 +467,8 @@
 {{end}}
 
 {{ define "cource_approved_admin"}}
-    <div>
-        <p class="cource_text_approval">Approved</p>
+    <div class="approved">
+        <p class="cource_text_approval" style="color: white;">Approved</p>
     </div>
 {{end}}
 
@@ -496,5 +549,17 @@
 
 {{ end }}
 
+
+{{ define "student_cource_assesment"}}
+
+    <tr>
+       <td>{{.Assesment_Title}}</td>
+       <td>{{.Assesment_Grade}}</td> 
+       <td>{{.Assesment_Comment}}</td> 
+        
+
+    </tr>
+
+{{ end }}
 </body>
 </html>
