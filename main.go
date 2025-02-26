@@ -65,6 +65,7 @@ func main() {
 	router.HandleFunc("/acamsstudentdata", routes.ACAMSStudentData)
 	router.HandleFunc("/programdetails/{id}", routes.ProgramDetails)
 	router.HandleFunc("/adminNews", routes.AdminNews)
+	router.HandleFunc("/getstudent", routes.GetAllStudentMsg)
 	router.HandleFunc("/adminMessages", routes.AdminMessagesPage)
 	router.HandleFunc("/studentedataadmin", routes.StudentProfileData)
 	router.HandleFunc("/readmessageadmin", routes.ReadMessageAdmin)

@@ -236,3 +236,63 @@ func AdminMessagesPage(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 }
+
+
+
+func GetAllStudentMsg(w http.ResponseWriter, r *http.Request){
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+	var massageData LoadMsg 
+	var msg MessageOut
+	var msgLs []MessageOut
+	var uuid string
+
+	r.ParseForm()
+
+	email := r.FormValue("email")
+	dbread := dbcode.SqlRead().DB
+
+	stmt, err := dbread.Prepare("SELECT uuid FROM studentdata WHERE email = ?")
+
+	if err != nil {
+		fmt.Println("FAILED TO PREPARE STATEMENT", err)
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(email).Scan(&uuid)
+	if err != nil{
+		fmt.Println("FAILED TO QUERYROW: ", err)
+	}
+
+
+	stmt_two, err_two = dbread.Query("SELECT select uuid,sender_uuid,sender_name, sender, message,seen_admin,date FROM messages WHERE sender_uuid = ?")
+
+	if err_two != nil {
+		fmt.Println("PREPARE STATEMENT FAILED: ", err_two)
+	}
+
+
+	defer stmt_two.Close()
+
+
+	stmt_two.Next(){
+		err_two = stmt_two.Scan(&msg.UUID, &msg.Student_UUID,&msg.Sender_Name, &msg.Message, &msg.Sender, &msg.Seen_Student, &msg.Seen_Admin, &msg.Date)
+
+		if err_two != nil {
+			fmt.Println("FAILED TO SCAN: ", err_two)
+		}
+
+		msgLs = append(msgLs, msg)
+	}
+
+
+	massageData = LoadMsg{
+		Msg: msgLs,
+	}
+	
+	err := tpl.ExecuteTemplate(w, "messageslog", massageData)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}

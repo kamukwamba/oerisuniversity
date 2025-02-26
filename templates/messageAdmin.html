@@ -100,14 +100,16 @@
 
         <div class="adminright">
             <div class="search">
-                <form action="/getstudent">
-                    <input class="input_st" type="text" placeholder="Student Name"><br>
+                <form hx-get="/getstudent"
+                    hx-target="#messagelog"
+                    hx-swap="innerHTML">
+                    <input class="input_st" type="text" placeholder="Student Email Address">
                     <button class="btn_st" style="margin-top: 5px;">
                         Search
                     </button>
                 </form>
             </div>
-            <div>
+            <div id="messagelog">
                 {{ template "messageslog" .}}
             </div>
         </div>
