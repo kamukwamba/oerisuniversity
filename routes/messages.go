@@ -241,7 +241,7 @@ func AdminMessagesPage(w http.ResponseWriter, r *http.Request) {
 
 func GetAllStudentMsg(w http.ResponseWriter, r *http.Request){
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
-	var massageData LoadMsg 
+	
 	var msg MessageOut
 	var msgLs []MessageOut
 	var uuid string
@@ -265,7 +265,7 @@ func GetAllStudentMsg(w http.ResponseWriter, r *http.Request){
 	}
 
 
-	stmt_two, err_two = dbread.Query("SELECT select uuid,sender_uuid,sender_name, sender, message,seen_admin,date FROM messages WHERE sender_uuid = ?")
+	stmt_two, err_two := dbread.Query("SELECT select uuid,sender_uuid,sender_name, sender, message,seen_admin,date FROM messages WHERE sender_uuid = ?", uuid)
 
 	if err_two != nil {
 		fmt.Println("PREPARE STATEMENT FAILED: ", err_two)
@@ -275,7 +275,7 @@ func GetAllStudentMsg(w http.ResponseWriter, r *http.Request){
 	defer stmt_two.Close()
 
 
-	stmt_two.Next(){
+	for stmt_two.Next(){
 		err_two = stmt_two.Scan(&msg.UUID, &msg.Student_UUID,&msg.Sender_Name, &msg.Message, &msg.Sender, &msg.Seen_Student, &msg.Seen_Admin, &msg.Date)
 
 		if err_two != nil {
@@ -286,11 +286,11 @@ func GetAllStudentMsg(w http.ResponseWriter, r *http.Request){
 	}
 
 
-	massageData = LoadMsg{
+	massageData := LoadMsg{
 		Msg: msgLs,
 	}
 	
-	err := tpl.ExecuteTemplate(w, "messageslog", massageData)
+	err = tpl.ExecuteTemplate(w, "messageslog", massageData)
 
 	if err != nil {
 		log.Fatal(err)
