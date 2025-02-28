@@ -8,7 +8,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
+	"io"
+	"os"
+	"path/filepath"
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 	"github.com/kamukwamba/oerisuniversity/encription"
 )
@@ -25,6 +27,7 @@ type NewsStruct struct {
 }
 
 type NewsHomePage struct {
+	Present bool
 	NewsMain NewsStruct
 	NewsList []NewsStruct
 }
@@ -33,12 +36,19 @@ type PageName struct {
 	Name string
 }
 
-func ReadNews(uuid, number string) (NewsStruct, []NewsStruct) {
+func ReadNews(uuid_in, number string) (NewsStruct, []NewsStruct) {
 
 	var news_one NewsStruct
 	var news_list []NewsStruct
 
 	get_data := dbcode.SqlRead().DB
+
+	var uuid string
+	var title string 
+	var auther string
+	var image_link string 
+	var story string 
+	var date string 
 
 	switch number {
 	case "one":
@@ -51,7 +61,22 @@ func ReadNews(uuid, number string) (NewsStruct, []NewsStruct) {
 
 		defer stmt.Close()
 
-		err = stmt.QueryRow(uuid).Scan(&news_one.UUID, &news_one.Title, &news_one.Auther, &news_one.Image_Link, &news_one.Story, &news_one.Date)
+		err = stmt.QueryRow(uuid_in).Scan(&uuid, &title, &auther, &image_link, &story, &date)
+
+
+		image_link_out := CleanNewsImages(uuid)
+
+		file_link := fmt.Sprintf("/news/%s/%s", image_link_out, image_link)
+
+		news_one = NewsStruct{
+			UUID: uuid,
+			Title: title,
+			Auther: auther,
+			Image_Link: file_link,
+			Story: story,
+			Date: date,
+		}
+
 
 		if err != nil {
 			fmt.Println("Failed to execute News One")
@@ -62,17 +87,30 @@ func ReadNews(uuid, number string) (NewsStruct, []NewsStruct) {
 		rows, err := get_data.Query("select * from news")
 
 		if err != nil {
-			fmt.Println("failed to laod news list")
+			fmt.Println("QUERY STATEMENT FAILED: ", err)
 
 		}
 
 		defer rows.Close()
 
 		for rows.Next() {
-			err := rows.Scan(&news_one.UUID, &news_one.Title, &news_one.Auther, &news_one.Image_Link, &news_one.Story, &news_one.Date)
+			err := rows.Scan(&uuid, &title, &auther, &image_link, &story, &date)
 
+
+			image_link_out := CleanNewsImages(uuid)
+
+			file_link := fmt.Sprintf("/news/%s/%s", image_link_out, image_link)
+
+			news_one = NewsStruct{
+				UUID: uuid,
+				Title: title,
+				Auther: auther,
+				Image_Link: file_link,
+				Story: story,
+				Date: date,
+			}
 			if err != nil {
-				fmt.Println("failed to get multiple news stories")
+				fmt.Println("FAILED TO LOAD", err)
 			}
 
 			news_list = append(news_list, news_one)
@@ -132,6 +170,19 @@ func ReadNewsRoute(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+func CleanNewsImages(uuid string) string{
+
+	new_uuid := strings.Split(uuid, "-")
+
+	new_file := "nI"
+
+	for _, item := range new_uuid {
+		new_file = new_file + item
+	}
+
+	return new_file
+}
 func Create_News(w http.ResponseWriter, r *http.Request) {
 
 	create_news := dbcode.SqlRead().DB
@@ -140,7 +191,6 @@ func Create_News(w http.ResponseWriter, r *http.Request) {
 
 	auther := r.FormValue("auther")
 	title := r.FormValue("title")
-	image_link := r.FormValue("image")
 	story := r.FormValue("story")
 	
 	fmt.Println("Story: ", story)
@@ -149,13 +199,32 @@ func Create_News(w http.ResponseWriter, r *http.Request) {
 	
 	date := fmt.Sprintf("%s", time.Now().Local())
 
+	
+
+	
+	new_file_dir := CleanNewsImages(uuid) 
+
+	
+
+	file, handler, err := r.FormFile("file")
+
+	if err != nil {
+		http.Error(w, "Error retrieving the file", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+
+	file_name := handler.Filename
+	
 	data_out := NewsStruct{
 		UUID:       uuid,
 		Auther:     auther,
 		Title:      title,
-		Image_Link: image_link,
+		Image_Link: file_name,
 		Story:      story,
 	}
+
 
 
 	stmt, err := create_news.Prepare("insert into news (uuid, title,auther, image, story, date) values (?,?,?,?,?,?)")
@@ -166,12 +235,29 @@ func Create_News(w http.ResponseWriter, r *http.Request) {
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(uuid, title, auther, image_link, story, date)
+	
+
+	_, err = stmt.Exec(uuid, title, auther, file_name, story, date)
 	if err != nil {
 		fmt.Println("failed to create")
 	}
 
-	
+
+	filePath := filepath.Join("./news", new_file_dir, file_name)
+
+	dst, err := os.Create(filePath)
+
+	if err != nil {
+		fmt.Println("FAILED TO UPLOAD FILE", err)
+	}
+
+	defer dst.Close()
+
+	_, err = io.Copy(dst, file)
+	if err != nil {
+		fmt.Println("FAILED TO UPLOAD TO SERVER", err)
+	}
+
 
 
 
@@ -404,19 +490,28 @@ func NewsPage(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
 	_, all := ReadNews("o", "many")
+	var present bool
+
+
+
 
 	var latest NewsStruct
 
 	if len(all) >= 1 {
 		if len(all) > 1 {
 			latest = all[len(all)-1]
-
+			
 		} else {
 			latest = all[0]
+			
 		}
+		present = true
+	}else{
+		present = false
 	}
 
 	news_main := NewsHomePage{
+		Present: present,
 		NewsMain: latest,
 		NewsList: all,
 	}

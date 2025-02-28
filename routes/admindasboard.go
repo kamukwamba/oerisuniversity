@@ -57,7 +57,7 @@ func DeleteStudentInfo(uuid string) bool{
 		_, err = stmt.Exec(uuid)
 		
 		if err != nil {
-			fmt.Println("failed to delete: ", err)
+			fmt.Println("FAILED TO DELETE: ", err)
 			deleted = false
 		}
 		
@@ -154,7 +154,7 @@ func AdminAuth(data AdminLogData, dataList []dbcode.AdminInfo) (bool, AdminInfo)
 		
 
 		if matchPassword == true && data.Email == email {
-			fmt.Println("A match was found")
+			
 			admin_data = AdminInfo{
 				ID:       id,
 				Name:     name,
@@ -162,17 +162,6 @@ func AdminAuth(data AdminLogData, dataList []dbcode.AdminInfo) (bool, AdminInfo)
 				Password: password,
 			}
 			result = true
-		}else if(data.Email == "mulubwatech@gmail.com" && data.Password == "mwanjamasupha"){
-			admin_data = AdminInfo{
-				ID: "34",
-				Name: "Mulubwa",
-				Email: "Mulubwa",
-				Password: "Mulubwa",
-			
-			}
-			
-			result = true
-		
 		}
 	}
 	return result, admin_data
@@ -202,7 +191,7 @@ func AdminDashboard(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if check {
-			fmt.Println("redirecting")
+			
 			err := tpl.ExecuteTemplate(w, "admindasboard.html", toshow)
 
 			if err != nil {
@@ -297,7 +286,7 @@ func GetACAMSStudents(admin_id string) []ProgramStruct {
 			Admin_ID:       admin_id,
 		}
 
-		fmt.Println("the cource data out: ", cource_data)
+		
 		if err != nil {
 			fmt.Println("Check the scan for student data admindashboard")
 			log.Fatal(err)
@@ -362,8 +351,7 @@ func UpdateCource(uuid, cource_name string) bool {
 
 	cource_approved := true
 
-	fmt.Println("Cource name: ", cource_name)
-	fmt.Println("UUID: ", uuid)
+	
 
 	dbread := dbcode.SqlRead().DB
 
@@ -432,7 +420,7 @@ func ApproveCourceUpdate(w http.ResponseWriter, r *http.Request) {
 	uuid := r.URL.Query().Get("user_uuid")
 	cource_name := r.URL.Query().Get("cource_name")
 
-	fmt.Println(uuid, cource_name)
+	
 
 	var setroute string
 	result := UpdateCource(uuid, cource_name)
@@ -465,7 +453,6 @@ func GetStudentProgramDataAdmin(programlist []string, students_uuid string) ([]A
 
 	for _, program := range programlist {
 
-		fmt.Println(program)
 
 		switch program {
 
@@ -476,7 +463,7 @@ func GetStudentProgramDataAdmin(programlist []string, students_uuid string) ([]A
 			if is_present {
 
 				var programdataacams ACAMS = dataout
-				fmt.Println("is present")
+				
 				programdata.UUID = programdataacams.UUID
 				programdata.Student_UUID = programdataacams.Student_UUID
 				programdata.Program_Name = programdataacams.Program_Name
@@ -560,7 +547,7 @@ func GetStudentProgramDataAdmin(programlist []string, students_uuid string) ([]A
 
 				available = append(available, true)
 
-				fmt.Println("Program Out: ", allcourcedataout.ProgramStruct, data_out)
+				
 			} else {
 				available = append(available, false)
 			}
@@ -592,7 +579,7 @@ func GetStudentProgramDataAdmin(programlist []string, students_uuid string) ([]A
 
 				available = append(available, true)
 
-				fmt.Println("Program Out: ", allcourcedataout.ProgramStruct, data_out)
+				
 			} else {
 				available = append(available, false)
 			}
@@ -641,7 +628,7 @@ func StudentProfileData(w http.ResponseWriter, r *http.Request) {
 
 	admin_infor := AdminData(admin_id)
 
-	fmt.Println("Admin Id: ", admin_id, "Admin Infor: ", admin_infor)
+	
 
 	studentdataout := GetStudentAllDetails(studentuuid)
 	listout := GetStudentPrograms(studentuuid)
@@ -664,9 +651,7 @@ func StudentProfileData(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func Example(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("The Code Is Working Out")
-}
+
 
 func CloseAdmintDiv(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
@@ -684,8 +669,7 @@ func ACAMSStudentData(w http.ResponseWriter, r *http.Request) {
 	admin_id := r.URL.Query().Get("out")
 	acamsstudents := GetACAMSStudents(admin_id)
 
-	fmt.Println("ADMIN ID::::", admin_id)
-	fmt.Println("The Route Has Been Hi")
+	
 	admin_infor := AdminData(admin_id)
 
 	data_out := AdminPage{
@@ -720,7 +704,7 @@ func AdminNews(w http.ResponseWriter, r *http.Request) {
 
 	err := tpl.ExecuteTemplate(w, "NewsAdminCreate.html", display_data)
 	
-	fmt.Println("All The News: ", all)
+	
 
 	if err != nil {
 		log.Fatal(err)
@@ -743,10 +727,6 @@ func DeleteMessageRouter(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func IsItWorking(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Println("the check is working")
-}
 
 func ApproveProgram(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
@@ -754,7 +734,7 @@ func ApproveProgram(w http.ResponseWriter, r *http.Request) {
 	user_uuid := r.URL.Query().Get("user_uuid")
 	program := r.URL.Query().Get("program")
 
-	fmt.Println(user_uuid, program)
+	
 
 	switch program {
 	case "acams":
@@ -778,14 +758,7 @@ func ApproveProgram(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	// datastring := fmt.Sprintf("The querris are %s ", dataout)
-	// fmt.Fprint(w, datastring)
 
-	// keys, ok := r.URL.Query()["id"]
-
-	// if ok {
-	// 	fmt.Println(keys)
-	// }
 
 	err := tpl.ExecuteTemplate(w, "approved", nil)
 

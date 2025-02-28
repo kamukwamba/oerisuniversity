@@ -50,14 +50,14 @@
             <div class="mainnewsdiv">
 
             
-                <div class="leftside">
+                <div class="leftside" style="padding: 20px;">
                     <div class="navbar" style="border: solid 1px white; border-radius: 5px;">
                         <div class="navitem">
                             Write
                         </div>
                     </div>
                     
-                    <div id="changer">
+                    <div id="changer" >
                     {{template "writearticle"}}
                     </div>
                 
@@ -111,7 +111,7 @@
 								<form hx-post="/createnews"
 								hx-target="#newsamplelist"
 								hx-swap="beforeend">
-									<input type="text" placeholder="News Title" name="title" class="articletitle">
+									<input type="text" placeholder="News Title" name="title" class="articletitle" >
 									<textarea name="composenews" class="writerarea" placeholder="Compose article" style="margin-top: 10px; padding: 15px; height: 70vh;"></textarea>
 									<input type="textarea" placeholder="Enter image link" name="image" class="articleinagelink">
 									<input type="textarea" placeholder="Enter Auther Name" name="auther" class="articleinagelink">
@@ -195,7 +195,6 @@
 
             <p class="summarytext">{{ .Story}}</p>
             <div class="viewupdatedelete">
-			
 				<a href="/viewnews" class="summarybtn view" style="text-align: center; text-decoration: none;"> View</a>
 				<a href="/viewnews" class="summarybtndelete" style="text-align: center; text-decoration: none;" > Delete</a>
 
@@ -209,13 +208,17 @@
 
     <div class="writearticle" style="padding-bottom: 30px;">
         <div class="writer">
-            <form hx-post="createnews"
+            <form hx-upload="/createnews"
             hx-target="#newsamplelist"
-            hx-swap="beforeend">
+            hx-swap="beforeend"
+             hx-encoding="multipart/form-data">
                 <input type="text" placeholder="News Title" name="title" class="articletitle">
-				<textarea name="story"  cols="90" rows="15" style="margin-top: 20px; padding: 5px;"></textarea>
+				<textarea name="story"  cols="90" rows="15" style="margin-top: 20px; padding-bottom: 10px;"></textarea>
                 <input type="textarea" placeholder="Enter image link" name="image" class="articleinagelink">
                 <input type="textarea" placeholder="Enter Auther Name" name="auther" class="articleinagelink">
+                <label for="file">Choose file to upload:</label>
+                <input type="file" id="file" name="file" required><br><br>
+
 
 
                 <div class="savearticlediv">

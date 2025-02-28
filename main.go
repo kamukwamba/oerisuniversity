@@ -73,7 +73,6 @@ func main() {
 	router.HandleFunc("/approve", routes.ApproveProgram)
 	router.HandleFunc("/create_cource_data", routes.CreateCourseData)
 	router.HandleFunc("/close_cource_div", routes.CloseCreateCourseData)
-	router.HandleFunc("/check_working", routes.IsItWorking)
 	router.HandleFunc("/add_cource", routes.AddCourceData)
 	router.HandleFunc("/getstudymaterial", routes.GetStudyMaterial)
 	router.HandleFunc("/get_admin_users", routes.AdminUsers)
@@ -137,7 +136,7 @@ func main() {
 	router.HandleFunc("/error", routes.ErrorPage)
 	router.HandleFunc("/assesmentsubmit", routes.UploadAssesment)
 
-	router.HandleFunc("/example", routes.Example)
+	
 
 	router.HandleFunc("/login", routes.LoginPage)
 	router.HandleFunc("/handinassesment", routes.HandInAssesment)

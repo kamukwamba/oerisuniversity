@@ -74,7 +74,8 @@ func AddToACAMSCources(student_uuid, date_in, payment_type string) bool {
 		"public_relation",
 		"anger_management",
 		"connecting_with_angles",
-		"critical_thinking"}
+		"critical_thinking", 
+		"introduction_to_metaphysical_science"}
 
 	for _, item := range cource_table {
 
@@ -176,7 +177,8 @@ func GetFromACAMSCources(student_uuid string) []CourceStruct {
 		"public_relation",
 		"anger_management",
 		"connecting_with_angles",
-		"critical_thinking"}
+		"critical_thinking", 
+		"introduction_to_metaphysical_science"}
 
 	for _, item := range cource_table {
 		dbread := dbcode.SqlRead().DB
@@ -493,7 +495,8 @@ func LoadACAMS() {
 		"public_relation",
 		"anger_management",
 		"connecting_with_angles",
-		"critical_thinking"}
+		"critical_thinking", 
+		"introduction_to_metaphysical_science"}
 
 	for _, item := range cource_table {
 		create_course_table := fmt.Sprintf(`
