@@ -47,7 +47,7 @@ func main() {
 
 	//MAIN SCREEN
 	router.HandleFunc("/", routes.HomePage)
-	router.HandleFunc("/aboutus/{id}", routes.AboutUs)
+	router.HandleFunc("/aboutus", routes.AboutUs)
 	router.HandleFunc("/programs", routes.Programs)
 	router.HandleFunc("/enroll", routes.Enrollment)
 	router.HandleFunc("/confirmenrrol", routes.ConfirmEnrollment)
@@ -61,7 +61,9 @@ func main() {
 	router.HandleFunc("/updtestudentpassword", routes.ChangePassword)
 	router.HandleFunc("/closeupdatedata", routes.CloseUpdateData)
 
+
 	//ADMIN DASHBOARD
+	router.HandleFunc("/studentcenter", routes.StudentCenter)
 	router.HandleFunc("/acamsstudentdata", routes.ACAMSStudentData)
 	router.HandleFunc("/programdetails/{id}", routes.ProgramDetails)
 	router.HandleFunc("/adminNews", routes.AdminNews)
@@ -95,6 +97,10 @@ func main() {
 	router.HandleFunc("/downloadassignment", routes.DownloadAssesments)
 	router.HandleFunc("/deletestuden", routes.DeleteStudent)
 	router.HandleFunc("/createadminemail", routes.CreateEmailData)
+	router.HandleFunc("/faq", routes.FAQ)
+	router.HandleFunc("/offerings", routes.Offerings)
+
+
 	
 
 	
@@ -106,7 +112,7 @@ func main() {
 	router.HandleFunc("/create_page", routes.CreatePage)
 	router.HandleFunc("/addexam", routes.AddExam)
 	router.HandleFunc("/examdetails", routes.AddExamDetails)
-	router.HandleFunc("/faq", routes.FAQ)
+	
 	router.HandleFunc("/takeexam", routes.TakeExam)
 	router.HandleFunc("/submitexam", routes.SubmitExam)
 	router.HandleFunc("/grade_exam", routes.GradeExam)
@@ -135,6 +141,8 @@ func main() {
 	router.HandleFunc("/close_admin_div", routes.CloseAdmintDiv)
 	router.HandleFunc("/error", routes.ErrorPage)
 	router.HandleFunc("/assesmentsubmit", routes.UploadAssesment)
+	router.HandleFunc("/forgotpassword", routes.PasswordResetPage)
+	router.HandleFunc("/passwordreset", routes.ResetPassword)
 
 	
 

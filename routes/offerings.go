@@ -12,9 +12,11 @@ func Offerings(w http.ResponseWriter, r *http.Request) {
 
 	//debug failure to laod templates
 
-	err := tpl.ExecuteTemplate(w, "index.html", nil)
+	err := tpl.ExecuteTemplate(w, "offerings.html", nil)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 }
+
+

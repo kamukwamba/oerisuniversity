@@ -18,3 +18,7 @@ func FAQ(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 }
+
+
+
+

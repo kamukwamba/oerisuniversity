@@ -242,6 +242,41 @@ func SendEmail(to string) error {
 	// Email configuration
 	
 	
+	data_out, _ := GetEmailData()
+	
+	from := data_out.Email 
+	password :=  data_out.Password
+	
+	
+	smtpHost := "smtp.gmail.com"
+	smtpPort := 587
+
+	subject := "Application Successfull"
+	body := fmt.Sprintf("Congratulations your application was successfull your username: %s and password: %s", to,to)
+	// Create a new message
+	m := gomail.NewMessage()
+	m.SetHeader("From", from)
+	m.SetHeader("To", to)
+	m.SetHeader("Subject", subject)
+	m.SetBody("text/plain", body)
+
+	// Create a new SMTP dialer
+	d := gomail.NewDialer(smtpHost, smtpPort, from, password)
+
+	// Send the email
+	if err := d.DialAndSend(m); err != nil {
+		return err
+	}
+	
+	SendToAdmin(to)
+
+	fmt.Println("Email sent successfully!")
+	return nil
+}
+
+
+func ResetMessage(newpassowrd, to string) error{
+	// Email configuration
 	
 	
 	data_out, _ := GetEmailData()
@@ -254,7 +289,7 @@ func SendEmail(to string) error {
 	smtpPort := 587
 
 	subject := "Application Successfull"
-	body := fmt.Sprintf("Congratulations yoour application was successfull your username: %s and password: %s", to,to)
+	body := fmt.Sprintf("Congratulations password reset  successfull. Your new password is : %s", newpassowrd)
 	// Create a new message
 	m := gomail.NewMessage()
 	m.SetHeader("From", from)
