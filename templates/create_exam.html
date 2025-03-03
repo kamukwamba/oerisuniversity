@@ -102,7 +102,7 @@
             
             <div id="question_list" class="leftDiv" style="padding: 20px;">
 
-                <div class="program_details">
+                <div class="program_details" id="details_saved">
                     {{ template "examdetails" .}}
                 </div>
                 {{range .ExamData}}
@@ -208,10 +208,11 @@
 
                 <button hx-post="/examdetails?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{.Cource_Data.UUID}}&section=save"
                 hx-target="#details_saved"
-                hx-swap="innerHTML" type="submit" class="create_button">Save Details</button>
+                hx-swap="outerHTML" type="submit" class="create_button">Save Details</button>
+                
                 <button hx-post="/examdetails?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{.Cource_Data.UUID}}&section=update"
                 hx-target="#details_saved"
-                hx-swap="innerHTML" type="submit" class="create_button">Update Details</button>
+                hx-swap="outerHTML" type="submit" class="create_button">Update Details</button>
 
 
             </form>
@@ -234,7 +235,7 @@
 
 
 {{ define "examdetailsC" }}
-    <div class="exam_details">
+    <div class="program_details" id="details_saved">
             <table>
                 <tbody>
                     <tr>
@@ -252,7 +253,7 @@
                     </tr>
                     <tr>
                         <th class="title">Duration</th>
-                        <td id="duration">{{ .Exam_Duration}}min</td>
+                        <td id="duration">{{ .Duration}}min</td>
                     </tr>
                 
                     <tr>
