@@ -437,9 +437,10 @@ func Update_Exam_Details(details Exam_Details) (bool, string) {
 		}
 
 		update_msg = "Exam details created successfully"
+
 	} else if present {
 		dbupdate := dbcode.SqlRead().DB
-		stmt, err := dbupdate.Prepare("UPDATE exam_details SET  program_name, cource_name, cource_code, duration, total_marks where uuid = ?")
+		stmt, err := dbupdate.Prepare("UPDATE exam_details SET  program_name = ?, cource_name = ?, cource_code = ?, duration = ?, total_marks = ? where uuid = ?")
 
 		if err != nil {
 			fmt.Println("Failed to Execute Update Query: ", err)
@@ -447,7 +448,7 @@ func Update_Exam_Details(details Exam_Details) (bool, string) {
 
 		defer stmt.Close()
 
-		_, err = stmt.Exec(details.Program_Name, details.Cource_Name, details.Cource_Code, details.Duration, details.Total_Marks, uuid)
+		_, err = stmt.Exec(details.Program_Name, details.Cource_Name, details.Cource_Code, details.Duration, details.Total_Marks,details.UUID)
 
 		if err != nil {
 			fmt.Println("Failed To Update Exam Details: ", err)
@@ -489,7 +490,7 @@ func Create_Exam_Details(details Exam_Details) (bool, string) {
 		stmt, err := dbcreate.Prepare("insert into exam_details(uuid,cource_uuid,program_name,cource_name,cource_code,duration, total_marks) values(?,?,?,?,?,?,?)")
 
 		if err != nil {
-			fmt.Println("Failedd to save exam details: ", err)
+			fmt.Println("PREPARE STATEMENT FAILED: ", err)
 		}
 
 		defer stmt.Close()
@@ -1311,7 +1312,7 @@ func AddExamDetails(w http.ResponseWriter, r *http.Request) {
 
 	section_out := r.URL.Query().Get("section")
 
-	fmt.Println(section_out)
+	
 
 	var exam_responce CreateExamResponse
 	var save_details bool

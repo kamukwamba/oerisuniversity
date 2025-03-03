@@ -14,7 +14,7 @@
         
         .question_div_one{
             width: 100%;
-            height: 400px;
+            height: 250px;
             border: solid 1px rgb(32, 0, 62);
             
         }
@@ -382,7 +382,7 @@
 
     <form hx-post="/saveUpdateQuestion?uuid={{.UUID}}&section=B"
             hx-target="#id{{.UUID}}"
-            hx-swap="outerHTML">
+            hx-swap="outerHTML" style="margin-bottom: 40px;">
                 <div style="background-color: rgb(32, 0, 62); padding: 5px; margin-bottom:5px;">
                     <label for="answer"  class="compose" style=" color: white;">Section B</label><br>
                 </div>
