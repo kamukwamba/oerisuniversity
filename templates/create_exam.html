@@ -171,7 +171,7 @@
         <div class="mainQuestionDiv" >
            
             <div id="question_list" class="leftDiv" style="padding: 20px; ">
-                <div class="program_details">
+                <div class="program_details" id="details_saved">
                     {{ template "examdetails" .}}
                 </div>
                 
@@ -183,7 +183,7 @@
                 <div id="sectionAID">
                     {{ template "sectionACreate" .}}
                 </div>
-            <!-- SECTION B QUESTIONS -->
+            <!-- SECTION B QUESTIONS --> 
                 <div id="sectionBID">
                     {{ template "sectionBCreate" .}}
                 </div>
@@ -208,11 +208,11 @@
 
                 <button hx-post="/examdetails?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{.Cource_Data.UUID}}&section=save"
                 hx-target="#details_saved"
-                hx-swap="outerHTML" type="submit" class="create_button">Save Details</button>
+                hx-swap="innerHTML" type="submit" class="create_button">Save Details</button>
                 
                 <button hx-post="/examdetails?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{.Cource_Data.UUID}}&section=update"
                 hx-target="#details_saved"
-                hx-swap="outerHTML" type="submit" class="create_button">Update Details</button>
+                hx-swap="innerHTML" type="submit" class="create_button">Update Details</button>
 
 
             </form>
