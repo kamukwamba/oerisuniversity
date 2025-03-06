@@ -7,14 +7,16 @@
 
    
   <body>
-   
- {{ template "adminheadertemp" .}}
-
-  {{  template "side_bar" .}}
-
-
+    {{ template "side_bar" .}}
+    
+    {{ template "adminheadertemp" .}}
+ 
 
 
+  
+
+  
+ 
 
   <div class="main">
           <div class="containt" id="maincontaint">
@@ -42,8 +44,8 @@
                         </ul>
                         <div class="bottom-details">
                             </span> </p>
-							<a href="/programdetails/acams?out={{ .Admin.ID}}" style="display:block; text-decoration: none;" class="btn2">Details </a>
-                            
+                            <a class="btn2" style="display:block; text-decoration: none;" href="/programdetails/acams?out={{ .Admin.ID}}">Details</a>
+                         
                             
                         </div>
                     </div>
@@ -67,14 +69,13 @@
                         </ul>
                         <div class="bottom-details">
                             </span> </p>
-							<a href="/programdetails/acms?out={{ .Admin.ID}}" style="display:block; text-decoration: none;" class="btn2">Details </a>
-							
+                            <a class="btn2" style="display:block; text-decoration: none;" href="/programdetails/acms?out={{ .Admin.ID}}">Details</a>
+                            
                            
                         </div>
                     </div>
                     
                     <div class="programcard">
-					
                         <h5>Award of Diploma in Metaphysical Sciences</h5>
                         <hr>
                         <ul>
@@ -98,15 +99,15 @@
                         </ul>
                         <div class="bottom-details">
                             </span> </p>
-							<a href="/programdetails/adms?out={{ .Admin.ID}}"  style="display:block; text-decoration: none;" class="btn2">Details </a>
-						
+                            <a class="btn2" style="display:block; text-decoration: none;" href="/programdetails/adms?out={{ .Admin.ID}}">Details</a>
+                            
+                          
                         </div>
 
                     </div>
 
                     
                     <div class="programcard">
-					
                         <h5>Award of Bachelors Degree in Metaphysical Sciences</h5>
                         <hr>
                         <ul>
@@ -136,7 +137,7 @@
                         </ul>
                         <div class="bottom-details">
                             </span> </p>
-							<a href="/programdetails/adbms?out={{ .Admin.ID}}" style="display:block; text-decoration: none;" class="btn2">Details </a>
+                            <a class="btn2" style="display:block; text-decoration: none;" href="/programdetails/adbms?out={{ .Admin.ID}}">Details</a>
                             
                         </div>
                     </div>
@@ -155,12 +156,16 @@
               </div>
         </div>
   </div>
+  
+  <div class = "hidden_main" >
+            
 
-	<div class="hidden_main">
-			<h3>Programs</h3>
-			<hr>
-			<div>
-			<div class="programcard">
+            <h2 class="dashboard_name" style="padding-left: 60px">
+            Programs
+            </h2>
+            <hr>
+            <div>
+                <div class="pgcard">
                         <h5>Award of Certificate of Attendance in Metaphysical Sciences</h5>
                         <hr>
                         <ul>
@@ -178,13 +183,13 @@
                         </ul>
                         <div class="bottom-details">
                             </span> </p>
-							<a href="/programdetails/acams?out={{ .Admin.ID}}" style="display:block; text-decoration: none;" class="btn2">Details </a>
+                            <a href="/programdetails/acams?out={{ .Admin.ID}}" style="display:block; text-decoration: none;" class="btn2">Details </a>
                             
                             
                         </div>
                     </div>
 
-                    <div class="programcard">
+                    <div class="pgcard">
                         <h5>Award of Certificate in Metaphysical Sciences</h5>
                         <hr>
                         <ul>
@@ -203,14 +208,14 @@
                         </ul>
                         <div class="bottom-details">
                             </span> </p>
-							<a href="/programdetails/acms?out={{ .Admin.ID}}" style="display:block; text-decoration: none;" class="btn2">Details </a>
-							
+                            <a href="/programdetails/acms?out={{ .Admin.ID}}" style="display:block; text-decoration: none;" class="btn2">Details </a>
+                            
                            
                         </div>
                     </div>
                     
-                    <div class="programcard">
-					
+                    <div class="pgcard">
+                    
                         <h5>Award of Diploma in Metaphysical Sciences</h5>
                         <hr>
                         <ul>
@@ -234,15 +239,15 @@
                         </ul>
                         <div class="bottom-details">
                             </span> </p>
-							<a href="/programdetails/adms?out={{ .Admin.ID}}"  style="display:block; text-decoration: none;" class="btn2">Details </a>
-						
+                            <a href="/programdetails/adms?out={{ .Admin.ID}}"  style="display:block; text-decoration: none;" class="btn2">Details </a>
+                        
                         </div>
 
                     </div>
 
                     
-                    <div class="programcard">
-					
+                    <div class="pgcard">
+                    
                         <h5>Award of Bachelors Degree in Metaphysical Sciences</h5>
                         <hr>
                         <ul>
@@ -272,23 +277,33 @@
                         </ul>
                         <div class="bottom-details">
                             </span> </p>
-							<a href="/programdetails/adbms?out={{ .Admin.ID}}" style="display:block; text-decoration: none;" class="btn2">Details </a>
+                            <a href="/programdetails/adbms?out={{ .Admin.ID}}" style="display:block; text-decoration: none;" class="btn2">Details </a>
                             
                         </div>
                     </div>
                     
-                    <div class="programcard">
+                    <div class="pgcard">
                         <h5>Award of Masters Degree in Metaphysical Sciences</h5>
                         <hr>
                     </div>
-                    <div class="programcard">
+                    <div class="pgcard">
                         <h5>Ph.D in Metaphysical Sciences</h5>
                         <hr>
                     </div>
                     
                     
                 </div>
-	</div>
+  </div>
 
-  </body>
+      <script>
+        // JavaScript to toggle the sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('hidden_div');
+            const hamburger = document.getElementById('hamburger');
+            hamburger.style.display = "flex"
+            sidebar.classList.toggle('open');
+        }
+    </script>
+
+ </body>
 </html>

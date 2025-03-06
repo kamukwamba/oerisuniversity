@@ -1,5 +1,6 @@
 {{ define "adminheadertemp"}}
 
+
 	<div class="heading">
       <h3 class="ucms_name">
           Admin
@@ -17,42 +18,31 @@
 	</div>
 	
 	<div class="heading_hidden">
-      <h3 class="ucms_name">
-          Admin
-      </h3>
-      <div class="heading_nav">
-        <div>
-            <a href="">{{ .Admin.Name}} <a>
+      
+        <h3 class="ucms_name" style="text-align: center; width: 100%">
+            Admin
+        </h3>
+
+          <div class="heading_nav" style=" display: flex; justify-content: end;">
+            <div>
+                <a href="">{{ .Admin.Name}} <a>
+            </div>
+            <div>
+                <a href="/adminlogin">sign out</a>
+            </div>
         </div>
-        <div>
-            <a href="">sign out</a>
-        </div>
-      </div>
+
+    
+      
 	  
-	  <!-- <div class="navbartop">
-		
-            <a  href="/programcards?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Programs</a>
-            
 
-            
-			<a  href="/acamsstudentdata?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Students</a>
-	   
-			<a  href="/adminMessages?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Messages</a>
-
-		
-			<a  href="/adminNews?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">News</a>
-			
-   
-			<a  href="/get_admin_users?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Lecturers</a>
-		
-			
-	
-            <a  href="/get_matrics?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Store</a>
-	  </div> -->
 	 
 
-	<nav>
-	  <ul class="sidebar">
+	<nav style="z-index: 1000;">
+       <li onclick=showsidebar() class="hidden-menu">
+              <a  href="#"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg></a>
+        </li>
+	  <ul class="sidebar" >
           <li onclick=closesidebar()>
           <a href="#"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg></a>
           </li>
@@ -80,6 +70,8 @@
               <a  href="/get_matrics?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Store</a>
           </li>
       
+
+       
       </ul>
 
   </nav>
@@ -97,11 +89,15 @@
   }
 
 
+</script>
+
+
 	  
 	  
 	
-	</div>
-	
+</div>
+
+
 
 
 

@@ -213,11 +213,7 @@ func AdminDashboard(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-	// err := tpl.ExecuteTemplate(w, "admindasboard.html", nil)
 
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 
 }
 
