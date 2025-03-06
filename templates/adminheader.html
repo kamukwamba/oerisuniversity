@@ -29,7 +29,7 @@
         </div>
       </div>
 	  
-	  <div class="navbartop">
+	  <!-- <div class="navbartop">
 		
             <a  href="/programcards?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Programs</a>
             
@@ -45,11 +45,58 @@
    
 			<a  href="/get_admin_users?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Lecturers</a>
 		
-			<a  href="/get_matrics?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Matrics</a>
+			
 	
             <a  href="/get_matrics?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Store</a>
-	  </div>
-	  
+	  </div> -->
+	 
+
+	<nav>
+	  <ul class="sidebar">
+          <li onclick=closesidebar()>
+          <a href="#"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg></a>
+          </li>
+          <li> 
+               <a  href="/programcards?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Programs</a>
+          </li>
+          <li>
+            	<a  href="/acamsstudentdata?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Students</a>
+          </li>
+          <li>
+              <a  href="/adminMessages?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Messages</a>
+          </li>
+          <li>
+              <a  href="/adminNews?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">News</a>
+          </li>
+          <li>
+              <a  href="/get_admin_users?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Lecturers</a>
+          </li>
+
+          <li>
+              <a  href="/get_matrics?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Matrics</a>
+          </li>
+         
+          <li>
+              <a  href="/get_matrics?out={{ .Admin.ID}}" class="dashbuttons" style="text-decoration: none; text-align: center; display: block; width: 90%; height: 40px;">Store</a>
+          </li>
+      
+      </ul>
+
+  </nav>
+
+
+<script>
+  function showsidebar(){
+      const sidebar = document.querySelector('.sidebar')
+      sidebar.style.display = 'flex'
+  }
+
+  function closesidebar(){
+      const sidebar = document.querySelector('.sidebar')
+      sidebar.style.display = 'none'
+  }
+
+
 	  
 	  
 	

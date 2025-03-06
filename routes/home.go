@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 	"github.com/kamukwamba/oerisuniversity/encription"
+	"github.com/google/uuid"
 )
 
 var tpl *template.Template
@@ -350,7 +351,7 @@ func LoadVisited() []Visited {
 	return data_out_list
 }
 
-func CreateVisitor(date string) bool {
+func CreateVisitor(date, id string) bool {
 	year, month, day := time.Now().Date()
 	year_out := strconv.Itoa(year)
 	month_out := month.String()
@@ -458,24 +459,25 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 
 	dateVisited := strings.Join([]string(data), "-")
 
-	_, err := r.Cookie("visited")
+	cookie, err := r.Cookie("visitor_id")
 
 	if err != nil {
 
-		http.SetCookie(w, &http.Cookie{
-			Name:    "visited",
-			Value:   dateVisited,
-			Expires: time.Now().Add(100 * 24 * time.Hour),
-		})
-		is_created := CreateVisitor(dateVisited)
+		id := uuid.New().String()
+
+		cookie = &http.Cookie{
+			Name:     "visitor_id",
+			Value:    id,
+			Expires:  time.Now().Add(365 * 24 * time.Hour), // Expires in 1 year
+			HttpOnly: true, 
+
+		}
+		http.SetCookie(w, cookie)
+		is_created := CreateVisitor(dateVisited, id)
 		
 		fmt.Println(is_created)
-		
-		
-
-	} else {
-		fmt.Println("Has Aleady Visited Us!!!")
-		
+	} else{
+		fmt.Println("Welcome back")
 	}
 
 	err = tpl.ExecuteTemplate(w, "index.html", nil)

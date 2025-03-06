@@ -10,13 +10,13 @@
 		<img src="/assets/Images/school_logo.png" class="logo" style="width: 200px; height: 170px;  margin-left: 100px;">
 		
 	  
-		<h1 class="mainHeader" style="color: white;">Oceries University Of Metaphysical Sciences</h1>
+		<h1 class="mainHeader" style="color: white;">Oceries University College Of Metaphysical Sciences</h1>
 	</div>
 	
 	<div class="headerSizeHiden" >
 		
 		<img src="/assets/Images/school_logo.png" class="logo_small" style="position: relative; margin-left: auto; margin-right: auto; width: 200px; height: 200px;">
-		<h1 class="headerCss" style="font-size: 2em;">Oceries University Of Metaphysical Sciences</h1>
+		<h1 class="headerCss" style="font-size: 2em;">Oceries University College Of Metaphysical Sciences</h1>
 	
 	</div>
 	
@@ -60,7 +60,7 @@
             </div>
           </li>
           <li class="dropdown-list">
-              <a href="">Students<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-360 280-560h400L480-360Z"/></svg></a>
+              <a href="#" id="student_down">Students<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-360 280-560h400L480-360Z"/></svg></a>
           <ul class="dropdown-menu dropdown-list-nav">
               <li class="dropdown-itemct"><a  href="/login">Login</a></li>
               <li class="dropdown-itemct"><a  href="/enroll">Enroll Now</a></li>
@@ -74,6 +74,7 @@
       <div class="hideonsmall">
         <a href="/">Home</a>
       </div>
+      
       <div class="hideonsmall">
         <a href="/aboutus">About Us</a>
       </div>
@@ -101,7 +102,7 @@
       </div>
       
       <div class="hideonsmall dropdown-list">
-        <a href="">Student<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-360 280-560h400L480-360Z"/></svg></a>
+        <a href="#" id="student_down">Student<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-360 280-560h400L480-360Z"/></svg></a>
         <div class="dropdown-menu">
             <a class="dropdown-itemct" href="/login">Login</a>
             <a class="dropdown-itemct" href="/enroll">Enroll Now</a>
@@ -129,6 +130,13 @@
       const sidebar = document.querySelector('.sidebar')
       sidebar.style.display = 'none'
   }
+
+    const link = document.getElementById('student_down');
+
+        
+    link.addEventListener('click', function(event) {
+   
+    event.preventDefault();
 
   
 </script>
