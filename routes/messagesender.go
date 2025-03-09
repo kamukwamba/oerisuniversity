@@ -253,7 +253,7 @@ func SendEmail(to string) error {
 
 	subject := "Application Successfull"
 	body := fmt.Sprintf("Congratulations your application was successfull your username: %s and password: %s", to,to)
-	// Create a new message
+
 	m := gomail.NewMessage()
 	m.SetHeader("From", from)
 	m.SetHeader("To", to)
@@ -264,9 +264,14 @@ func SendEmail(to string) error {
 	d := gomail.NewDialer(smtpHost, smtpPort, from, password)
 
 	// Send the email
-	if err := d.DialAndSend(m); err != nil {
-		return err
+	err := d.DialAndSend(m)
+
+	if err != nil{
+		fmt.Println("FAILED TO SEND EMAIL CHECK \"messagesender.go\" ", err)
 	}
+		
+	
+	
 	
 	SendToAdmin(to)
 
