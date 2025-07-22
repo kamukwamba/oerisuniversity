@@ -237,11 +237,9 @@ func AdminMessagesPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
-
-func GetAllStudentMsg(w http.ResponseWriter, r *http.Request){
+func GetAllStudentMsg(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
-	
+
 	var msg MessageOut
 	var msgLs []MessageOut
 	var uuid string
@@ -260,10 +258,9 @@ func GetAllStudentMsg(w http.ResponseWriter, r *http.Request){
 	defer stmt.Close()
 
 	err = stmt.QueryRow(email).Scan(&uuid)
-	if err != nil{
+	if err != nil {
 		fmt.Println("FAILED TO QUERYROW: ", err)
 	}
-
 
 	stmt_two, err_two := dbread.Query("SELECT select uuid,sender_uuid,sender_name, sender, message,seen_admin,date FROM messages WHERE sender_uuid = ?", uuid)
 
@@ -271,12 +268,10 @@ func GetAllStudentMsg(w http.ResponseWriter, r *http.Request){
 		fmt.Println("PREPARE STATEMENT FAILED: ", err_two)
 	}
 
-
 	defer stmt_two.Close()
 
-
-	for stmt_two.Next(){
-		err_two = stmt_two.Scan(&msg.UUID, &msg.Student_UUID,&msg.Sender_Name, &msg.Message, &msg.Sender, &msg.Seen_Student, &msg.Seen_Admin, &msg.Date)
+	for stmt_two.Next() {
+		err_two = stmt_two.Scan(&msg.UUID, &msg.Student_UUID, &msg.Sender_Name, &msg.Message, &msg.Sender, &msg.Seen_Student, &msg.Seen_Admin, &msg.Date)
 
 		if err_two != nil {
 			fmt.Println("FAILED TO SCAN: ", err_two)
@@ -285,11 +280,10 @@ func GetAllStudentMsg(w http.ResponseWriter, r *http.Request){
 		msgLs = append(msgLs, msg)
 	}
 
-
 	massageData := LoadMsg{
 		Msg: msgLs,
 	}
-	
+
 	err = tpl.ExecuteTemplate(w, "messageslog", massageData)
 
 	if err != nil {

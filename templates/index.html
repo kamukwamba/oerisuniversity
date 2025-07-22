@@ -7,8 +7,10 @@
     <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/NewsContent.css?v=2.6">
     <link rel="stylesheet" href="/assets/css/curriculum.css?v=1.2">
-    <link rel="icon" type="image/png" href="/assets/Images/favicon.png">
 
+
+    {{ template "sitelogimage" }}
+   
 
     <script src="/assets/js/color-modes.js"></script>
 
@@ -128,4 +130,7 @@
 {{template "footer"}}
 </html>
 
+{{ define "sitelogimage"}}
+<link rel="icon" type="image/png" href="/assets/Images/favicon.png">
+{{ end }}
 

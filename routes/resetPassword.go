@@ -1,17 +1,16 @@
 package routes
 
 import (
+	"crypto/rand"
 	"fmt"
 	"html/template"
 	"log"
-	"net/http"
-	"crypto/rand"
 	"math/big"
+	"net/http"
+
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 	"github.com/kamukwamba/oerisuniversity/encription"
 )
-
-
 
 const (
 	lowercaseLetters = "abcdefghijklmnopqrstuvwxyz"
@@ -20,7 +19,7 @@ const (
 	specialChars     = "!@#$%^&*()-_=+,.?/:;{}[]~"
 )
 
-func generatePassword(length int) (string, error) {
+func generatePassword2(length int) (string, error) {
 	allChars := lowercaseLetters + uppercaseLetters + digits + specialChars
 
 	password := make([]byte, length)
@@ -35,8 +34,7 @@ func generatePassword(length int) (string, error) {
 	return string(password), nil
 }
 
-
-func CheckUserCridentials(email string)( bool, string){
+func CheckUserCridentials(email string) (bool, string) {
 
 	dbread := dbcode.SqlRead().DB
 	var email_out string
@@ -62,24 +60,19 @@ func CheckUserCridentials(email string)( bool, string){
 
 	return present, email_out
 
-
 }
 
-
-
-
-
-func UpdateCridentials(email string){
+func UpdateCridentials(email string) {
 
 	dbread := dbcode.SqlRead().DB
-	newpassowrd, _ := generatePassword(8)
+	newpassowrd, _ := generatePassword2(8)
 	resetSucc := true
 	key := encription.GetKey()
-	encryptPassword ,_ := encription.EncryptData(newpassowrd, key)
+	encryptPassword, _ := encription.EncryptData(newpassowrd, key)
 
 	stmt, err := dbread.Prepare("UPDATE studentcridentials SET password = ? WHERE email = ?")
 
-	if err != nil{
+	if err != nil {
 		fmt.Println("PREPARE STATEMENT ERROR: ", err)
 		resetSucc = false
 	}
@@ -97,12 +90,10 @@ func UpdateCridentials(email string){
 
 	fmt.Println(resetSucc)
 
-
 }
-func PasswordResetPage(w http.ResponseWriter, r *http.Request){
+func PasswordResetPage(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
-
 
 	err := tpl.ExecuteTemplate(w, "resetpassword.html", nil)
 
@@ -111,25 +102,20 @@ func PasswordResetPage(w http.ResponseWriter, r *http.Request){
 	}
 }
 
-
-
-func ResetPassword(w http.ResponseWriter, r *http.Request){
+func ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 	r.ParseForm()
 
 	var templateName string
 
-
 	emailIn := r.FormValue("email")
 	present, _ := CheckUserCridentials(emailIn)
 
-
-
-	if present{
+	if present {
 		UpdateCridentials(emailIn)
 		templateName = "resetsuccessful"
-	}else{
+	} else {
 		templateName = "emaildoes"
 
 	}

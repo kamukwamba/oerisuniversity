@@ -4,13 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
 	"os"
 
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 	"github.com/kamukwamba/oerisuniversity/routes"
-	
-	
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -37,6 +34,11 @@ func main() {
 	routes.LoadAssesmentTable()
 	routes.CreateVisitorTable()
 	routes.CreateEmailSenderTem()
+
+	//NEW DATA BASES
+	routes.CreateProgramDB()
+	routes.CreateCourseDB()
+
 	fmt.Println("::SERVER STARTED::PORT::8080")
 
 	router := http.NewServeMux()
@@ -51,18 +53,22 @@ func main() {
 	router.HandleFunc("/programs", routes.Programs)
 	router.HandleFunc("/enroll", routes.Enrollment)
 	router.HandleFunc("/confirmenrrol", routes.ConfirmEnrollment)
-	router.HandleFunc("/adminlogin", routes.AdminLogin)
-	router.HandleFunc("/admindashboard", routes.AdminDashboard)
+
 	router.HandleFunc("/programcards", routes.Programcards)
 	router.HandleFunc("/news", routes.NewsPage)
 	router.HandleFunc("/readnewsstory", routes.ReadNewsRoute)
-	router.HandleFunc("/deletemessage", routes.DeleteMessageRouter)
+	router.HandleFunc("/delete", routes.DeleteMessageRouter)
 	router.HandleFunc("/getstudentdata", routes.ChangeStudentPassword)
 	router.HandleFunc("/updtestudentpassword", routes.ChangePassword)
 	router.HandleFunc("/closeupdatedata", routes.CloseUpdateData)
 
-
 	//ADMIN DASHBOARD
+	//NEW ROUTES START
+	router.HandleFunc("/adminlogin", routes.AdminLogin)
+	router.HandleFunc("/admindashboard", routes.AdminDashboard)
+	router.HandleFunc("/createNewProgram", routes.CreateNewProgramR)
+	//NEW ROUTES END
+
 	router.HandleFunc("/studentcenter", routes.StudentCenter)
 	router.HandleFunc("/acamsstudentdata", routes.ACAMSStudentData)
 	router.HandleFunc("/programdetails/{id}", routes.ProgramDetails)
@@ -99,20 +105,14 @@ func main() {
 	router.HandleFunc("/createadminemail", routes.CreateEmailData)
 	router.HandleFunc("/faq", routes.FAQ)
 	router.HandleFunc("/offerings", routes.Offerings)
-
-
-	
-
-	
-	
-	
-	
+	router.HandleFunc("/resetpassword", routes.ForgotPassword)
+	router.HandleFunc("/confirmreset", routes.ConfirmStudentId)
 
 	//EXAM
 	router.HandleFunc("/create_page", routes.CreatePage)
 	router.HandleFunc("/addexam", routes.AddExam)
 	router.HandleFunc("/examdetails", routes.AddExamDetails)
-	
+
 	router.HandleFunc("/takeexam", routes.TakeExam)
 	router.HandleFunc("/submitexam", routes.SubmitExam)
 	router.HandleFunc("/grade_exam", routes.GradeExam)
@@ -122,7 +122,6 @@ func main() {
 	router.HandleFunc("/updatequestion", routes.UpdateQuestion)
 	router.HandleFunc("/deletequestion", routes.DeleteQuestion)
 	router.HandleFunc("/saveUpdateQuestion", routes.SaveQuestionUpdates)
-
 
 	//STUDENT PORTAL ROUTES
 	router.HandleFunc("/confirmlogin", routes.ConfirmStudentLogin)
@@ -143,8 +142,6 @@ func main() {
 	router.HandleFunc("/assesmentsubmit", routes.UploadAssesment)
 	router.HandleFunc("/forgotpassword", routes.PasswordResetPage)
 	router.HandleFunc("/passwordreset", routes.ResetPassword)
-
-	
 
 	router.HandleFunc("/login", routes.LoginPage)
 	router.HandleFunc("/handinassesment", routes.HandInAssesment)

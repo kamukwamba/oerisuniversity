@@ -144,8 +144,8 @@ func ValidateSudent(email_in, password_in string) (bool, string) {
 	var student_uuid string
 	var email string
 	var password string
-	
-	fmt.Println("Email: ",email_in)
+
+	fmt.Println("Email: ", email_in)
 	fmt.Println("Password: ", password_in)
 
 	err = stmt.QueryRow(email_in).Scan(&uuid, &student_uuid, &email, &password)
@@ -155,16 +155,14 @@ func ValidateSudent(email_in, password_in string) (bool, string) {
 		// log.Fatal(err)
 		isstudent = false
 	}
-	
+
 	fmt.Println(uuid, student_uuid, email, email, password)
-	
-	
-	compareHashedKeys :=  CheckPassword(password, password_in)
-	
-	if compareHashedKeys != true{
+
+	compareHashedKeys := CheckPassword(password, password_in)
+
+	if compareHashedKeys != true {
 		isstudent = false
 	}
-
 
 	return isstudent, student_uuid
 

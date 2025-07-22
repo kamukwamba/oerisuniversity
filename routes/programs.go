@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -23,15 +22,23 @@ func Programs(w http.ResponseWriter, r *http.Request) {
 func Programcards(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
+	var programsAvailable bool
 
 	out := r.URL.Query().Get("out")
 
-	fmt.Println("Admin ID: ", out)
-
 	admin_infor := AdminData(out)
+	programdata, errout := GetAllProgramData()
 
-	data_out := AdminPage{
-		Admin: admin_infor,
+	if errout != nil {
+		programsAvailable = false
+	} else {
+		programsAvailable = true
+	}
+
+	data_out := AdminLandingData{
+		Admin:         admin_infor,
+		ProgramD:      programdata,
+		DataAvailable: programsAvailable,
 	}
 
 	//debug failure to laod templates

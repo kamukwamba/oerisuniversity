@@ -3,12 +3,13 @@ package routes
 import (
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"os"
-	"io"
-	"time"
 	"path/filepath"
+	"time"
+
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 	"github.com/kamukwamba/oerisuniversity/encription"
 )
@@ -24,24 +25,23 @@ type AssesmentGrade struct {
 }
 
 type AssesmentOut struct {
-	Present       bool
-	Assesment []AssesmentGrade
+	Present      bool
+	Assesment    []AssesmentGrade
 	Student_UUID string
-	Cource_Name string
-	StInfo StudentInfo
+	Cource_Name  string
+	StInfo       StudentInfo
 }
 
-
 type FileDownload struct {
-		FileName string
-		Student_UUID string
-		Cource_Name string
-	}
-type HandedIn struct {
-	Cource_Name string
+	FileName     string
 	Student_UUID string
-	FileDir []FileDirectory
-	Assesment []AssesmentGrade
+	Cource_Name  string
+}
+type HandedIn struct {
+	Cource_Name  string
+	Student_UUID string
+	FileDir      []FileDirectory
+	Assesment    []AssesmentGrade
 }
 
 func GetAssesmentData(student_uuid, cource_name string) (bool, []AssesmentGrade) {
@@ -70,9 +70,7 @@ func GetAssesmentData(student_uuid, cource_name string) (bool, []AssesmentGrade)
 
 		present = true
 
-		
 		assesment_out_list = append(assesment_out_list, assesment_out)
-		
 
 	}
 
@@ -89,13 +87,11 @@ func HandInAssesment(w http.ResponseWriter, r *http.Request) {
 	present, assesment_data := GetAssesmentData(student_uuid, cource_name)
 
 	display_assesment := AssesmentOut{
-		Present:       present,
-		Assesment: assesment_data,
-		StInfo:      studentdata,
-		Cource_Name: cource_name,
+		Present:      present,
+		Assesment:    assesment_data,
+		StInfo:       studentdata,
+		Cource_Name:  cource_name,
 		Student_UUID: student_uuid,
-
-		
 	}
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
@@ -180,14 +176,12 @@ func SaveGrade(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
-func DownloadAssesments(w  http.ResponseWriter, r *http.Request){
+func DownloadAssesments(w http.ResponseWriter, r *http.Request) {
 	student_uuid := r.URL.Query().Get("student_uuid")
 	cource_name := r.URL.Query().Get("cource_name")
 	pdf_filename := r.URL.Query().Get("file_name")
-	
+
 	dbFilePath := fmt.Sprintf("./assesmentFiles/%s/%s/%s.pdf", student_uuid, cource_name, pdf_filename)
-	
 
 	if _, err := os.Stat(dbFilePath); os.IsNotExist(err) {
 		http.Error(w, "Database file not found", http.StatusNotFound)
@@ -197,7 +191,6 @@ func DownloadAssesments(w  http.ResponseWriter, r *http.Request){
 	w.Header().Set("Content-Type", "application/octet-stream")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filepath.Base(dbFilePath)))
 
-	
 	file, err := os.Open(dbFilePath)
 	if err != nil {
 		http.Error(w, "Unable to open the file", http.StatusInternalServerError)
@@ -205,14 +198,12 @@ func DownloadAssesments(w  http.ResponseWriter, r *http.Request){
 	}
 	defer file.Close()
 
-	
 	_, err = io.Copy(w, file)
 	if err != nil {
 		http.Error(w, "Error writing file to response", http.StatusInternalServerError)
 		return
 	}
 }
-
 
 func GradeCA(w http.ResponseWriter, r *http.Request) {
 
@@ -221,25 +212,23 @@ func GradeCA(w http.ResponseWriter, r *http.Request) {
 
 	var present bool
 	var fileDirOut []FileDirectory
-	
-	present, fileDirOut = ListFileDirectories(student_uuid, cource_name)
 
+	present, fileDirOut = ListFileDirectories(student_uuid, cource_name)
 
 	var data_out HandedIn
 	var data_out_list []AssesmentGrade
-	
 
 	present, assesment_data := GetAssesmentData(student_uuid, cource_name)
 
 	if present {
 		data_out_list = assesment_data
 	}
-	
+
 	data_out = HandedIn{
-		Cource_Name: cource_name,
+		Cource_Name:  cource_name,
 		Student_UUID: student_uuid,
-		FileDir: fileDirOut,
-		Assesment: data_out_list,
+		FileDir:      fileDirOut,
+		Assesment:    data_out_list,
 	}
 
 	fmt.Println(data_out)
@@ -250,7 +239,7 @@ func GradeCA(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		fmt.Println("Ther Was a Problem", err)
-		
+
 	}
 
 }
@@ -277,11 +266,6 @@ func LoadAssesmentTable() {
 	}
 
 }
-
-
-
-
-
 
 func listAssignments(dir string) ([]string, error) {
 	var pdfFiles []string

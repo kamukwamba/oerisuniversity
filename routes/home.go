@@ -3,16 +3,18 @@ package routes
 import (
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
-	"io"
-	"os"
-	"path/filepath"
+
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 	"github.com/kamukwamba/oerisuniversity/encription"
+
 	"github.com/google/uuid"
 )
 
@@ -28,7 +30,7 @@ type NewsStruct struct {
 }
 
 type NewsHomePage struct {
-	Present bool
+	Present  bool
 	NewsMain NewsStruct
 	NewsList []NewsStruct
 }
@@ -45,11 +47,11 @@ func ReadNews(uuid_in, number string) (NewsStruct, []NewsStruct) {
 	get_data := dbcode.SqlRead().DB
 
 	var uuid string
-	var title string 
+	var title string
 	var auther string
-	var image_link string 
-	var story string 
-	var date string 
+	var image_link string
+	var story string
+	var date string
 
 	switch number {
 	case "one":
@@ -64,20 +66,18 @@ func ReadNews(uuid_in, number string) (NewsStruct, []NewsStruct) {
 
 		err = stmt.QueryRow(uuid_in).Scan(&uuid, &title, &auther, &image_link, &story, &date)
 
-
 		image_link_out := CleanNewsImages(uuid)
 
 		file_link := fmt.Sprintf("/news/%s/%s", image_link_out, image_link)
 
 		news_one = NewsStruct{
-			UUID: uuid,
-			Title: title,
-			Auther: auther,
+			UUID:       uuid,
+			Title:      title,
+			Auther:     auther,
 			Image_Link: file_link,
-			Story: story,
-			Date: date,
+			Story:      story,
+			Date:       date,
 		}
-
 
 		if err != nil {
 			fmt.Println("Failed to execute News One")
@@ -97,18 +97,17 @@ func ReadNews(uuid_in, number string) (NewsStruct, []NewsStruct) {
 		for rows.Next() {
 			err := rows.Scan(&uuid, &title, &auther, &image_link, &story, &date)
 
-
 			image_link_out := CleanNewsImages(uuid)
 
 			file_link := fmt.Sprintf("/news/%s/%s", image_link_out, image_link)
 
 			news_one = NewsStruct{
-				UUID: uuid,
-				Title: title,
-				Auther: auther,
+				UUID:       uuid,
+				Title:      title,
+				Auther:     auther,
 				Image_Link: file_link,
-				Story: story,
-				Date: date,
+				Story:      story,
+				Date:       date,
 			}
 			if err != nil {
 				fmt.Println("FAILED TO LOAD", err)
@@ -171,8 +170,7 @@ func ReadNewsRoute(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
-func CleanNewsImages(uuid string) string{
+func CleanNewsImages(uuid string) string {
 
 	new_uuid := strings.Split(uuid, "-")
 
@@ -193,19 +191,14 @@ func Create_News(w http.ResponseWriter, r *http.Request) {
 	auther := r.FormValue("auther")
 	title := r.FormValue("title")
 	story := r.FormValue("story")
-	
+
 	fmt.Println("Story: ", story)
 
 	uuid := encription.Generateuudi()
-	
+
 	date := fmt.Sprintf("%s", time.Now().Local())
 
-	
-
-	
-	new_file_dir := CleanNewsImages(uuid) 
-
-	
+	new_file_dir := CleanNewsImages(uuid)
 
 	file, handler, err := r.FormFile("file")
 
@@ -215,9 +208,8 @@ func Create_News(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-
 	file_name := handler.Filename
-	
+
 	data_out := NewsStruct{
 		UUID:       uuid,
 		Auther:     auther,
@@ -225,8 +217,6 @@ func Create_News(w http.ResponseWriter, r *http.Request) {
 		Image_Link: file_name,
 		Story:      story,
 	}
-
-
 
 	stmt, err := create_news.Prepare("insert into news (uuid, title,auther, image, story, date) values (?,?,?,?,?,?)")
 
@@ -236,13 +226,10 @@ func Create_News(w http.ResponseWriter, r *http.Request) {
 
 	defer stmt.Close()
 
-	
-
 	_, err = stmt.Exec(uuid, title, auther, file_name, story, date)
 	if err != nil {
 		fmt.Println("failed to create")
 	}
-
 
 	filePath := filepath.Join("./news", new_file_dir, file_name)
 
@@ -258,9 +245,6 @@ func Create_News(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("FAILED TO UPLOAD TO SERVER", err)
 	}
-
-
-
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
@@ -299,29 +283,27 @@ func CreateVisitorTable() {
 func CheckDate(date string) (bool, string) {
 	is_present := true
 	var current_count string
-	
+
 	dbconn := dbcode.SqlRead().DB
-	
+
 	stmt, err := dbconn.Prepare("select visit_time, counter from visitors where visit_time = ?")
-	
-	if err !=  nil {
-		
+
+	if err != nil {
+
 		fmt.Println("CheckDate: ", err)
 		is_present = false
 	}
-	
-	defer stmt.Close()
-	
-	var is_date string 
 
-	err  = stmt.QueryRow(date).Scan(&is_date, &current_count)
-	
+	defer stmt.Close()
+
+	var is_date string
+
+	err = stmt.QueryRow(date).Scan(&is_date, &current_count)
+
 	if err != nil {
 		fmt.Println("There is not date in string ", err)
 		is_present = false
 	}
-	
-	
 
 	return is_present, current_count
 }
@@ -356,7 +338,7 @@ func CreateVisitor(date, id string) bool {
 	year_out := strconv.Itoa(year)
 	month_out := month.String()
 	day_out := strconv.Itoa(day)
-	
+
 	createnow := false
 
 	dbconn := dbcode.SqlRead().DB
@@ -392,16 +374,14 @@ func CreateVisitor(date, id string) bool {
 
 		defer stmtc.Close()
 
-		
 		counter := 1
 		_, err = stmtc.Exec(counter, date_out)
-		
-		if err != nil{
-			
+
+		if err != nil {
+
 			fmt.Println("Filed to create new visito: ", err)
 		}
 	}
-
 
 	return createnow
 }
@@ -469,14 +449,13 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 			Name:     "visitor_id",
 			Value:    id,
 			Expires:  time.Now().Add(365 * 24 * time.Hour), // Expires in 1 year
-			HttpOnly: true, 
-
+			HttpOnly: true,
 		}
 		http.SetCookie(w, cookie)
 		is_created := CreateVisitor(dateVisited, id)
-		
+
 		fmt.Println(is_created)
-	} else{
+	} else {
 		fmt.Println("Welcome back")
 	}
 
@@ -494,26 +473,23 @@ func NewsPage(w http.ResponseWriter, r *http.Request) {
 	_, all := ReadNews("o", "many")
 	var present bool
 
-
-
-
 	var latest NewsStruct
 
 	if len(all) >= 1 {
 		if len(all) > 1 {
 			latest = all[len(all)-1]
-			
+
 		} else {
 			latest = all[0]
-			
+
 		}
 		present = true
-	}else{
+	} else {
 		present = false
 	}
 
 	news_main := NewsHomePage{
-		Present: present,
+		Present:  present,
 		NewsMain: latest,
 		NewsList: all,
 	}

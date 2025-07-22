@@ -170,8 +170,21 @@
 				var p_name_out = original_text.toUpperCase();
 				program_name.textContent = p_name_out;
 			</script>
-	  </div>
+	    </div>
+    </div>
+
+
+
+
     
+    
+    
+</body>
+
+</html>
+
+
+
     {{ define "cource_data_close"}}
         <div class="cource_data" style="display: none;">
     
@@ -441,7 +454,7 @@
     {{ end }}
 
     {{ define "empty_tr"}}
-        <tr style="display=none">
+        <tr style="display: none">
             <td></td>
             <td></td>
             <td></td>
@@ -479,15 +492,11 @@
     {{ end }}
 
 
-    
-    
-    
-</body>
-
-</html>
 
 
-
+{{ template "failedToCreateCourse"}}
+        <li style="column-span: all;">FAILED TO CREATE NEW COURSE ENTRY, COURSE NAME OR CODE IS ALREADY IN USE BY ANOTHER PROGRAM</li>
+{{ end }}
 
 
 
