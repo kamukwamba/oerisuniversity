@@ -4,11 +4,11 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-
+	
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 )
 
-// Login PAGE FOR ADMIN LOG IN
+
 type AdminLandingData struct {
 	Admin         AdminInfo
 	ProgramD      []ProgramDataEntry
@@ -26,18 +26,22 @@ func AdminLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 // ADMIN DASH BOARD
-func IsHXRequest(r *http.Request) bool {
-	return r.Header.Get("HX-Request") == "true"
-}
+
+
+
 func AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
-	var cardDataAvailable bool
+
 	if r.Method == "POST" {
 		r.ParseForm()
+		
+
 		adminList := dbcode.AdminGet()
+		var cardDataAvailable bool
 
 		email := r.PostFormValue("email")
 		password := r.PostFormValue("password")
+
 
 		authget := AdminLogData{
 			Email:    email,
@@ -54,27 +58,26 @@ func AdminDashboard(w http.ResponseWriter, r *http.Request) {
 			cardDataAvailable = true
 		}
 
+		
+
 		toshow := AdminLandingData{
 			Admin:         admin_dataout,
 			ProgramD:      cardData,
 			DataAvailable: cardDataAvailable,
 		}
 
+		
+
 		if check {
+			
+			err := tpl.ExecuteTemplate(w, "A_adminDashboard.html", toshow)
 
-			if IsHXRequest(r) {
-				w.Header().Set("HX-Redirect", "/dashboard")
-				w.WriteHeader(http.StatusOK)
-				return
-			}
-
-			err := tpl.ExecuteTemplate(w, "A_adminDasboard.html", toshow)
-
+			CreateCookie(admin_dataout.First_Name,admin_dataout.ID, w,r)
 			if err != nil {
 				log.Fatal(err)
 			}
 		} else {
-			err := tpl.Execute(w, "Invalid username or password")
+			err := tpl.ExecuteTemplate(w, "A_adminLoginError.html", nil)
 
 			if err != nil {
 				log.Fatal(err)
@@ -82,12 +85,15 @@ func AdminDashboard(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else {
-		err := tpl.Execute(w, "Invalid username or password")
+
+		
+		err := tpl.ExecuteTemplate(w, "A_adminLoginError.html", nil)
 
 		if err != nil {
 			log.Fatal(err)
 		}
 
 	}
+
 
 }

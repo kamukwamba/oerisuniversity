@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Dashboard</title>
+    <title>Administrative Dashboard</title>
+    <script src="/assets/htmx.js"></script>
+
     <style>
         :root {
             --primary: #6a0dad;
@@ -264,39 +266,57 @@
 </head>
 <body>
     <header>
-        <div class="logo">Purple Dashboard</div>
+        <div class="logo">OUCMPS</div>
         <div class="user-info">
-            <span>Welcome, Admin</span>
+            <span>Welcome, {{ .Admin.Name}}</span>
             <div class="user-avatar">A</div>
         </div>
     </header>
 
     <nav>
         <ul class="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Dashboard</a></li>
-            <li><a href="#">Projects</a></li>
-            <li><a href="#">Tasks</a></li>
-            <li><a href="#">Team</a></li>
-            <li><a href="#">Reports</a></li>
+            <li><a href="/programcards?out={{ .Admin.ID}}" class="dashbuttons">Programs</a></li>
+            <li><a href="/studentdata?out={{ .Admin.ID}}">Stidents</a></li>
+            <li><a href="/adminMessages?out={{ .Admin.ID}}">Messages</a></li>
+            <li><a href="/adminNews?out={{ .Admin.ID}}">News</a></li>
+            <li><a href="/get_admin_users?out={{ .Admin.ID}}">Lectures</a></li>
+            <li><a href="/get_matrics?out={{ .Admin.ID}}">Matrics</a></li>
             <li><a href="#">Settings</a></li>
         </ul>
     </nav>
 
     <div class="container">
-        <main class="main-content">
-            <div class="cards-container">
+        <main class="main-content" id="main-content">
+            <div class="cards-container" id="cards-container">
                 <!-- Cards -->
+                
 
-                {{ if .DataAvailabele}}
-
+                {{ if .DataAvailable}}
                     {{ range .ProgramD}}
-                        {{ template "programCardTemp" . }}
-                    {{end}}
+                        <div class="card">
+                            <div class="card-header">
+                                <button class="card-btn update"><a class="btn2" style="display:block; text-decoration: none;" href="/updateprogramdetails?programCode={{ .Code}}">Update</a></button>
+                                
+                            </div>
+                            <div class="card-body">
+                                <h3>{{ .Name }}</h3>
+                                <ul class="card-list">
+                                    {{range .CourseNames}}
+                                        <li>{{.Name}}</li>
+                                    {{end}}
+                                   
+                                </ul>
+                                    
+                            </div>
+                            <div class="card-footer">
+                                <a class="btn2" style="display:block; text-decoration: none;" href="/programdetails?courseCode={{ .Code}}">Details</a>
+                            </div>
+                        </div>
+                        
+                    {{ end }}
 
-                {{else}}
 
-                {{end}}
+                {{ end }}
                 
                 
             </div>
@@ -304,7 +324,10 @@
 
         <aside class="sidebar">
             <h2>Add New Program</h2>
-            <form action="/createNewProgram" method="POST">
+            <form hx-post="/createNewProgram" 
+                    hx-target="#cards-container"
+                    hx-swap="beforeend">
+
                 <div class="form-group" >
                     <label for="project-name">Program Name</label>
                     <input type="text" id="project-name" name="program_name" placeholder="Enter program name">
@@ -314,8 +337,7 @@
                     <label for="project-description">Program Code</label>
                     <textarea id="project-description" placeholder="Enter program code" name="program_code"></textarea>
                 </div>
-                
-                
+
                 
                 <button type="submit" class="submit-btn">Create Program</button>
             </form>
@@ -324,25 +346,43 @@
 </body>
 </html>
 
-
 {{  define "programCardTemp" }}
 
     <div class="card">
     <div class="card-header">
-        <button class="card-btn update">Update</button>
-        <button class="card-btn delete">Delete</button>
+        <button class="card-btn update"><a class="btn2" style="display:block; text-decoration: none;" href="/updateprogramdetails?programCode={{ .Code}}">Update</a></button>
+        
     </div>
     <div class="card-body">
         <h3>{{ .Name }}</h3>
         <ul class="card-list">
-            {{ range .CourseNames}}
-                <li>{{ .CourseNames.Name}}</li>
-            {{ end }}
-        
+            {{range .CourseNames}}
+                <li>{{.Name}}</li>
+            {{end}}
+           
         </ul>
+            
     </div>
     <div class="card-footer">
-        <a class="btn2" style="display:block; text-decoration: none;" href="/programdetails/{{ .Code}}={{ .Admin.ID}}">Details</a>
+        <a class="btn2" style="display:block; text-decoration: none;" href="/programdetails/?courseCode={{ .Code}}">Details</a>
     </div>
 </div>
+{{ end }}
+
+{{  define "programCardTempEmpty" }}
+
+    <div class="card">
+    <div class="card-header">
+        <button class="card-btn update"><a class="btn2" style="display:block; text-decoration: none;" href="/updateprogramdetails?programCode={{ .Code}}">Update</a></button>
+        
+    </div>
+    <div class="card-body">
+        <h3>{{ .Name }}</h3>
+        
+            
+    </div>
+    <div class="card-footer">
+        <a class="btn2" style="display:block; text-decoration: none;" href="/programdetails/?courseCode={{ .Code}}">Details</a>
+    </div>
+    </div>
 {{ end }}

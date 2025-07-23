@@ -145,6 +145,7 @@ func AdminAuth(data AdminLogData, dataList []dbcode.AdminInfo) (bool, AdminInfo)
 
 		matchPassword := CheckPassword(password, data.Password)
 
+
 		if matchPassword == true && data.Email == email {
 
 			admin_data = AdminInfo{
@@ -153,7 +154,11 @@ func AdminAuth(data AdminLogData, dataList []dbcode.AdminInfo) (bool, AdminInfo)
 				Email:    email,
 				Password: password,
 			}
+			
+
 			result = true
+
+			break
 		}
 	}
 	return result, admin_data

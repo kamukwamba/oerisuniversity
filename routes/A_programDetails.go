@@ -26,20 +26,24 @@ type ProgramDataEntry struct {
 }
 
 func CreateProgramDB() {
-	db := dbcode.SqlRead().DB
+	dbread := dbcode.SqlRead().DB
 
-	defer db.Close()
-	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS ProgramData (
+
+
+	programData := `CREATE TABLE IF NOT EXISTS ProgramData(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		programName TEXT UNIQUE,
-		programCode TEXT UNIQUE,
-	)`)
+		programCode TEXT UNIQUE
+	);`
+
+	defer dbread.Close()
+
+	_, err := dbread.Exec(programData)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%q: %s\n", err, programData)
+		
 	}
-
-	defer db.Close()
 
 }
 
@@ -48,36 +52,58 @@ func CreateNewProgramR(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 	program_name := r.FormValue("program_name")
-	program_code := r.FormValue("programcode")
+	program_code := r.FormValue("program_code")
+	render := false
+
+	dataCreated := ProgramDataEntry{
+		Name: program_name,
+		Code: program_code,
+	}
+
+	fmt.Println("dataCreated", dataCreated)
 
 	err := ConfirmProgramDataExists(program_name, program_code)
 
 	if err != nil {
-		fmt.Println("Program Exist With that Program Code Or Program Name")
-	} else {
 		err = CreateProgramEntry(program_name, program_code)
+
 		if err != nil {
 			fmt.Printf("Failed to Create Program Entry:: %s", err)
 		} else {
 			fmt.Println("Program Entry Created Sucesfully")
+			render = true
+		}
+	} else {
+		fmt.Println("Program Exist With that Program Code Or Program Name")
+		
+	}
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	if render{
+		err := tpl.ExecuteTemplate(w, "programCardTempEmpty", dataCreated)
+
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 
-}
 
-func ProgramCourseDataPage(w http.ResponseWriter, r *http.Request) {
 
 }
+
 
 func ConfirmProgramDataExists(programName, programCode string) error {
 	db := dbcode.SqlRead().DB
 	defer db.Close()
 
-	var program_name, program_code string
-	err := db.QueryRow("SELECT courseList FROM ProgramDataList WHERE programName = ? OR programCode = ? ", programName, programCode).Scan(&program_name, program_code)
+	var course_code string
+	var course_name string
+
+	err := db.QueryRow("SELECT courseName, courseCode FROM CourseNames WHERE  programCode = ? ", programCode).Scan(&course_name, &course_code)
 
 	if err != nil {
-		fmt.Printf("Program Name Already Exists:: %s", err)
+		fmt.Printf("Program Name Already Exists Changed:: %s", err)
 	}
 
 	return err
@@ -89,21 +115,31 @@ func CreateProgramEntry(programName, programCode string) error {
 
 	defer db.Close()
 
-	_, err := db.Exec("INSERT INTO ProgramDataList (programName, programCode) VALUES (?,?)",
+	_, err := db.Exec("INSERT INTO ProgramData (programName, programCode) VALUES (?,?)",
 		programName, programCode)
 
-	return err
+
+	if err != nil {
+		fmt.Println("Failed to add to database")
+		return err
+
+	}
+
+	return nil
 }
 
 func GetAllProgramData() ([]ProgramDataEntry, error) {
 
 	db := dbcode.SqlRead().DB
 	var programData ProgramDataEntry
-	var programDataListOut []ProgramDataEntry
+	
+	
 
 	rows, err := db.Query("SELECT programName, programCode FROM ProgramData")
 	if err != nil {
 		return nil, err
+		
+
 	}
 	defer rows.Close()
 
@@ -115,8 +151,11 @@ func GetAllProgramData() ([]ProgramDataEntry, error) {
 		var course_names []Course_Name
 
 		err := rows.Scan(&program_name, &program_code)
+
+		
 		if err != nil {
 			return nil, err
+			fmt.Println("the getall error", err)
 		} else {
 			course_names_check, errCourses := GetProgramCourses(program_code)
 
@@ -134,9 +173,11 @@ func GetAllProgramData() ([]ProgramDataEntry, error) {
 			CourseNames: course_names,
 		}
 
-		resultList = append(programDataListOut, programData)
+		resultList = append(resultList, programData)
 
 	}
+
+	fmt.Println(resultList)
 
 	return resultList, nil
 }
@@ -295,7 +336,7 @@ func CreateCourseDB() {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		courseName TEXT UNIQUE,
 		courseCode TEXT UNIQUE,
-		programCode TEXT UNIQUE,
+		programCode TEXT UNIQUE
 	)`)
 
 	if err != nil {

@@ -182,7 +182,7 @@ func GetProgramDetails(program_name string) ([]CourceDataStruct, bool) {
 	}
 	defer statement.Close()
 
-	fmt.Println("The Program Name:: ", program_name)
+	
 
 	for statement.Next() {
 		err := statement.Scan(
@@ -207,14 +207,27 @@ func GetProgramDetails(program_name string) ([]CourceDataStruct, bool) {
 	return cuorce_data_out_list, data_present
 }
 
+
+
+
+
+
+
+
+
+
+
 func ProgramDetails(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("Button Has Been Presseds")
+	
 
-	path := r.PathValue("id")
-	out := r.URL.Query().Get("out")
+	admin_id, err := GetUserName(r)
 
-	admin_infor := AdminData(out)
+	out := r.URL.Query().Get("programcode")
+
+
+
+	admin_infor := AdminData(admin_id)
 
 	var program_data ProgramDataOut
 

@@ -36,7 +36,7 @@ func main() {
 	routes.CreateEmailSenderTem()
 
 	//NEW DATA BASES
-	routes.CreateProgramDB()
+	routes.CreateProgramDB() 
 	routes.CreateCourseDB()
 
 	fmt.Println("::SERVER STARTED::PORT::8080")
@@ -67,11 +67,12 @@ func main() {
 	router.HandleFunc("/adminlogin", routes.AdminLogin)
 	router.HandleFunc("/admindashboard", routes.AdminDashboard)
 	router.HandleFunc("/createNewProgram", routes.CreateNewProgramR)
+	router.HandleFunc("/studentdata", routes.ACAMSStudentData)
+	
 	//NEW ROUTES END
 
 	router.HandleFunc("/studentcenter", routes.StudentCenter)
-	router.HandleFunc("/acamsstudentdata", routes.ACAMSStudentData)
-	router.HandleFunc("/programdetails/{id}", routes.ProgramDetails)
+	router.HandleFunc("/programdetails", routes.ProgramDetails)
 	router.HandleFunc("/adminNews", routes.AdminNews)
 	router.HandleFunc("/getstudent", routes.GetAllStudentMsg)
 	router.HandleFunc("/adminMessages", routes.AdminMessagesPage)
