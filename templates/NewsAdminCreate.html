@@ -3,8 +3,22 @@
 
   <head>
     {{ template "head_temp"}}
+    {{ template "adminhearstyle"}}
+    {{ template "sitelogimage" }}
+
 
     <style>
+        .main_new{
+            position: fixed;
+            top: 20vh;
+            width: 100%;
+            height: 650px;
+            box-sizing: border-box;
+            padding-bottom: 70px;
+            display: block;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
       .details_btn{
           display: block; 
           text-decoration: none; 
@@ -34,37 +48,33 @@
 
    
   <body>
-   {{ template "adminheadertemp" .}}
 
 
+    <div style="overflow-y:scroll;">
+        {{ template "headernav" .}}
 
-
-  {{  template "side_bar" .}}
-
-
-    <div class="main">
         <h2 class="dashboard_name">
             News
         </h2>
-        <hr>
-            <div class="mainnewsdiv">
+        <hr />
+            <div class="messagedivadmin" style="position: relative; background-color: white; overflow-y: scroll; margin-right: 10px;">
 
             
                 <div class="leftside" style="padding: 20px;">
-                    <div class="navbar" style="border: solid 1px white; border-radius: 5px;">
+                    <div class="navbar" style="border: solid 1px white; border-radius: 5px;  background-color: rgb(106, 13, 173);">
                         <div class="navitem">
                             Write
                         </div>
                     </div>
                     
-                    <div id="changer" >
+                    <div id="changer"  >
                     {{template "writearticle"}}
                     </div>
                 
                 </div>
 
                 <div class="rightside" id="adminright" style="border-radius: 5px; padding-bottom: 40px;">
-                    <h3 class="News" style="text-decoration: none; font-weight: lighter;">
+                    <h3 class="News" style="text-decoration: none; font-weight: lighter; background-color: rgb(106, 13, 173)">
                         News Articles
                     </h3>
                     <ul id="newsamplelist">
@@ -86,54 +96,7 @@
 	
 	 
 	
-	<div class="hidden_main">
-		 <button onclick=msglogOpen()  class="openMsg">
-			News
-		  </button>
-		<h2 class="dashboard_name" style="padding-left: 60px">
-			News
-		</h2>
-        <hr>
-            <div class="mainnewsdiv" style="margin-bottom: 100px; width: 100%;">
-
-            
-                <div class="leftside" style="width: 100%; border: solid 1px white; border-radius: 5px;">
-                    <div class="navbar"  style="width: 100%;">
-                        <div class="navitem" >
-                            Write
-                        </div>
-                    </div>
-                    
-                    <div id="changer" style="width: 100%; margin-left: auto; margin-right: auto;">
-						<div class="writearticle" style="padding-bottom: 30px;">
-						
-							<div class="writer" style="margin-left: auto; margin-right: auto;">
-								<form hx-post="/createnews"
-								hx-target="#newsamplelist"
-								hx-swap="beforeend">
-									<input type="text" placeholder="News Title" name="title" class="articletitle" >
-									<textarea name="composenews" class="writerarea" placeholder="Compose article" style="margin-top: 10px; padding: 15px; height: 70vh;"></textarea>
-									<input type="textarea" placeholder="Enter image link" name="image" class="articleinagelink">
-									<input type="textarea" placeholder="Enter Auther Name" name="auther" class="articleinagelink">
-
-
-									<div class="savearticlediv">
-										<button type="submit" class="savearticle">Save Article</button>
-									</div>
-									
-								</form>
-							</div>
-							
-						</div>
-                    </div>
-                
-                </div>
-
-                
-
-            </div>
-		
-	</div>
+	
 	
 	
 	
@@ -206,7 +169,7 @@
 
 {{define "writearticle"}}
 
-    <div class="writearticle" style="padding-bottom: 30px;">
+    <div class="writearticle" style="padding-bottom: 30px; overflow-y: scroll;">
         <div class="writer">
             <form hx-upload="/createnews"
             hx-target="#newsamplelist"

@@ -94,6 +94,7 @@ type ExamOut struct {
 		ExamData    []Questions_Construct
 		ExamDetails ExamDetails
 		CourceNameFm string
+		Admin_Name string
 	}
 
 type CreateExamResponse struct {
@@ -725,6 +726,8 @@ func SaveQuestionUpdates(w http.ResponseWriter, r *http.Request){
 func CreatePage(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
+	user_name, err := GetUserName(r)
+
 	program_data := r.URL.Query().Get("uuid")
 	var exam_value string
 	
@@ -767,6 +770,7 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 			ExamData:    result_out,
 			ExamDetails: get_exam_details,
 			CourceNameFm: formatCourceName,
+			Admin_Name: user_name,
 		}
 
 	} else {
@@ -774,6 +778,8 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 			Present:     false,
 			Cource_Data: get_program_data,
 			CourceNameFm: formatCourceName,
+			Admin_Name: user_name,
+
 		}
 
 	}
@@ -1434,7 +1440,7 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 	
 	cource_name := r.URL.Query().Get("cource_name")
 	cource_uuid := r.URL.Query().Get("uuid")
-	exam_time := r.FormValue("exam_time")
+	exam_time := r.FormValue("questionType")
 	
 
 	
@@ -1452,7 +1458,7 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 
 	case "A":
 
-		question_a := r.FormValue("question_a")
+		question_a := r.FormValue("questionText")
 		answers := r.FormValue("answer")
 
 		if len(answers) < 1 {
@@ -1476,6 +1482,7 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 			}
 
 			_, quuid := Create_Exam(question_content)
+
 			UpdateExamEntered(cource_uuid)
 			fmt.Println("Fuck")
 			question_content.UUID = quuid
@@ -1507,16 +1514,16 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 			question_content.UUID = quuid
 
 			exam_responce = question_content
-			fmt.Println(exam_responce.UUID)
+			
 				
-			template_name = "question_section_a"
+			template_name = "examquestion"
 			
 		}
 
 	case "B":
 		
 
-		question_b := r.FormValue("question_b")
+		question_b := r.FormValue("questionText")
 		var question_content Questions_Construct
 
 		if is_present {
@@ -1533,13 +1540,13 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 
 			_, quuid := Create_Exam(question_content)
 			UpdateExamEntered(cource_uuid)
-			fmt.Println("Fuck")
+			
 
 			question_content.UUID = quuid
 
 			exam_responce = question_content
 
-			template_name = "question_section_b"
+			template_name = "examquestion"
 			
 
 		} else {
@@ -1555,12 +1562,12 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 
 			_, quuid := Create_Exam(question_content)
 			UpdateExamEntered(cource_uuid)
-			fmt.Println("Fuck")
+		
 			question_content.UUID = quuid
 
 			exam_responce = question_content
 
-			template_name = "question_section_b"
+			template_name = "examquestion"
 
 			
 		}

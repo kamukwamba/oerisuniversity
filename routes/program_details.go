@@ -15,6 +15,7 @@ type CourceDataStruct struct {
 	UUID             string
 	Program_Name     string
 	Cource_Name      string
+	Course_Code      string
 	Cource_Aseesment string
 	Video_List       string
 	Module           string
@@ -27,6 +28,7 @@ type ProgramDataOut struct {
 	Program_Name string
 	ProgramData  []CourceDataStruct
 	Admin        AdminInfo
+	Admin_Name string
 }
 
 type CourceDataUpdate struct {
@@ -37,6 +39,8 @@ type CourceDataUpdate struct {
 func UpdateCourceData(w http.ResponseWriter, r *http.Request) {
 
 	uuid := r.URL.Query().Get("cource_uuid")
+
+	fmt.Println("Hit")
 
 	dbconn := dbcode.SqlRead().DB
 	var cource_data CourceDataStruct
@@ -62,7 +66,7 @@ func UpdateCourceData(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err_out)
 	}
 
-	err_out := tpl.ExecuteTemplate(w, "cource_data_updater", cource_data)
+	err_out := tpl.ExecuteTemplate(w, "updatecoursedatanew", cource_data)
 
 	if err_out != nil {
 		http.Redirect(w, r, "/error", http.StatusSeeOther)
@@ -221,39 +225,44 @@ func ProgramDetails(w http.ResponseWriter, r *http.Request) {
 
 	
 
-	admin_id, err := GetUserName(r)
+	admin_name, err := GetUserName(r)
 
-	out := r.URL.Query().Get("programcode")
+	code := r.URL.Query().Get("programcode")
+	
 
+	fmt.Println("the program code: ",code)
 
+	
+	// admin_infor := AdminData(admin_id)
 
-	admin_infor := AdminData(admin_id)
 
 	var program_data ProgramDataOut
 
-	result, present := GetProgramDetails(path)
+	result, present := GetProgramDetails(code)
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+
 
 	if present {
 
 		program_data = ProgramDataOut{
 			Present:      true,
-			Program_Name: path,
+			Program_Name: code,
 			ProgramData:  result,
-			Admin:        admin_infor,
+			Admin_Name: admin_name,
 		}
 
 	} else {
 		program_data = ProgramDataOut{
 			Present:      false,
-			Program_Name: path,
-			Admin:        admin_infor,
+			Program_Name: code,
+			Admin_Name:        admin_name,
 		}
 	}
 
-	fmt.Println(program_data)
-	err := tpl.ExecuteTemplate(w, "programedetails.html", program_data)
+
+	err = tpl.ExecuteTemplate(w, "A_programedetails.html", program_data)
 
 	if err != nil {
 		log.Fatal(err)
@@ -419,7 +428,7 @@ func AddCourceData(w http.ResponseWriter, r *http.Request) {
 		Cource_Aseesment: assesment_link,
 	}
 
-	err_out := tpl.ExecuteTemplate(w, "cource_data_tr", data_out)
+	err_out := tpl.ExecuteTemplate(w, "cource_data_tr_two", data_out)
 
 	if err_out != nil {
 		log.Fatal(err)

@@ -4,7 +4,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 )
 
@@ -13,6 +12,7 @@ type AdminLandingData struct {
 	Admin         AdminInfo
 	ProgramD      []ProgramDataEntry
 	DataAvailable bool
+	Admin_Name string
 }
 
 func AdminLogin(w http.ResponseWriter, r *http.Request) {
@@ -70,9 +70,19 @@ func AdminDashboard(w http.ResponseWriter, r *http.Request) {
 
 		if check {
 			
+
+
+			//START 
+				user_id := admin_dataout.ID
+				user_name := admin_dataout.Name
+
+				CreateCookie(user_name, user_id, w, r)
+				
+
+
+			//END
 			err := tpl.ExecuteTemplate(w, "A_adminDashboard.html", toshow)
 
-			CreateCookie(admin_dataout.First_Name,admin_dataout.ID, w,r)
 			if err != nil {
 				log.Fatal(err)
 			}

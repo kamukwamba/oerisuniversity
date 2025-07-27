@@ -258,6 +258,7 @@ func UpdateAdminUsers(w http.ResponseWriter, r *http.Request) {
 type AdminUserData struct {
 	Admin AdminInfo
 	Users []AdminUser
+	Admin_Name string
 }
 
 func Matrics(w http.ResponseWriter, r *http.Request) {
@@ -290,19 +291,20 @@ func AdminUsers(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	admin_id := r.URL.Query().Get("out")
-	admin_infor := AdminData(admin_id)
+	
+
+	user_name, err := GetUserName(r)
 
 	_, admin_user_data_list := GetAdminUsers("many", "none")
 
 	display_data := AdminUserData{
-		Admin: admin_infor,
+		Admin_Name: user_name,
 		Users: admin_user_data_list,
 	}
 
-	fmt.Println("The user list", admin_user_data_list)
+	
 
-	err := tpl.ExecuteTemplate(w, "admin_users.html", display_data)
+	err = tpl.ExecuteTemplate(w, "admin_users.html", display_data)
 
 	if err != nil {
 		log.Fatal(err)

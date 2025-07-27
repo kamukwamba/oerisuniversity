@@ -2,20 +2,15 @@
 <html lang="en">
     <head>
 	 {{ template "head_temp"}}
-
+     {{ template "adminhearstyle"}}
     </head>
 
 
 
     <body>
-   
-	{{ template "adminheadertemp" .}}
- 
- 
-	
-	{{  template "side_bar" .}}
-	  <div class="main">
-			  
+       
+	  <div>
+	    {{ template "headernav" .}}
 		{{ template "messageAdmin" .}}
 	  </div>
 	  
@@ -93,7 +88,9 @@
     <div class="messagedivadmin">
 
         
-        <div class="adminleft">
+        <div class="adminleft" style="border: solid 1px black; margin-left: 20px; margin-right: 20px; border-radius: 5px;" >
+
+
             <div id="readmessagesdiv">
 
             </div>
@@ -101,7 +98,7 @@
         </div>
 
 
-        <div class="adminright">
+        <div class="adminright" style="border: solid 1px black; margin-right: 20px; border-radius: 5px;">
             <div class="search">
                 <form hx-get="/getstudent"
                     hx-target="#messagelog"

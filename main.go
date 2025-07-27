@@ -67,12 +67,16 @@ func main() {
 	router.HandleFunc("/adminlogin", routes.AdminLogin)
 	router.HandleFunc("/admindashboard", routes.AdminDashboard)
 	router.HandleFunc("/createNewProgram", routes.CreateNewProgramR)
-	router.HandleFunc("/studentdata", routes.ACAMSStudentData)
+	router.HandleFunc("/studentdata", routes.StudentData)
+	router.HandleFunc("/programdetails", routes.ProgramDetails)
+	router.HandleFunc("/updatecourcedata", routes.UpdateCourceData)
+	router.HandleFunc("/createnewcourse", routes.AddCourceData)
+
 	
 	//NEW ROUTES END
 
 	router.HandleFunc("/studentcenter", routes.StudentCenter)
-	router.HandleFunc("/programdetails", routes.ProgramDetails)
+	
 	router.HandleFunc("/adminNews", routes.AdminNews)
 	router.HandleFunc("/getstudent", routes.GetAllStudentMsg)
 	router.HandleFunc("/adminMessages", routes.AdminMessagesPage)
@@ -82,14 +86,12 @@ func main() {
 	router.HandleFunc("/approve", routes.ApproveProgram)
 	router.HandleFunc("/create_cource_data", routes.CreateCourseData)
 	router.HandleFunc("/close_cource_div", routes.CloseCreateCourseData)
-	router.HandleFunc("/add_cource", routes.AddCourceData)
 	router.HandleFunc("/getstudymaterial", routes.GetStudyMaterial)
 	router.HandleFunc("/get_admin_users", routes.AdminUsers)
 	router.HandleFunc("/createadmin", routes.CreatAdminUser)
 	router.HandleFunc("/updateadminuser", routes.UpdateAdminUsers)
 	router.HandleFunc("/getupdate", routes.GetUpateAdmin)
 	router.HandleFunc("/loadform", routes.LoadAdminForm)
-	router.HandleFunc("/update_cource_data", routes.UpdateCourceData)
 	router.HandleFunc("/saveucdaata", routes.UpdateProgramDetails)
 	router.HandleFunc("/gradeca", routes.GradeCA)
 	router.HandleFunc("/delete_cource_data", routes.DeleteCource)
@@ -110,7 +112,7 @@ func main() {
 	router.HandleFunc("/confirmreset", routes.ConfirmStudentId)
 
 	//EXAM
-	router.HandleFunc("/create_page", routes.CreatePage)
+	router.HandleFunc("/createexampage", routes.CreatePage)
 	router.HandleFunc("/addexam", routes.AddExam)
 	router.HandleFunc("/examdetails", routes.AddExamDetails)
 

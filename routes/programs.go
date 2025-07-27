@@ -23,10 +23,10 @@ func Programcards(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 	var programsAvailable bool
+	user_name, err := GetUserName(r)
 
-	out := r.URL.Query().Get("out")
+	
 
-	admin_infor := AdminData(out)
 	programdata, errout := GetAllProgramData()
 
 	if errout != nil {
@@ -36,14 +36,14 @@ func Programcards(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data_out := AdminLandingData{
-		Admin:         admin_infor,
+		Admin_Name:         user_name,
 		ProgramD:      programdata,
 		DataAvailable: programsAvailable,
 	}
 
 	//debug failure to laod templates
 
-	err := tpl.ExecuteTemplate(w, "programcards.html", data_out)
+	err = tpl.ExecuteTemplate(w, "A_programs.html", data_out)
 
 	if err != nil {
 		log.Fatal(err)

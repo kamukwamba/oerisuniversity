@@ -24,6 +24,7 @@ type AdminInfo struct {
 type AdminPage struct {
 	Admin     AdminInfo
 	AcamsData []ProgramStruct
+	Admin_Name string
 }
 
 // Marked For Removal
@@ -99,6 +100,8 @@ func DeleteStudent(w http.ResponseWriter, r *http.Request) {
 func AdminData(uuid string) AdminInfo {
 	var admin_info AdminInfo
 	dbconn := dbcode.SqlRead().DB
+
+	fmt.Println(uuid)
 
 	stmt, err := dbconn.Prepare("select uuid, first_name, last_name, email from admin where uuid = ?")
 
@@ -184,7 +187,7 @@ func StudentACAMSData(student_uuid string) {
 
 }
 
-func GetACAMSStudents(admin_id string) []ProgramStruct {
+func GetACAMSStudents() []ProgramStruct {
 	dbread := dbcode.SqlRead()
 	var conuter int
 	var datalist []ProgramStruct
@@ -226,7 +229,7 @@ func GetACAMSStudents(admin_id string) []ProgramStruct {
 			Paid:           paid,
 			Completed:      completed,
 			Date:           date,
-			Admin_ID:       admin_id,
+			
 		}
 
 		if err != nil {
@@ -594,20 +597,21 @@ func CloseAdmintDiv(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func ACAMSStudentData(w http.ResponseWriter, r *http.Request) {
+func StudentData(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	admin_id := r.URL.Query().Get("out")
-	acamsstudents := GetACAMSStudents(admin_id)
+	
+	acamsstudents := GetACAMSStudents()
 
-	admin_infor := AdminData(admin_id)
+	user_name, err := GetUserName(r)
 
 	data_out := AdminPage{
-		Admin:     admin_infor,
+	
 		AcamsData: acamsstudents,
+		Admin_Name: user_name,
 	}
 
-	err := tpl.ExecuteTemplate(w, "studentdataadmin.html", data_out)
+	err = tpl.ExecuteTemplate(w, "A_studentdataadmin.html", data_out)
 
 	if err != nil {
 		log.Fatal(err)
@@ -617,22 +621,25 @@ func ACAMSStudentData(w http.ResponseWriter, r *http.Request) {
 type CreatNews struct {
 	Admin   AdminInfo
 	AllNews []NewsStruct
+	Admin_Name string
 }
 
 func AdminNews(w http.ResponseWriter, r *http.Request) {
 
 	_, all := ReadNews("o", "many")
-	admin_id := r.URL.Query().Get("out")
-	admin_infor := AdminData(admin_id)
+
+	
+
+	user_name, err := GetUserName(r)
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
 	display_data := CreatNews{
-		Admin:   admin_infor,
+		Admin_Name:   user_name,
 		AllNews: all,
 	}
 
-	err := tpl.ExecuteTemplate(w, "NewsAdminCreate.html", display_data)
+	err = tpl.ExecuteTemplate(w, "NewsAdminCreate.html", display_data)
 
 	if err != nil {
 		log.Fatal(err)
@@ -661,27 +668,13 @@ func ApproveProgram(w http.ResponseWriter, r *http.Request) {
 	user_uuid := r.URL.Query().Get("user_uuid")
 	program := r.URL.Query().Get("program")
 
-	switch program {
-	case "acams":
-		if Update(user_uuid, "acams") {
-			fmt.Println("Update was succesfull")
-
-		}
-
-	case "acms":
-		if Update(user_uuid, "acms") {
-			fmt.Println("Update was succesfull")
-		}
-	case "adms":
-		if Update(user_uuid, "adms") {
-			fmt.Println("Update was succesfull")
-		}
-	case "abdms":
-		if Update(user_uuid, "abdms") {
-			fmt.Println("Update was succesfull")
-		}
-
+	if Update(user_uuid, program){
+		fmt.Println("Update succesfull")
+	}else{
+		fmt.Println("Failed to Update Program")
 	}
+
+	
 
 	err := tpl.ExecuteTemplate(w, "approved", nil)
 
