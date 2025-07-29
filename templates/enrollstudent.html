@@ -59,7 +59,7 @@
             <label  class="first_ten"for="email">Email</label>
             <input  class="input_one" type="email"  required name="email" id="email">
 
-            {{if .}}  
+            {{if .EmailPresent}}  
                 <p style="color: red; font-family:
                 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 font-weight: lighter;">User email already in use</p>
@@ -347,12 +347,14 @@
             
             <label class="first_ten" for="programs">Select program you would like to enroll for</label>
             <select class="dropdowns" name="program" id="programs" required>
-                <option value="ACAMS">Award of Certificate of Attendance in Metaphysical Sciences</option>
-                <option value="ACMS">Award of Certificate in Metaphysical Sciences</option>
-                <option value="ADMS">Award of Diploma in Metaphysical Sciences</option>
-                <option value="ABDMS">Award of Bachelors Degree in Metaphysical Sciences</option>
-                <option value="AMDMS">Award of Masters Degree in Metaphysical Sciences</option>
-                <option value="PhDMS">Ph.D in Metaphysical Sciences</option>
+
+                {{ if .Present }}
+                     {{ range .ProgramList}}
+                    <option value="{{ .Code}}">{{ .Name}}</option>
+                   
+                    {{ end }}
+                   
+                {{ end }}
 
             </select><br>
             <label class="first_ten" for="payment">Select Payment Type</label>

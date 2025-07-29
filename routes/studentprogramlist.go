@@ -49,22 +49,11 @@ func AddToProgramList(program_name, student_uuid string) bool {
 	// .dbread"UPDATE artist_t SET check_s = ? WHERE artist_n = ?", "2021-05-20", 42
 
 	fmt.Println("The Program Out In: ", program_name)
+	
+	programlist := GetStudentPrograms(student_uuid)
 
-	switch program_name {
-	case "acms":
-		programlist := GetStudentPrograms(student_uuid)
+	AppendProgramList(program_name, student_uuid, programlist)
 
-		AppendProgramList("ACMS", student_uuid, programlist)
-
-	case "adms":
-		programlist := GetStudentPrograms(student_uuid)
-
-		updated = AppendProgramList("ADMS", student_uuid, programlist)
-	case "abdms":
-		programlist := GetStudentPrograms(student_uuid)
-		updated = AppendProgramList("ABDMS", student_uuid, programlist)
-
-	}
 
 	return updated
 

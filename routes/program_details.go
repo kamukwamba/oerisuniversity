@@ -228,9 +228,7 @@ func ProgramDetails(w http.ResponseWriter, r *http.Request) {
 	admin_name, err := GetUserName(r)
 
 	code := r.URL.Query().Get("programcode")
-	
 
-	fmt.Println("the program code: ",code)
 
 	
 	// admin_infor := AdminData(admin_id)

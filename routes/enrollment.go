@@ -171,7 +171,14 @@ func (stringSlice StringSlice) Value() (driver.Value, error) {
 	return value, nil
 }
 
+
+
 func Enrollment(w http.ResponseWriter, r *http.Request) {
+
+
+	programs_available := ProgramsAvailabel()
+
+
 
 	r.ParseForm()
 	if r.Method == "POST" {
@@ -181,7 +188,7 @@ func Enrollment(w http.ResponseWriter, r *http.Request) {
 
 	//debug failure to laod templates
 
-	err := tpl.ExecuteTemplate(w, "enrollstudent.html", nil)
+	err := tpl.ExecuteTemplate(w, "enrollstudent.html", programs_available)
 
 	if err != nil {
 		log.Fatal(err)
@@ -246,9 +253,10 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
 
-	//convert on to true
-	program_name := "ACAMS"
 	var studentsdatain StudentInfo
+
+	
+	program_name := r.FormValue("program")
 	uuid := encription.Generateuudi()
 	first_name := r.FormValue("first_name")
 	last_name := r.FormValue("last_name")
@@ -316,10 +324,9 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if chaeck_user {
-		fmt.Println("User With eamil already in database")
 
-		user_email_in_use := Inuse{
-			Present: true,
+		user_email_in_use := ProgramsAvailabelSt{
+			EmailPresent: true,
 		}
 
 		err := tpl.ExecuteTemplate(w, "enrollstudent.html", user_email_in_use)
@@ -329,7 +336,7 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else {
-		fmt.Println("Create New User")
+	
 		result := CreateStudent(studentsdatain)
 
 		if result {
@@ -338,7 +345,7 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 
 			date_applied := fmt.Sprintf("%s", current_time)
 
-			acams_data := ACAMS{
+			program_data := StudentProgramData{
 				Student_UUID:   uuid,
 				First_Name:     first_name,
 				Last_Name:      last_name,
@@ -351,7 +358,9 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 				Date:           date_applied,
 			}
 
-			addedtoacams := CreateACAMS(acams_data, payment_type)
+			addedtoacams := CreateProgramData(program_data, payment_type, program_name)
+
+
 		
 	
 			err := SendEmail(email)

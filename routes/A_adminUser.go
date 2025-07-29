@@ -29,6 +29,7 @@ type MatricsData struct {
 	Admin       AdminInfo
 	VisitedList []Visited
 	SenderData  ApplicationApprovedSender
+	Admin_Name  string
 }
 
 func CreatAdminUser(w http.ResponseWriter, r *http.Request) {
@@ -256,8 +257,8 @@ func UpdateAdminUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 type AdminUserData struct {
-	Admin AdminInfo
-	Users []AdminUser
+	Admin      AdminInfo
+	Users      []AdminUser
 	Admin_Name string
 }
 
@@ -265,21 +266,19 @@ func Matrics(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	admin_id := r.URL.Query().Get("out")
-	admin_infor := AdminData(admin_id)
+	user_name, err := GetUserName(r)
 
 	metrics_data := LoadVisited()
 
 	data_sender, _ := GetEmailData()
 	fmt.Println("the data is out:  ", data_sender)
 	data_out := MatricsData{
-		Admin:       admin_infor,
+		Admin_Name:  user_name,
 		VisitedList: metrics_data,
 		SenderData:  data_sender,
 	}
 
-	fmt.Println("Currently Visited", data_out)
-	err := tpl.ExecuteTemplate(w, "metric.html", data_out)
+	err = tpl.ExecuteTemplate(w, "metric.html", data_out)
 	if err != nil {
 
 		fmt.Println("Matrics; Line:262; Erro: ", err)
@@ -291,18 +290,14 @@ func AdminUsers(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	
-
 	user_name, err := GetUserName(r)
 
 	_, admin_user_data_list := GetAdminUsers("many", "none")
 
 	display_data := AdminUserData{
 		Admin_Name: user_name,
-		Users: admin_user_data_list,
+		Users:      admin_user_data_list,
 	}
-
-	
 
 	err = tpl.ExecuteTemplate(w, "admin_users.html", display_data)
 

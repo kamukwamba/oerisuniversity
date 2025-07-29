@@ -8,7 +8,9 @@ import (
 	"github.com/kamukwamba/oerisuniversity/encription"
 )
 
-type ACAMS struct {
+
+
+type StudentProgramData struct {
 	UUID           string
 	Student_UUID   string
 	Program_Name   string
@@ -29,9 +31,7 @@ type CourceData struct {
 
 // CORRECT THE ACAMS STRUCT ERROR
 
-func WorkOnProgramNames() {
 
-}
 
 func ApplyForCource(uuid, cource_name string) bool {
 	cource_applied := true
@@ -62,30 +62,24 @@ func ApplyForCource(uuid, cource_name string) bool {
 	return cource_applied
 }
 
-func AddToACAMSCources(student_uuid, date_in, payment_type string) bool {
+
+func AddToProgramCources(student_uuid, date_in, payment_type, program_code string) bool {
 	dbcreate := dbcode.SqlRead().DB
 
-	added_to_cource_table := true
-	cource_table := []string{
-		"communication",
-		"public_speaking",
-		"intuition",
-		"understanding_religion",
-		"public_relation",
-		"anger_management",
-		"connecting_with_angles",
-		"critical_thinking", 
-		"introduction_to_metaphysical_science"}
+	course_tables, err := GetProgramCourses(program_code)
 
-	for _, item := range cource_table {
+	added_to_cource_table := true
+	
+
+	for _, item := range cource_tables {
 
 		uuid := encription.Generateuudi()
 
 		cource_create, err := dbcreate.Begin()
 
 		if err != nil {
-			error_out := fmt.Sprintf("AddToACAMSCources: %s", err)
-			ErrorPrintOut("acamsfile", "AddToACAMSCources", error_out)
+			error_out := fmt.Sprintf("AddToProgramCources: %s", err)
+			ErrorPrintOut("programcoursecreate", "AddToProgramCources", error_out)
 		}
 
 		insert_String := fmt.Sprintf(`insert into %s(
@@ -100,14 +94,14 @@ func AddToACAMSCources(student_uuid, date_in, payment_type string) bool {
 			examined,
 			continuorse_assesment,
 			completed,
-			date) values(?,?,?,?,?,?,?,?,?,?,?,?)`, item)
+			date) values(?,?,?,?,?,?,?,?,?,?,?,?)`, item.Code)
 
 		statment, err := cource_create.Prepare(insert_String)
 
 		if err != nil {
 			error_out := fmt.Sprintf("failed to insert student in: %s,error: %s", item, err)
 
-			ErrorPrintOut("acamsfile", "AddToACAMSCources", error_out)
+			ErrorPrintOut("programcoursecreate", "AddToProgramCources", error_out)
 		}
 
 		defer statment.Close()
@@ -147,7 +141,7 @@ func AddToACAMSCources(student_uuid, date_in, payment_type string) bool {
 
 		if err != nil {
 			error_out := fmt.Sprintf("failde to aad to cource table: %s, error: %s", item, err)
-			ErrorPrintOut("acamsfile", "AddToACAMSCources", error_out)
+			ErrorPrintOut("programcoursecreate", "AddToProgramCources", error_out)
 
 		}
 
@@ -155,7 +149,7 @@ func AddToACAMSCources(student_uuid, date_in, payment_type string) bool {
 
 		if err != nil {
 			error_out := fmt.Sprintf("failde to commit to cource table: %s, error: %s", item, err)
-			ErrorPrintOut("acamsfile", "AddToACAMSCources", error_out)
+			ErrorPrintOut("programcoursecreate", "AddToProgramCources", error_out)
 
 		}
 
@@ -164,26 +158,19 @@ func AddToACAMSCources(student_uuid, date_in, payment_type string) bool {
 	return added_to_cource_table
 }
 
-func GetFromACAMSCources(student_uuid string) []CourceStruct {
+func GetFromProductCources(student_uuid, program_code string) []CourceStruct {
 	var cource_data_out CourceStruct
 
 	var cource_data_out_list []CourceStruct
 
-	cource_table := []string{
-		"communication",
-		"public_speaking",
-		"intuition",
-		"understanding_religion",
-		"public_relation",
-		"anger_management",
-		"connecting_with_angles",
-		"critical_thinking", 
-		"introduction_to_metaphysical_science"}
+	course_tables, err := GetProgramCourses(program_code)
 
-	for _, item := range cource_table {
+	
+
+	for _, item := range cource_tables {
 		dbread := dbcode.SqlRead().DB
 
-		data_query_string := fmt.Sprintf("select uuid, student_uuid, cource_name, book, module,video, applied, approved, examined, continuorse_assesment,completed, date from %s   where student_uuid = ?", item)
+		data_query_string := fmt.Sprintf("select uuid, student_uuid, cource_name, book, module,video, applied, approved, examined, continuorse_assesment,completed, date from %s   where student_uuid = ?", item.Code)
 
 		stmt, err := dbread.Prepare(data_query_string)
 
@@ -219,12 +206,11 @@ func GetFromACAMSCources(student_uuid string) []CourceStruct {
 
 	}
 
-	fmt.Println("ACAMS", cource_data_out)
 
 	return cource_data_out_list
 }
 
-func CreateACAMS(data_in ACAMS, payment_type string) bool {
+func CreateProgamData(data_in StudentProgramData, payment_type, program_code string) bool {
 	created_succesfully := true
 
 	dbcreate := dbcode.SqlRead().DB
@@ -239,7 +225,7 @@ func CreateACAMS(data_in ACAMS, payment_type string) bool {
 		created_succesfully = false
 	}
 
-	statment, err := student_create.Prepare(`insert into acams(
+	prepare_str := Sprintf(`insert into %(
 		uuid,
 		student_uuid,
 		program_name,
@@ -251,23 +237,25 @@ func CreateACAMS(data_in ACAMS, payment_type string) bool {
 		payment_method,
 		paid,
 		completed,
-		date) values(?,?,?,?,?,?,?,?,?,?,?,?)`)
+		date) values(?,?,?,?,?,?,?,?,?,?,?,?)`, program_code)
+
+	statment, err := student_create.Prepare()
 
 	if err != nil {
 		error_out := fmt.Sprintf("the prepare statment: %s", err)
-		ErrorPrintOut("acams", "CreateACAMS", error_out)
+		ErrorPrintOut("programcoursecreate", "CreateProgram", error_out)
 		created_succesfully = false
 
 	}
 
 	defer statment.Close()
 
-	var program_name = "acams"
+	
 
 	_, err = statment.Exec(
 		uuid,
 		data_in.Student_UUID,
-		program_name,
+		data_in.Program_Name,
 		data_in.First_Name,
 		data_in.Last_Name,
 		data_in.Email,
@@ -296,7 +284,7 @@ func CreateACAMS(data_in ACAMS, payment_type string) bool {
 		created_succesfully = false
 
 	}
-	add_to_cources := AddToACAMSCources(data_in.Student_UUID, data_in.Date, payment_type)
+	add_to_cources := AddToProgramCources(data_in.Student_UUID, data_in.Date, payment_type)
 
 	fmt.Println("adding to corces was succesful", add_to_cources)
 
@@ -305,22 +293,26 @@ func CreateACAMS(data_in ACAMS, payment_type string) bool {
 
 }
 
-func GetACAMSAdmin(students_uuid_in, promt string) (bool, ACAMS, []ACAMS) {
+func GetProgramAdmin(students_uuid_in, promt, program_code string) (bool, StudentProgramData, []StudentProgramData) {
 	var confirmacms bool
-	var acams_data_out ACAMS
-	var acams_data_out_list []ACAMS
+	var acams_data_out StudentProgramData
+	var acams_data_out_list []StudentProgramData
 
+
+	var prepare_str string
 	promtout := promt
 	dbread := dbcode.SqlRead().DB
 
 	switch promtout {
 
 	case "one":
-		statement, err := dbread.Prepare("select uuid, student_uuid, program_name,first_name, last_name, email, applied, approved, payment_method, paid, completed, date from acams where student_uuid = ?")
+
+		prepare_str = Sprintf("select uuid, student_uuid, program_name,first_name, last_name, email, applied, approved, payment_method, paid, completed, date from %s where student_uuid = ?", program_code)
+		statement, err := dbread.Prepare(prepare_str)
 
 		if err != nil {
 			error_out := fmt.Sprintf("%s prepare", err)
-			ErrorPrintOut("acams", "GetACAMS", error_out)
+			ErrorPrintOut("programcoursecreate", "GetPrograms", error_out)
 			confirmacms = false
 		}
 
@@ -343,11 +335,12 @@ func GetACAMSAdmin(students_uuid_in, promt string) (bool, ACAMS, []ACAMS) {
 		return confirmacms, acams_data_out, acams_data_out_list
 
 	case "multiple":
-		rows, err := dbread.Query("select * from acams")
+		prepare_str = Sprintf("select * from %s", program_code)
+		rows, err := dbread.Query()
 
 		if err != nil {
 			error_out := fmt.Sprintf("getting multiple acams data: %s", err)
-			ErrorPrintOut("acams", "GetACAMS", error_out)
+			ErrorPrintOut("programcoursecreate", "GetPrograms", error_out)
 		}
 
 		defer rows.Close()
@@ -370,7 +363,7 @@ func GetACAMSAdmin(students_uuid_in, promt string) (bool, ACAMS, []ACAMS) {
 
 			if err != nil {
 				error_out := fmt.Sprintf("getting multiple acams data for loop: %s", err)
-				ErrorPrintOut("acams", "GetACAMS", error_out)
+				ErrorPrintOut("programcoursecreate", "GetPrograms", error_out)
 			}
 
 			acams_data_out_list = append(acams_data_out_list, acams_data_out)
@@ -382,7 +375,7 @@ func GetACAMSAdmin(students_uuid_in, promt string) (bool, ACAMS, []ACAMS) {
 
 }
 
-func GetACAMS(students_uuid_in, promt string) (bool, ACAMS, []ACAMS) {
+func GetProgramsStudents(students_uuid_in, promt, program_name string) (bool, StudentProgramData, []StudentProgramData) {
 	var confirmacms bool
 	var acams_data_out ACAMS
 	var acams_data_out_list []ACAMS
@@ -390,10 +383,13 @@ func GetACAMS(students_uuid_in, promt string) (bool, ACAMS, []ACAMS) {
 	promtout := promt
 	dbread := dbcode.SqlRead().DB
 
+	var prepare_str string
+
 	switch promtout {
 
 	case "one":
-		statement, err := dbread.Prepare("select uuid, student_uuid, program_name,first_name, last_name, email, applied, approved, payment_method, paid, completed, date from acams where student_uuid = ?")
+		prepare_str = fmt.Sprintf("select uuid, student_uuid, program_name,first_name, last_name, email, applied, approved, payment_method, paid, completed, date from %s where student_uuid = ?", program_name)
+		statement, err := dbread.Prepare(prepare_str)
 
 		if err != nil {
 			error_out := fmt.Sprintf("%s prepare", err)
@@ -407,7 +403,7 @@ func GetACAMS(students_uuid_in, promt string) (bool, ACAMS, []ACAMS) {
 
 		if err != nil {
 			error_out := fmt.Sprintf("%s assigning", err)
-			ErrorPrintOut("acams 405", "GetACAMS", error_out)
+			ErrorPrintOut("acams 405", "Get Student Program Data", error_out)
 		}
 
 		fmt.Println("the approved tag", acams_data_out.Approved)
@@ -420,7 +416,8 @@ func GetACAMS(students_uuid_in, promt string) (bool, ACAMS, []ACAMS) {
 		return confirmacms, acams_data_out, acams_data_out_list
 
 	case "multiple":
-		rows, err := dbread.Query("select * from acams")
+		prepare_str = Sprintf("select * from %s", program_name)
+		rows, err := dbread.Query(prepare_str)
 
 		if err != nil {
 			error_out := fmt.Sprintf("getting multiple acams data: %s", err)
@@ -459,14 +456,49 @@ func GetACAMS(students_uuid_in, promt string) (bool, ACAMS, []ACAMS) {
 
 }
 
-func LoadACAMS() {
+
+func CreateCourseTable(course_name string) error{
 
 	dbread := dbcode.SqlRead()
 
 	defer dbread.DB.Close()
 
-	create_acams := `
-		create table if not exists acams(
+
+	create_course_table := fmt.Sprintf(`
+	create table if not exists %s(uuid blob not null, 
+		student_uuid text,
+		cource_name text,
+		book text,
+		module text,
+		video text,
+		applied bool,
+		approved bool,
+		continuorse_assesment text,
+		examined bool,
+		completed bool,
+		date text);`, item)
+
+	_, err := dbread.DB.Exec(create_course_table)
+	if err != nil {
+		log.Printf("%q: %s\n", err, create_course_table)
+		return err
+	}
+	
+	return nil
+
+}
+
+
+
+func CreateProgramTabel(table_name string) error{
+
+
+	dbread := dbcode.SqlRead()
+
+	defer dbread.DB.Close()
+
+	create_program := fmt.Sprintf(`
+		create table if not exists %s(
 			uuid blob not null,
 			student_uuid text,
 			program_name text,
@@ -479,46 +511,15 @@ func LoadACAMS() {
 			paid text,
 			completed bool,
 			date text
-		);`
+		);`, table_name)
 
-	_, create_acams_error := dbread.DB.Exec(create_acams)
-	if create_acams_error != nil {
-		log.Printf("%q: %s\n", create_acams_error, create_acams)
+	_, err := dbread.DB.Exec(create_program)
+	if err != nil {
+		log.Printf("%q: %s\n", err, create_program)
+		return err
 	}
-
-	//CREATE THE COURCE TABLES
-	cource_table := []string{
-		"communication",
-		"public_speaking",
-		"intuition",
-		"understanding_religion",
-		"public_relation",
-		"anger_management",
-		"connecting_with_angles",
-		"critical_thinking", 
-		"introduction_to_metaphysical_science"}
-
-	for _, item := range cource_table {
-		create_course_table := fmt.Sprintf(`
-		create table if not exists %s(uuid blob not null, 
-			student_uuid text,
-			cource_name text,
-			book text,
-			module text,
-			video text,
-			applied bool,
-			approved bool,
-			continuorse_assesment text,
-			examined bool,
-			completed bool,
-			date text);`, item)
-
-		_, create_course_table_error := dbread.DB.Exec(create_course_table)
-
-		if create_course_table_error != nil {
-			log.Printf("%q: %s\n", create_course_table_error, create_course_table)
-
-		}
-	}
-
+	
+	return nil
 }
+
+

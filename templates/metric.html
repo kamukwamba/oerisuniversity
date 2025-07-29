@@ -2,8 +2,24 @@
 <html lang="en">
   <head>
    {{ template "head_temp"}}
+   {{ template "adminhearstyle"}}
+    {{ template "sitelogimage" }}
    
    <style>
+   	.main_matrics{
+   		position: relative;
+   		z-index: 1;
+	    width: 100%;
+	    height: 100vh;
+	    box-sizing: border-box;
+	    padding-bottom: 70px;
+	    display: block;
+	    overflow-x: hidden;
+	    padding-left:40px;
+	   
+
+
+   	}
 	.backupbtn{
 		background-color: rgb(32, 0, 62);
 		color: white;
@@ -49,17 +65,14 @@
     </head>
 
    
-  <body>
-    {{ template "adminheadertemp" .}}
- 
-
-	{{  template "side_bar" .}}
+  <body >
+    {{ template "headernav" .}}
 
 
 
 
 
-  <div class="main">
+  <div class="main_matrics">
 	<h2 class="dashboard_name">
         User Metrics
     </h2>

@@ -60,7 +60,7 @@ func CreateNewProgramR(w http.ResponseWriter, r *http.Request) {
 		Code: program_code,
 	}
 
-	fmt.Println("dataCreated", dataCreated)
+	
 
 	err := ConfirmProgramDataExists(program_name, program_code)
 
@@ -128,6 +128,37 @@ func CreateProgramEntry(programName, programCode string) error {
 	return nil
 }
 
+
+type ProgramsAvailabelSt struct {
+	Present bool
+	EmailPresent bool
+	ProgramList []ProgramDataEntry
+}
+
+func ProgramsAvailabel() ProgramsAvailabelSt{
+
+	var present bool
+	var program_list ProgramsAvailabelSt
+
+	programs_available, err := GetAllProgramData()
+
+	if err != nil {
+		present = false
+
+	}else{
+		present = true
+	}
+
+	program_list = ProgramsAvailabelSt{
+		Present: present,
+		ProgramList: programs_available, 
+	}
+
+
+	return program_list
+}
+
+
 func GetAllProgramData() ([]ProgramDataEntry, error) {
 
 	db := dbcode.SqlRead().DB
@@ -177,7 +208,7 @@ func GetAllProgramData() ([]ProgramDataEntry, error) {
 
 	}
 
-	fmt.Println(resultList)
+
 
 	return resultList, nil
 }
@@ -188,7 +219,7 @@ func GetPorgamCourseR(w http.ResponseWriter, r *http.Request) {
 
 	program_code := r.URL.Query().Get("programcode")
 
-	fmt.Println(program_code)
+	
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
