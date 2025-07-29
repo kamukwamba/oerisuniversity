@@ -69,7 +69,7 @@ func Validation(email string) bool {
 	return result
 }
 
-func CreateStudentCridentials(studentdate StudentCridentials) bool {
+func CreateStudentCridentials(uuid, email string) bool {
 
 	confirm_creation := true
 	dbread := dbcode.SqlRead()
@@ -78,11 +78,11 @@ func CreateStudentCridentials(studentdate StudentCridentials) bool {
 		log.Fatal()
 	}
 
-	uuid := encription.Generateuudi()
-	
-	student_uuid := studentdate.StudentUUID
-	student_email := studentdate.Email
-	securepassword, _ :=  HashPassword(studentdate.Password)
+	uuid_encrpt := encription.Generateuudi()
+
+	student_uuid := uuid
+	student_email := email
+	securepassword, _ := HashPassword(email)
 	student_password := securepassword
 
 	stmt, err := cridentials.Prepare("insert into studentcridentials(uuid, student_uuid, email,password) values(?,?,?,?)")
@@ -92,7 +92,7 @@ func CreateStudentCridentials(studentdate StudentCridentials) bool {
 	}
 
 	defer stmt.Close()
-	_, err = stmt.Exec(uuid, student_uuid, student_email, student_password)
+	_, err = stmt.Exec(uuid_encrpt, student_uuid, student_email, student_password)
 
 	if err != nil {
 		log.Fatal(err)
@@ -171,14 +171,9 @@ func (stringSlice StringSlice) Value() (driver.Value, error) {
 	return value, nil
 }
 
-
-
 func Enrollment(w http.ResponseWriter, r *http.Request) {
 
-
 	programs_available := ProgramsAvailabel()
-
-
 
 	r.ParseForm()
 	if r.Method == "POST" {
@@ -255,7 +250,6 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 
 	var studentsdatain StudentInfo
 
-	
 	program_name := r.FormValue("program")
 	uuid := encription.Generateuudi()
 	first_name := r.FormValue("first_name")
@@ -336,7 +330,7 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else {
-	
+
 		result := CreateStudent(studentsdatain)
 
 		if result {
@@ -358,30 +352,16 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 				Date:           date_applied,
 			}
 
-			addedtoacams := CreateProgramData(program_data, payment_type, program_name)
+			err := CreateProgamData(program_data, payment_type, program_name)
 
-
-		
-	
-			err := SendEmail(email)
 			if err != nil {
-				fmt.Println("Error sending email:", err)
-			}
-
-			if addedtoacams {
-				SendEMAIL()
-				studentcridentials := StudentCridentials{
-					StudentUUID: uuid,
-					Email:       email,
-					Password:    email,
-				}
-				CreateStudentCridentials(studentcridentials)
+				log.Printf("Failed to add student to program: %s", err)
+			} else {
 				AddStudentPrograms(uuid, program_name)
 				MakeStudentExamTable(uuid)
-
-			} else {
-				fmt.Println("Problem with adding student to acams")
+				CreateStudentCridentials(uuid, email)
 			}
+
 		} else {
 			fmt.Println("FAILED TO CREATE NEW USER")
 		}

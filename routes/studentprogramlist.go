@@ -8,11 +8,12 @@ import (
 	"github.com/kamukwamba/oerisuniversity/encription"
 )
 
-func AddStudentPrograms(studentuuid, programname string) {
+func AddStudentPrograms(studentuuid, program_code string) {
 	var programlistname StringSlice
+
 	uuid := encription.Generateuudi()
 
-	programlistname = append(programlistname, programname)
+	programlistname = append(programlistname, program_code)
 
 	dbread := dbcode.SqlRead()
 	program_name_list, err := dbread.DB.Begin()
@@ -49,11 +50,10 @@ func AddToProgramList(program_name, student_uuid string) bool {
 	// .dbread"UPDATE artist_t SET check_s = ? WHERE artist_n = ?", "2021-05-20", 42
 
 	fmt.Println("The Program Out In: ", program_name)
-	
+
 	programlist := GetStudentPrograms(student_uuid)
 
 	AppendProgramList(program_name, student_uuid, programlist)
-
 
 	return updated
 
@@ -122,11 +122,9 @@ func AppendProgramList(program_name, student_uuid string, program_list []string)
 func GetStudentProgramData(programlist []string, students_uuid string) ([]AllCourceData, bool) {
 
 	var programdata ProgramStruct
-	var programdataa ProgramStruct
 
 	var courcedata []CourceStruct
 	var allcourcedataout AllCourceData
-	var allcourcedataouta AllCourceData
 
 	var allcourcedataoutlist []AllCourceData
 
@@ -137,146 +135,38 @@ func GetStudentProgramData(programlist []string, students_uuid string) ([]AllCou
 	for _, program := range programlist {
 		cunt += 1
 		fmt.Println("Count Print", cunt)
-		if program == "ACAMS" {
-			is_present, dataout, _ := GetACAMS(students_uuid, "one")
 
-			if is_present {
-				fmt.Println("IS PRESENT", dataout)
+		is_present, dataout, _ := GetProgramsStudents(students_uuid, "one", program)
 
-				var programdataacams ACAMS = dataout
+		if is_present {
+			fmt.Println("IS PRESENT", dataout)
 
-				programdata.UUID = programdataacams.UUID
-				programdata.Student_UUID = programdataacams.Student_UUID
-				programdata.Program_Name = programdataacams.Program_Name
-				programdata.First_Name = programdataacams.First_Name
-				programdata.Last_Name = programdataacams.Last_Name
-				programdata.Email = programdataacams.Email
-				programdata.Payment_Method = programdataacams.Payment_Method
-				programdata.Paid = programdataacams.Paid
-				programdata.Approved = programdataacams.Approved
-				programdata.Applied = programdataacams.Applied
-				programdata.Completed = programdataacams.Completed
-				programdata.Date = programdataacams.Date
+			var programdataacams StudentProgramData = dataout
 
-				courcedata = GetFromACAMSCources(students_uuid)
+			programdata.UUID = programdataacams.UUID
+			programdata.Student_UUID = programdataacams.Student_UUID
+			programdata.Program_Name = programdataacams.Program_Name
+			programdata.First_Name = programdataacams.First_Name
+			programdata.Last_Name = programdataacams.Last_Name
+			programdata.Email = programdataacams.Email
+			programdata.Payment_Method = programdataacams.Payment_Method
+			programdata.Paid = programdataacams.Paid
+			programdata.Approved = programdataacams.Approved
+			programdata.Applied = programdataacams.Applied
+			programdata.Completed = programdataacams.Completed
+			programdata.Date = programdataacams.Date
 
-				allcourcedataout.ProgramStruct = programdata
-				allcourcedataout.Cource_Struct = courcedata
+			courcedata = GetFromProgramCources(students_uuid, program)
 
-				allcourcedataoutlist = append(allcourcedataoutlist, allcourcedataout)
+			allcourcedataout.ProgramStruct = programdata
+			allcourcedataout.Cource_Struct = courcedata
 
-				available = append(available, true)
-			} else {
-				available = append(available, false)
-			}
+			allcourcedataoutlist = append(allcourcedataoutlist, allcourcedataout)
 
+			available = append(available, true)
+		} else {
+			available = append(available, false)
 		}
-
-		fmt.Println("Obtained ACAMS")
-
-		if program == "ACMS" {
-
-			fmt.Println("Obtained ACMS")
-			is_present, _, data_out := GetACMS(students_uuid, "one")
-
-			var programdataacms ACMS = data_out
-			if is_present {
-				programdataa.UUID = programdataacms.UUID
-				programdataa.Student_UUID = programdataacms.Student_UUID
-				programdataa.Program_Name = programdataacms.Program_Name
-				programdataa.First_Name = programdataacms.First_Name
-				programdataa.Last_Name = programdataacms.Last_Name
-				programdataa.Email = programdataacms.Email
-				programdataa.Payment_Method = programdataacms.Payment_Method
-				programdataa.Paid = programdataacms.Paid
-				programdataa.Approved = programdataacms.Approved
-				programdataa.Applied = programdataacms.Applied
-				programdataa.Completed = programdataacms.Completed
-				programdataa.Date = programdataacms.Date
-
-				courcedata = GetFromACMSCources(students_uuid)
-
-				allcourcedataouta.ProgramStruct = programdataa
-				allcourcedataouta.Cource_Struct = courcedata
-
-				allcourcedataoutlist = append(allcourcedataoutlist, allcourcedataouta)
-
-				available = append(available, true)
-
-			} else {
-				available = append(available, false)
-			}
-		}
-		if program == "ADMS" {
-			fmt.Println("Obtained ACMS")
-			is_present, data_out, _ := GetADMS(students_uuid, "one")
-
-			var programdataacms ProgramStruct = data_out
-			if is_present {
-				programdataa.UUID = programdataacms.UUID
-				programdataa.Student_UUID = programdataacms.Student_UUID
-				programdataa.Program_Name = programdataacms.Program_Name
-				programdataa.First_Name = programdataacms.First_Name
-				programdataa.Last_Name = programdataacms.Last_Name
-				programdataa.Email = programdataacms.Email
-				programdataa.Payment_Method = programdataacms.Payment_Method
-				programdataa.Paid = programdataacms.Paid
-				programdataa.Approved = programdataacms.Approved
-				programdataa.Applied = programdataacms.Applied
-				programdataa.Completed = programdataacms.Completed
-				programdataa.Date = programdataacms.Date
-
-				courcedata = GetFromADMSCoures(students_uuid)
-
-				allcourcedataouta.ProgramStruct = programdataa
-				allcourcedataouta.Cource_Struct = courcedata
-
-				allcourcedataoutlist = append(allcourcedataoutlist, allcourcedataouta)
-
-				available = append(available, true)
-
-			} else {
-				available = append(available, false)
-			}
-
-		}
-		// GetFromADMSOne(students_uuid)
-
-		if program == "ABDMS" {
-			fmt.Println("Obtained ABDMS")
-			is_present, data_out, _ := GetABDMS(students_uuid, "one")
-
-			var programdataacms ProgramStruct = data_out
-			if is_present {
-				programdataa.UUID = programdataacms.UUID
-				programdataa.Student_UUID = programdataacms.Student_UUID
-				programdataa.Program_Name = programdataacms.Program_Name
-				programdataa.First_Name = programdataacms.First_Name
-				programdataa.Last_Name = programdataacms.Last_Name
-				programdataa.Email = programdataacms.Email
-				programdataa.Payment_Method = programdataacms.Payment_Method
-				programdataa.Paid = programdataacms.Paid
-				programdataa.Approved = programdataacms.Approved
-				programdataa.Applied = programdataacms.Applied
-				programdataa.Completed = programdataacms.Completed
-				programdataa.Date = programdataacms.Date
-
-				courcedata = GetFromABDMSCources(students_uuid)
-
-				allcourcedataouta.ProgramStruct = programdataa
-				allcourcedataouta.Cource_Struct = courcedata
-
-				allcourcedataoutlist = append(allcourcedataoutlist, allcourcedataouta)
-
-				available = append(available, true)
-
-				fmt.Println("Working ABDMS", data_out)
-			} else {
-				available = append(available, false)
-			}
-
-		}
-		// GetFromABDMS(students_uuid)
 
 	}
 

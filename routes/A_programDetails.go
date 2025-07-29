@@ -28,8 +28,6 @@ type ProgramDataEntry struct {
 func CreateProgramDB() {
 	dbread := dbcode.SqlRead().DB
 
-
-
 	programData := `CREATE TABLE IF NOT EXISTS ProgramData(
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		programName TEXT UNIQUE,
@@ -42,7 +40,7 @@ func CreateProgramDB() {
 
 	if err != nil {
 		log.Printf("%q: %s\n", err, programData)
-		
+
 	}
 
 }
@@ -60,8 +58,6 @@ func CreateNewProgramR(w http.ResponseWriter, r *http.Request) {
 		Code: program_code,
 	}
 
-	
-
 	err := ConfirmProgramDataExists(program_name, program_code)
 
 	if err != nil {
@@ -75,12 +71,12 @@ func CreateNewProgramR(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		fmt.Println("Program Exist With that Program Code Or Program Name")
-		
+
 	}
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	if render{
+	if render {
 		err := tpl.ExecuteTemplate(w, "programCardTempEmpty", dataCreated)
 
 		if err != nil {
@@ -88,10 +84,7 @@ func CreateNewProgramR(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-
-
 }
-
 
 func ConfirmProgramDataExists(programName, programCode string) error {
 	db := dbcode.SqlRead().DB
@@ -118,7 +111,6 @@ func CreateProgramEntry(programName, programCode string) error {
 	_, err := db.Exec("INSERT INTO ProgramData (programName, programCode) VALUES (?,?)",
 		programName, programCode)
 
-
 	if err != nil {
 		fmt.Println("Failed to add to database")
 		return err
@@ -128,14 +120,13 @@ func CreateProgramEntry(programName, programCode string) error {
 	return nil
 }
 
-
 type ProgramsAvailabelSt struct {
-	Present bool
+	Present      bool
 	EmailPresent bool
-	ProgramList []ProgramDataEntry
+	ProgramList  []ProgramDataEntry
 }
 
-func ProgramsAvailabel() ProgramsAvailabelSt{
+func ProgramsAvailabel() ProgramsAvailabelSt {
 
 	var present bool
 	var program_list ProgramsAvailabelSt
@@ -145,31 +136,26 @@ func ProgramsAvailabel() ProgramsAvailabelSt{
 	if err != nil {
 		present = false
 
-	}else{
+	} else {
 		present = true
 	}
 
 	program_list = ProgramsAvailabelSt{
-		Present: present,
-		ProgramList: programs_available, 
+		Present:     present,
+		ProgramList: programs_available,
 	}
-
 
 	return program_list
 }
-
 
 func GetAllProgramData() ([]ProgramDataEntry, error) {
 
 	db := dbcode.SqlRead().DB
 	var programData ProgramDataEntry
-	
-	
 
 	rows, err := db.Query("SELECT programName, programCode FROM ProgramData")
 	if err != nil {
 		return nil, err
-		
 
 	}
 	defer rows.Close()
@@ -183,10 +169,10 @@ func GetAllProgramData() ([]ProgramDataEntry, error) {
 
 		err := rows.Scan(&program_name, &program_code)
 
-		
 		if err != nil {
-			return nil, err
 			fmt.Println("the getall error", err)
+
+			return nil, err
 		} else {
 			course_names_check, errCourses := GetProgramCourses(program_code)
 
@@ -208,18 +194,12 @@ func GetAllProgramData() ([]ProgramDataEntry, error) {
 
 	}
 
-
-
 	return resultList, nil
 }
 
 ///COURSES CRUD
 
 func GetPorgamCourseR(w http.ResponseWriter, r *http.Request) {
-
-	program_code := r.URL.Query().Get("programcode")
-
-	
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 

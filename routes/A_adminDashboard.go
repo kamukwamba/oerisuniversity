@@ -22,8 +22,8 @@ type AdminInfo struct {
 
 // Marked For Removal
 type AdminPage struct {
-	Admin     AdminInfo
-	AcamsData []ProgramStruct
+	Admin      AdminInfo
+	AcamsData  []ProgramStruct
 	Admin_Name string
 }
 
@@ -148,7 +148,6 @@ func AdminAuth(data AdminLogData, dataList []dbcode.AdminInfo) (bool, AdminInfo)
 
 		matchPassword := CheckPassword(password, data.Password)
 
-
 		if matchPassword == true && data.Email == email {
 
 			admin_data = AdminInfo{
@@ -157,7 +156,6 @@ func AdminAuth(data AdminLogData, dataList []dbcode.AdminInfo) (bool, AdminInfo)
 				Email:    email,
 				Password: password,
 			}
-			
 
 			result = true
 
@@ -229,7 +227,6 @@ func GetACAMSStudents() []ProgramStruct {
 			Paid:           paid,
 			Completed:      completed,
 			Date:           date,
-			
 		}
 
 		if err != nil {
@@ -393,145 +390,42 @@ func GetStudentProgramDataAdmin(programlist []string, students_uuid string) ([]A
 	var available []bool
 
 	for _, program := range programlist {
+		is_present, dataout, _ := GetProgramAdmin(students_uuid, "one", program)
 
-		switch program {
+		if is_present {
 
-		case "ACAMS":
+			var programdataacams StudentProgramData = dataout
 
-			is_present, dataout, _ := GetACAMSAdmin(students_uuid, "one")
+			programdata.UUID = programdataacams.UUID
+			programdata.Student_UUID = programdataacams.Student_UUID
+			programdata.Program_Name = programdataacams.Program_Name
+			programdata.First_Name = programdataacams.First_Name
+			programdata.Last_Name = programdataacams.Last_Name
+			programdata.Email = programdataacams.Email
+			programdata.Payment_Method = programdataacams.Payment_Method
+			programdata.Paid = programdataacams.Paid
+			programdata.Approved = programdataacams.Approved
+			programdata.Applied = programdataacams.Applied
+			programdata.Completed = programdataacams.Completed
+			programdata.Date = programdataacams.Date
 
-			if is_present {
+			courcedata = GetFromProgramCources(students_uuid, program)
 
-				var programdataacams ACAMS = dataout
+			allcourcedataout.ProgramStruct = programdata
+			allcourcedataout.Cource_Struct = courcedata
 
-				programdata.UUID = programdataacams.UUID
-				programdata.Student_UUID = programdataacams.Student_UUID
-				programdata.Program_Name = programdataacams.Program_Name
-				programdata.First_Name = programdataacams.First_Name
-				programdata.Last_Name = programdataacams.Last_Name
-				programdata.Email = programdataacams.Email
-				programdata.Payment_Method = programdataacams.Payment_Method
-				programdata.Paid = programdataacams.Paid
-				programdata.Approved = programdataacams.Approved
-				programdata.Applied = programdataacams.Applied
-				programdata.Completed = programdataacams.Completed
-				programdata.Date = programdataacams.Date
+			allcourcedataoutlist = append(allcourcedataoutlist, allcourcedataout)
 
-				courcedata = GetFromACAMSCources(students_uuid)
-
-				allcourcedataout.ProgramStruct = programdata
-				allcourcedataout.Cource_Struct = courcedata
-
-				allcourcedataoutlist = append(allcourcedataoutlist, allcourcedataout)
-
-				available = append(available, true)
-			} else {
-				available = append(available, false)
-			}
-
-		case "ACMS":
-			is_present, data_out, _ := GetACMSAdmin(students_uuid, "one")
-
-			var programdataacms ACMS = data_out
-			if is_present {
-				programdata.UUID = programdataacms.UUID
-				programdata.Student_UUID = programdataacms.Student_UUID
-				programdata.Program_Name = programdataacms.Program_Name
-				programdata.First_Name = programdataacms.First_Name
-				programdata.Last_Name = programdataacms.Last_Name
-				programdata.Email = programdataacms.Email
-				programdata.Payment_Method = programdataacms.Payment_Method
-				programdata.Paid = programdataacms.Paid
-				programdata.Approved = programdataacms.Approved
-				programdata.Applied = programdataacms.Applied
-				programdata.Completed = programdataacms.Completed
-				programdata.Date = programdataacms.Date
-
-				courcedata = GetFromACMSCources(students_uuid)
-
-				allcourcedataout.ProgramStruct = programdata
-				allcourcedataout.Cource_Struct = courcedata
-
-				allcourcedataoutlist = append(allcourcedataoutlist, allcourcedataout)
-
-				available = append(available, true)
-
-				fmt.Println("Program Out: ", allcourcedataout.ProgramStruct, data_out)
-			} else {
-				available = append(available, false)
-			}
-		case "ADMS":
-			is_present, data_out, _ := GetADMSAdmin(students_uuid, "one")
-
-			var programdataacms ProgramStruct = data_out
-			if is_present {
-				programdata.UUID = programdataacms.UUID
-				programdata.Student_UUID = programdataacms.Student_UUID
-				programdata.Program_Name = programdataacms.Program_Name
-				programdata.First_Name = programdataacms.First_Name
-				programdata.Last_Name = programdataacms.Last_Name
-				programdata.Email = programdataacms.Email
-				programdata.Payment_Method = programdataacms.Payment_Method
-				programdata.Paid = programdataacms.Paid
-				programdata.Approved = programdataacms.Approved
-				programdata.Applied = programdataacms.Applied
-				programdata.Completed = programdataacms.Completed
-				programdata.Date = programdataacms.Date
-
-				courcedata = GetFromADMSCoures(students_uuid)
-
-				allcourcedataout.ProgramStruct = programdata
-				allcourcedataout.Cource_Struct = courcedata
-
-				allcourcedataoutlist = append(allcourcedataoutlist, allcourcedataout)
-
-				available = append(available, true)
-
-			} else {
-				available = append(available, false)
-			}
-
-		case "ABDMS":
-			is_present, data_out, _ := GetABDMSAdmin(students_uuid, "one")
-
-			var programdataacms ProgramStruct = data_out
-			if is_present {
-				programdata.UUID = programdataacms.UUID
-				programdata.Student_UUID = programdataacms.Student_UUID
-				programdata.Program_Name = programdataacms.Program_Name
-				programdata.First_Name = programdataacms.First_Name
-				programdata.Last_Name = programdataacms.Last_Name
-				programdata.Email = programdataacms.Email
-				programdata.Payment_Method = programdataacms.Payment_Method
-				programdata.Paid = programdataacms.Paid
-				programdata.Approved = programdataacms.Approved
-				programdata.Applied = programdataacms.Applied
-				programdata.Completed = programdataacms.Completed
-				programdata.Date = programdataacms.Date
-
-				courcedata = GetFromABDMSCources(students_uuid)
-
-				allcourcedataout.ProgramStruct = programdata
-				allcourcedataout.Cource_Struct = courcedata
-
-				allcourcedataoutlist = append(allcourcedataoutlist, allcourcedataout)
-
-				available = append(available, true)
-
-			} else {
-				available = append(available, false)
-			}
-
-		default:
+			available = append(available, true)
+		} else {
 			available = append(available, false)
-
 		}
 
 	}
 
 	programsavailable.Available = available[0]
 
-	return allcourcedataoutlist, available[0]
+	return allcourcedataoutlist, programsavailable.Available
 
 }
 
@@ -600,14 +494,17 @@ func CloseAdmintDiv(w http.ResponseWriter, r *http.Request) {
 func StudentData(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	
 	acamsstudents := GetACAMSStudents()
 
 	user_name, err := GetUserName(r)
 
+	if err != nil {
+		fmt.Println("Failed to get cookie")
+	}
+
 	data_out := AdminPage{
-	
-		AcamsData: acamsstudents,
+
+		AcamsData:  acamsstudents,
 		Admin_Name: user_name,
 	}
 
@@ -619,8 +516,8 @@ func StudentData(w http.ResponseWriter, r *http.Request) {
 }
 
 type CreatNews struct {
-	Admin   AdminInfo
-	AllNews []NewsStruct
+	Admin      AdminInfo
+	AllNews    []NewsStruct
 	Admin_Name string
 }
 
@@ -628,15 +525,13 @@ func AdminNews(w http.ResponseWriter, r *http.Request) {
 
 	_, all := ReadNews("o", "many")
 
-	
-
 	user_name, err := GetUserName(r)
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
 	display_data := CreatNews{
-		Admin_Name:   user_name,
-		AllNews: all,
+		Admin_Name: user_name,
+		AllNews:    all,
 	}
 
 	err = tpl.ExecuteTemplate(w, "NewsAdminCreate.html", display_data)
@@ -668,13 +563,11 @@ func ApproveProgram(w http.ResponseWriter, r *http.Request) {
 	user_uuid := r.URL.Query().Get("user_uuid")
 	program := r.URL.Query().Get("program")
 
-	if Update(user_uuid, program){
+	if Update(user_uuid, program) {
 		fmt.Println("Update succesfull")
-	}else{
+	} else {
 		fmt.Println("Failed to Update Program")
 	}
-
-	
 
 	err := tpl.ExecuteTemplate(w, "approved", nil)
 

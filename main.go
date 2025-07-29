@@ -23,10 +23,9 @@ func main() {
 	//LOAD DATA TABLES
 	dbcode.LoadDB()
 
-	routes.LoadACAMS()
-	routes.LoadACMS()
-	routes.LoadADMS()
-	routes.LoadABDMS()
+	// routes.LoadACMS()
+	// routes.LoadADMS()
+	// routes.LoadABDMS()
 	routes.LoadAssesments()
 	routes.LoadCource()
 	routes.LoadExamTable()
@@ -36,7 +35,7 @@ func main() {
 	routes.CreateEmailSenderTem()
 
 	//NEW DATA BASES
-	routes.CreateProgramDB() 
+	routes.CreateProgramDB()
 	routes.CreateCourseDB()
 
 	fmt.Println("::SERVER STARTED::PORT::8080")
@@ -72,11 +71,10 @@ func main() {
 	router.HandleFunc("/updatecourcedata", routes.UpdateCourceData)
 	router.HandleFunc("/createnewcourse", routes.AddCourceData)
 
-	
 	//NEW ROUTES END
 
 	router.HandleFunc("/studentcenter", routes.StudentCenter)
-	
+
 	router.HandleFunc("/adminNews", routes.AdminNews)
 	router.HandleFunc("/getstudent", routes.GetAllStudentMsg)
 	router.HandleFunc("/adminMessages", routes.AdminMessagesPage)
