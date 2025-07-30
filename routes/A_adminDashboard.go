@@ -185,58 +185,73 @@ func StudentACAMSData(student_uuid string) {
 
 }
 
-func GetACAMSStudents() []ProgramStruct {
+f
+
+
+
+
+
+func GetAllStudentsData() []ProgramStruct {
 	dbread := dbcode.SqlRead()
 	var conuter int
 	var datalist []ProgramStruct
 
-	var cource_data ProgramStruct
-	rows, err := dbread.DB.Query("select * from  acams")
-	if err != nil {
-		fmt.Println("Failed to get acams student data")
-	}
-	defer rows.Close()
+	getallprograms, err := GetAllProgramData()
 
-	for rows.Next() {
-		conuter += 1
 
-		var uuid string
-		var student_uuid string
-		var program_name string
-		var first_name string
-		var last_name string
-		var email string
-		var applied bool
-		var approved bool
-		var payment_method string
-		var paid string
-		var completed bool
-		var date string
-		err := rows.Scan(&uuid, &student_uuid, &program_name, &first_name, &last_name, &email, &applied, &approved, &payment_method, &paid, &completed, &date)
+	for item, _ := range getallprograms{
+		var cource_data ProgramStruct
 
-		cource_data = ProgramStruct{
-			UUID:           uuid,
-			Student_UUID:   student_uuid,
-			Program_Name:   program_name,
-			First_Name:     first_name,
-			Last_Name:      last_name,
-			Email:          email,
-			Applied:        applied,
-			Approved:       approved,
-			Payment_Method: payment_method,
-			Paid:           paid,
-			Completed:      completed,
-			Date:           date,
-		}
-
+		query_str := fmt.Sprintf("select * from %s", item)
+		rows, err := dbread.DB.Query(query_str)
 		if err != nil {
-			fmt.Println("Check the scan for student data admindashboard")
-			log.Fatal(err)
+			fmt.Printf("Failed to get student data from %s ", query_str)
 		}
+		defer rows.Close()
 
-		datalist = append(datalist, cource_data)
+		for rows.Next() {
+			conuter += 1
 
+			var uuid string
+			var student_uuid string
+			var program_name string
+			var first_name string
+			var last_name string
+			var email string
+			var applied bool
+			var approved bool
+			var payment_method string
+			var paid string
+			var completed bool
+			var date string
+			err = rows.Scan(&uuid, &student_uuid, &program_name, &first_name, &last_name, &email, &applied, &approved, &payment_method, &paid, &completed, &date)
+
+			cource_data = ProgramStruct{
+				UUID:           uuid,
+				Student_UUID:   student_uuid,
+				Program_Name:   program_name,
+				First_Name:     first_name,
+				Last_Name:      last_name,
+				Email:          email,
+				Applied:        applied,
+				Approved:       approved,
+				Payment_Method: payment_method,
+				Paid:           paid,
+				Completed:      completed,
+				Date:           date,
+			}
+
+			if err != nil {
+				fmt.Println("Check the scan for student data admindashboard")
+				log.Fatal(err)
+			}
+
+			datalist = append(datalist, cource_data)
+
+		}
 	}
+
+	
 
 	return datalist
 }
@@ -458,6 +473,8 @@ func StudentProfileData(w http.ResponseWriter, r *http.Request) {
 
 	admin_id := r.URL.Query().Get("out")
 
+	user_name, err := GetUserName()
+
 	admin_infor := AdminData(admin_id)
 
 	studentdataout := GetStudentAllDetails(studentuuid)
@@ -469,11 +486,11 @@ func StudentProfileData(w http.ResponseWriter, r *http.Request) {
 		Available:        present,
 		StInfo:           studentdataout,
 		AllCourceDataOut: programdataout,
-		Admin:            admin_infor,
+		Admin_Name: user_name,
 	}
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err := tpl.ExecuteTemplate(w, "studentdetailstemplate.html", studentdataoutadmin)
+	err = tpl.ExecuteTemplate(w, "studentdetailstemplate.html", studentdataoutadmin)
 
 	if err != nil {
 		log.Fatal(err)
@@ -494,7 +511,7 @@ func CloseAdmintDiv(w http.ResponseWriter, r *http.Request) {
 func StudentData(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	acamsstudents := GetACAMSStudents()
+	acamsstudents := GetAllStudentsData()
 
 	user_name, err := GetUserName(r)
 

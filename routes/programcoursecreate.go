@@ -84,6 +84,7 @@ func AddToProgramCources(student_uuid, date_in, payment_type, program_code strin
 			uuid,
 			student_uuid,
 			cource_name,
+			cource_code,
 			book,
 			module,
 			video,
@@ -92,7 +93,7 @@ func AddToProgramCources(student_uuid, date_in, payment_type, program_code strin
 			examined,
 			continuorse_assesment,
 			completed,
-			date) values(?,?,?,?,?,?,?,?,?,?,?,?)`, item.Code)
+			date) values(?,?,?,?,?,?,?,?,?,?,?,?,?)`, item.Code)
 
 		statment, err := cource_create.Prepare(insert_String)
 
@@ -170,7 +171,7 @@ func GetFromProgramCources(student_uuid, program_code string) []CourceStruct {
 	for _, item := range course_tables {
 		dbread := dbcode.SqlRead().DB
 
-		data_query_string := fmt.Sprintf("select uuid, student_uuid, cource_name, book, module,video, applied, approved, examined, continuorse_assesment,completed, date from %s  where student_uuid = ?", item.Code)
+		data_query_string := fmt.Sprintf("select uuid, student_uuid, cource_name,course_code, book, module,video, applied, approved, examined, continuorse_assesment,completed, date from %s  where student_uuid = ?", item.Code)
 
 		stmt, err := dbread.Prepare(data_query_string)
 
@@ -185,6 +186,7 @@ func GetFromProgramCources(student_uuid, program_code string) []CourceStruct {
 		err = stmt.QueryRow(student_uuid).Scan(&cource_data_out.UUID,
 			&cource_data_out.Student_UUID,
 			&cource_data_out.Cource_Name,
+			&cource_data_out.Cource_Code,
 			&cource_data_out.Book,
 			&cource_data_out.Module,
 			&cource_data_out.Video,
@@ -393,7 +395,7 @@ func GetProgramsStudents(students_uuid_in, promt, program_name string) (bool, St
 
 		if err != nil {
 			error_out := fmt.Sprintf("%s prepare", err)
-			ErrorPrintOut("acams 395", "GetACMS", error_out)
+			ErrorPrintOut("programcoursecreate 395", "GetProgramsStudents", error_out)
 			confirmacms = false
 		}
 
@@ -456,7 +458,7 @@ func GetProgramsStudents(students_uuid_in, promt, program_name string) (bool, St
 
 }
 
-func CreateCourseTable(course_name string) error {
+func CreateCourseTable(course_code string) error {
 
 	dbread := dbcode.SqlRead()
 
@@ -466,6 +468,7 @@ func CreateCourseTable(course_name string) error {
 	create table if not exists %s(uuid blob not null, 
 		student_uuid text,
 		cource_name text,
+		course_code text,
 		book text,
 		module text,
 		video text,
@@ -474,7 +477,7 @@ func CreateCourseTable(course_name string) error {
 		continuorse_assesment text,
 		examined bool,
 		completed bool,
-		date text);`, course_name)
+		date text);`, course_code)
 
 	_, err := dbread.DB.Exec(create_course_table)
 	if err != nil {

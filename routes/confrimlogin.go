@@ -110,6 +110,7 @@ type CourceStruct struct {
 	UUID                  string
 	Student_UUID          string
 	Cource_Name           string
+	Course_Code string
 	Book                  string
 	Module                string
 	Video                 string
@@ -126,6 +127,7 @@ type StudentCourse struct {
 	StInfo           StudentInfo
 	AllCourceDataOut []AllCourceData
 	Admin            AdminInfo
+	Admin_Name string
 }
 
 func ValidateSudent(email_in, password_in string) (bool, string) {

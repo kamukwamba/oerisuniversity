@@ -67,6 +67,9 @@ func CreateNewProgramR(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("Failed to Create Program Entry:: %s", err)
 		} else {
 			fmt.Println("Program Entry Created Sucesfully")
+			err != CreateProgramTabel(program_code){
+				fmt.Println("Failed to create program table")
+			}
 			render = true
 		}
 	} else {
@@ -236,6 +239,12 @@ func CreateProgramCourseR(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Failed to get the email and password", err)
 		setTemplatName = "failedToCreateCourse"
 
+	}else{
+
+		err = CreateCourseTable(course_code) 
+		if err != nil{
+			fmt.Println("Failed to create course table: ", err)
+		}
 	}
 
 	defer stmt.Close()
