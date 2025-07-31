@@ -97,6 +97,8 @@ func UploadAssesment(w http.ResponseWriter, r *http.Request) {
 	
 	student_uuid := r.URL.Query().Get("uuid")
 	cource_name := r.URL.Query().Get("cource_name")
+	cource_code := r.URL.Query().Get("course_code")
+
 
 	stID := CleanStudentUUID(student_uuid)
 	
@@ -105,7 +107,7 @@ func UploadAssesment(w http.ResponseWriter, r *http.Request) {
 
 	fileName := handler.Filename
 
-	CreateFileDirectory(cource_name, student_uuid, fileName)
+	CreateFileDirectory(cource_name, cource_code,student_uuid, fileName)
 
 
 	if err != nil {

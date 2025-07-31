@@ -185,7 +185,7 @@ func StudentACAMSData(student_uuid string) {
 
 }
 
-f
+
 
 
 
@@ -197,6 +197,11 @@ func GetAllStudentsData() []ProgramStruct {
 	var datalist []ProgramStruct
 
 	getallprograms, err := GetAllProgramData()
+
+
+	if err != nil {
+		fmt.Println("Failed to get student Program Data: ", err)
+	}
 
 
 	for item, _ := range getallprograms{
@@ -471,12 +476,8 @@ func StudentProfileData(w http.ResponseWriter, r *http.Request) {
 
 	studentuuid := r.URL.Query().Get("student_uuid")
 
-	admin_id := r.URL.Query().Get("out")
-
-	user_name, err := GetUserName()
-
-	admin_infor := AdminData(admin_id)
-
+	user_name, err := GetUserName(r)
+	
 	studentdataout := GetStudentAllDetails(studentuuid)
 	listout := GetStudentPrograms(studentuuid)
 

@@ -29,6 +29,7 @@ func LoadExam() {
 			student_uuid blob,
 			program_name text,
 			cource_name text,
+			cource_code text,
 			grade text,
 			remark text,
 			comment text);`
@@ -51,6 +52,7 @@ func LoadAssesments() {
 			student_uuid blob,
 			program_name text,
 			cource_name text,
+			cource_code text,
 			grade text,
 			remark text,
 			comment text);`
@@ -64,6 +66,7 @@ func LoadAssesments() {
 			uuid blod,
 			student_uuid blob,
 			cource_name text,
+			cource_code text,
 			file text,
 			date text);`
 
@@ -110,15 +113,16 @@ func ListFileDirectories(student_uuid, cource_name string) (bool, []FileDirector
 
 
 
-func CreateFileDirectory(cource_name, student_uuid, file_name string){
+func CreateFileDirectory(cource_name, cource_code,student_uuid, file_name string){
 	dbread := dbcode.SqlRead().DB
 	uuid := encription.Generateuudi()
 	date := time.Now()
 
+	cource_code = SanitizeCookieValue(cource_code)
 	
 
 	stCleaned := CleanStudentUUID(student_uuid)
-	stmt, err := dbread.Prepare("INSERT INTO assesmentdirectory(uuid, student_uuid, cource_name, file, date) values(?,?,?,?,?)")
+	stmt, err := dbread.Prepare("INSERT INTO assesmentdirectory(uuid, student_uuid, cource_name,course_code,file, date) values(?,?,?,?,?,?)")
 
 	if err != nil {
 
@@ -127,7 +131,7 @@ func CreateFileDirectory(cource_name, student_uuid, file_name string){
 
 	defer stmt.Close()
 
-	_,err = stmt.Exec(uuid, stCleaned, cource_name, file_name, date)
+	_,err = stmt.Exec(uuid, stCleaned, cource_name, cource_code,file_name, date)
 	if err != nil {
 		fmt.Println("FAILED TO CREATE FILE DIRECTORY")
 	}
@@ -144,6 +148,7 @@ func LoadCource() {
 			uuid blod,
 			program_name text,
 			cource_name text,
+			cource_code,
 			cource_assesment text,
 			video_list text,
 			module text,

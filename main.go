@@ -23,9 +23,7 @@ func main() {
 	//LOAD DATA TABLES
 	dbcode.LoadDB()
 
-	// routes.LoadACMS()
-	// routes.LoadADMS()
-	// routes.LoadABDMS()
+	
 	routes.LoadAssesments()
 	routes.LoadCource()
 	routes.LoadExamTable()

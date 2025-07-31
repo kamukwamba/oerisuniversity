@@ -186,7 +186,7 @@ func GetFromProgramCources(student_uuid, program_code string) []CourceStruct {
 		err = stmt.QueryRow(student_uuid).Scan(&cource_data_out.UUID,
 			&cource_data_out.Student_UUID,
 			&cource_data_out.Cource_Name,
-			&cource_data_out.Cource_Code,
+			&cource_data_out.Course_Code,
 			&cource_data_out.Book,
 			&cource_data_out.Module,
 			&cource_data_out.Video,

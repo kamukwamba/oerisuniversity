@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administrative Dashboard</title>
     <link rel="stylesheet" href="/assets/css/cource_data.css">
-
+    {{ template "sitelogimage" }}
+    
     <script src="/assets/htmx.js"></script>
 
     <style>
@@ -321,7 +322,7 @@
     <nav>
         <ul class="nav-links">
             <li><a href="/programcards?out={{ .Admin.ID}}" class="dashbuttons">Programs</a></li>
-            <li><a href="/studentdata?out={{ .Admin.ID}}">Stidents</a></li>
+            <li><a href="/studentdata?out={{ .Admin.ID}}">Students</a></li>
             <li><a href="/adminMessages?out={{ .Admin.ID}}">Messages</a></li>
             <li><a href="/adminNews?out={{ .Admin.ID}}">News</a></li>
             <li><a href="/get_admin_users?out={{ .Admin.ID}}">Lectures</a></li>
@@ -339,6 +340,8 @@
                     <table>
                         <thead>
                             <th>Cource Name</th>
+                            <th>Cource Code</th>
+
                             <th>Book</th>
                             <th>Module</th>
                             <th>Videos</th>
@@ -373,27 +376,27 @@
                 
                 <div class="form-group">
                     <label for="project-description">Course Name</label>
-                    <textarea id="project-description" placeholder="Enter program code" name="cource_name" required></textarea>
+                    <textarea id="project-description" placeholder="Enter Course Name" name="cource_name" required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="project-description">Course Code</label>
-                    <textarea id="project-description" placeholder="Enter program code" name="course_code" required></textarea>
+                    <textarea id="project-description" placeholder="Enter Course Code" name="course_code" required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="project-description">Recommended Book</label>
-                    <textarea id="project-description" placeholder="Enter program code" name="book_link"></textarea>
+                    <textarea id="project-description" placeholder="Enter Recommended Books" name="book_link"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="project-description">Module</label>
-                    <textarea id="project-description" placeholder="Enter program code" name="modole_link"></textarea>
+                    <textarea id="project-description" placeholder="Enter Module Link" name="modole_link"></textarea>
                 </div>
                   <div class="form-group">
                     <label for="project-description">Assesments</label>
-                    <textarea id="project-description" placeholder="Enter program code" name="assesment_link"></textarea>
+                    <textarea id="project-description" placeholder="Enter Assesment Link" name="assesment_link"></textarea>
                 </div>
                    <div class="form-group">
                     <label for="project-description">Video List</label>
-                    <textarea id="project-description" placeholder="Enter program code" name="video_link"></textarea>
+                    <textarea id="project-description" placeholder="Enter Video List (video links must be separeted by a ','!!)" name="video_link"></textarea>
                 </div>
 
 
@@ -410,6 +413,7 @@
 
 <tr id="tr{{.UUID}}">
     <td class="truncate" id="c_name_clean">{{ .Cource_Name}}</td>
+    <td class="truncate" id="c_name_clean">{{ .Cource_Code}}</td>
 
     <td class="truncate">{{ .Book}}</td>
     <td class="truncate">{{ .Module}}</td>

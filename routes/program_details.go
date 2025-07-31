@@ -229,7 +229,7 @@ func ProgramDetails(w http.ResponseWriter, r *http.Request) {
 
 	code := r.URL.Query().Get("programcode")
 
-
+	fmt.Println("Program Code: ", code)
 	
 	// admin_infor := AdminData(admin_id)
 
@@ -390,7 +390,7 @@ func AddCourceData(w http.ResponseWriter, r *http.Request) {
 
 	program_name := r.FormValue("program_name")
 	cource_name := r.FormValue("cource_name")
-
+	course_code := SanitizeCookieValue(r.FormValue("cource_code"))
 	book_link := r.FormValue("book_link")
 	module_link := r.FormValue("module_link")
 	video_link := r.FormValue("video_link")
@@ -399,10 +399,10 @@ func AddCourceData(w http.ResponseWriter, r *http.Request) {
 	create_uuid := encription.Generateuudi()
 	exam := "false"
 
-	fmt.Println(program_name, cource_name, book_link, module_link, video_link, assesment_link)
+
 
 	create_cource := dbcode.SqlRead().DB
-	statment, err := create_cource.Prepare("insert into cource_table(uuid, program_name, cource_name, cource_assesment, video_list,module,recomended_book, exam_file) values(?,?,?,?,?,?,?,?)")
+	statment, err := create_cource.Prepare("insert into cource_table(uuid, program_name, cource_name, cource_code,cource_assesment, video_list,module,recomended_book, exam_file) values(?,?,?,?,?,?,?,?,?)")
 
 	if err != nil {
 		log.Fatal(err)
@@ -410,7 +410,7 @@ func AddCourceData(w http.ResponseWriter, r *http.Request) {
 
 	defer statment.Close()
 
-	_, err = statment.Exec(create_uuid, program_name, cource_name, assesment_link, video_link, module_link, book_link, exam)
+	_, err = statment.Exec(create_uuid, program_name, cource_name, course_code,assesment_link, video_link, module_link, book_link, exam)
 
 	if err != nil {
 		log.Fatal(err)
@@ -426,9 +426,16 @@ func AddCourceData(w http.ResponseWriter, r *http.Request) {
 		Cource_Aseesment: assesment_link,
 	}
 
-	err_out := tpl.ExecuteTemplate(w, "cource_data_tr_two", data_out)
+	err = CreateNewCourseTable(course_code)
 
-	if err_out != nil {
+	if err != nil {
+		fmt.Println("Failed to create new course table")
+
+	}
+
+	err = tpl.ExecuteTemplate(w, "cource_data_tr_two", data_out)
+
+	if err != nil {
 		log.Fatal(err)
 	}
 

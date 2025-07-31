@@ -24,7 +24,11 @@ type ProgramDataEntry struct {
 	Code        string
 	CourseNames []Course_Name
 }
-
+type ProgramsAvailabelSt struct {
+	Present      bool
+	EmailPresent bool
+	ProgramList  []ProgramDataEntry
+}
 func CreateProgramDB() {
 	dbread := dbcode.SqlRead().DB
 
@@ -67,7 +71,8 @@ func CreateNewProgramR(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("Failed to Create Program Entry:: %s", err)
 		} else {
 			fmt.Println("Program Entry Created Sucesfully")
-			err != CreateProgramTabel(program_code){
+			err = CreateProgramTabel(program_code)
+			if err != nil {
 				fmt.Println("Failed to create program table")
 			}
 			render = true
@@ -123,11 +128,7 @@ func CreateProgramEntry(programName, programCode string) error {
 	return nil
 }
 
-type ProgramsAvailabelSt struct {
-	Present      bool
-	EmailPresent bool
-	ProgramList  []ProgramDataEntry
-}
+
 
 func ProgramsAvailabel() ProgramsAvailabelSt {
 
@@ -364,5 +365,40 @@ func CreateCourseDB() {
 	}
 
 	defer db.Close()
+
+}
+
+
+func CreateNewCourseTable(course_code string) error{
+
+	dbread := dbcode.SqlRead()
+
+	defer dbread.DB.Close()
+
+	stmt_str := fmt.Sprintf(`
+		create table if not exists %s(uuid blob not null, 
+			student_uuid text,
+			cource_name text,
+			course_code text,
+			book text,
+			module text,
+			video text,
+			applied bool,
+			approved bool,
+			continuorse_assesment text,
+			examined bool,
+			completed bool,
+			date text);`, course_code)
+
+	_, err := dbread.DB.Exec(stmt_str)
+
+	if err != nil {
+		log.Printf("%q: %s\n", err, stmt_str)
+		return err
+
+	}
+
+
+	return nil
 
 }
