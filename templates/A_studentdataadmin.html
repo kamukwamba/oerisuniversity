@@ -386,7 +386,7 @@
 
 				
 				<tbody>
-				  {{ range .AcamsData}}
+				  {{ range .ProgramData}}
 					{{ if .Approved}}
 					<tr>
 					  <th scope="row"></th>
@@ -420,7 +420,7 @@
 					
 			  
 					  <td>
-						<a href="studentedataadmin?student_uuid={{ .Student_UUID}}&out={{ .Admin_ID}}" class="details_btn" style="background-color: red; text-decoration: none; 
+						<a href="/studentedataadmin?student_uuid={{ .Student_UUID}}" class="details_btn" style="background-color: red; text-decoration: none; 
 						color: white;
 						border: solid 1px white;">Details</a>
 					  </div>

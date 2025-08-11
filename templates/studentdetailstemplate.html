@@ -2,8 +2,13 @@
 <!doctype html>
 <html lang="en">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Administrative Dashboard</title>
+        <script src="/assets/htmx.js"></script>
+        {{ template "sitelogimage" }}
+        {{ template "adminhearstyle" }}
         {{ template "head_temp"}}
-        {{ template "adminhearstyle"}}
 
         <style>
             .cource_approve{
@@ -17,7 +22,7 @@
             margin-right: 5px;
             }
 
-        .cource_approve:hover{
+            .cource_approve:hover{
             background-color: rgb(32, 0, 62);
             color: white;
             }
@@ -65,7 +70,7 @@
                 border-radius: 3px;
                 background-color: white;
                 color: rgb(32, 0, 62);
-;
+
             }
 
             .approve_complition:hover{
@@ -100,7 +105,7 @@
 
    
   <body>
-    {{ template "headernav"}}
+    {{  template "headernav" .}}
 
 
     <div class="main" style="padding: 15px; height: 100vh; overflow-y: scroll;">
@@ -153,20 +158,20 @@
             <hr>
             
             
-				<div class="program_details">
-					
-						
-						{{ range .AllCourceDataOut }} 
-							{{ template "programdata" .}}
-						{{ end }}
+                <div class="program_details">
+                    
+                        
+                        {{ range .AllCourceDataOut }} 
+                            {{ template "programdata" .}}
+                        {{ end }}
 
-					
-						<div style="height: 50px; width: 100px;"></div>
+                    
+                        <div style="height: 50px; width: 100px;"></div>
 
-				</div>
-				
-				
-			</div>
+                </div>
+                
+                
+            </div>
             
             
         </div>  
@@ -179,9 +184,11 @@
     <div style="display: none;" id="centered_div">
                     
     </div>
-
+    
 </body>
-</html>
+</html> 
+
+
 {{ define "admin_cource_assesment"}}
 
 
@@ -280,7 +287,7 @@
 
 
 {{define "programdata"}}
-    <h5 class="program_name">{{ .Program_Name}}</h5>
+    <h5 class="program_name">{{ .ProgramStruct.Program_Name}}</h5>
                 
     <div class="program_table">
     <table>
@@ -288,7 +295,6 @@
         <tr>
             <th>#</th>
             <th>Course Name</th>
-            <th>Course Code</th>
             <th>Continouse Assesment</th>
             <th>Exam</th>
             <th>Supplimentary</th>
@@ -303,8 +309,6 @@
                 <tr>
                     <td></td>
                     <td>{{ .Cource_Name}}</td>
-                    <td>{{ .Cource_Code}}</td>
-
                     <td><a 
                         hx-post="/gradeca?student_uuid={{.Student_UUID}}&cource_name={{.Cource_Name}}" 
                         hx-target = "#centered_div" 
@@ -312,9 +316,9 @@
 
                     <td> <a href="/grade_exam?student_uuid={{ .Student_UUID}}&cource_name={{ .Cource_Name}}">Grade Exam</a></td>
                     <td id="btc{{.Cource_Name}}"><button class="approve_complition" 
-						hx-post="/courcecompleted?cource_name = {{.Cource_Name}}&student={{.Student_UUID}}" 
-						hx-target = "#btc{{.Cource_Name}}"
-						hx-swap = "innerHTML" style="height: fit-content;" >Approve Supplimentary</button></td>
+                        hx-post="/courcecompleted?cource_name = {{.Cource_Name}}&student={{.Student_UUID}}" 
+                        hx-target = "#btc{{.Cource_Name}}"
+                        hx-swap = "innerHTML" style="height: fit-content;" >Approve Supplimentary</button></td>
                     <td id="courceapprovaladmin">
                         {{ if .Approved }}
                             {{ template "cource_approved_admin" .}}
@@ -335,13 +339,13 @@
     </table>
     </div>
 
-	
+    
     <div class="updatecourcesdatediv">
         
 
         
 
-        <div id="approve_{{.UUID}}" class="update_div">
+        <div id="approve_{{.ProgramStruct.UUID}}" class="update_div">
 
             {{ if  .ProgramStruct.Approved }}
                 {{ template "approved" }}
@@ -352,7 +356,7 @@
 
                
         </div>
-        <div id="completed_{{.UUID}}" class="update_div">
+        <div id="completed_{{.ProgramStruct.UUID}}" class="update_div">
 
         
 
@@ -373,23 +377,23 @@
 
 
 {{ define "cource_complete_tag"}}
-	<div style="color: rgb(32, 02, 62); 
-		width: 150px; 
-		border: solid 1px rgb(32, 02, 62);
-		border-radius: 3px; 
-		background-color: white;" >
-		Course Completed
-	</div>
+    <div style="color: rgb(32, 02, 62); 
+        width: 150px; 
+        border: solid 1px rgb(32, 02, 62);
+        border-radius: 3px; 
+        background-color: white;" >
+        Course Completed
+    </div>
 {{ end }}
 
 {{ define "cource_notcomplete_tag"}}
-	<div style="color: rgb(32, 02, 62); 
-		width: 150px; 
-		border: solid 1px rgb(32, 02, 62);
-		border-radius: 3px; 
-		background-color: white;" >
-		Not Complete
-	</div>
+    <div style="color: rgb(32, 02, 62); 
+        width: 150px; 
+        border: solid 1px rgb(32, 02, 62);
+        border-radius: 3px; 
+        background-color: white;" >
+        Not Complete
+    </div>
 
 {{end}}
 
@@ -410,7 +414,7 @@
 {{define "cource_approve_admin"}}
 
     <button
-    hx-post="/courceupdateadmin?user_uuid={{ .Student_UUID}}&cource_name={{ .Cource_Name}}"
+    hx-post="/courceupdateadmin?user_uuid={{ .ProgramStruct.Student_UUID }}&cource_name={{ .Cource_Name}}"
     hx-swap="outerHTML"
     class="cource_approve">
     Approve 
@@ -420,8 +424,8 @@
 
 {{ define "approveprogram"}}
         <div class="approve_btn">
-            <p hx-get="/approve?user_uuid={{ .Student_UUID}}&program={{ .Program_Name}}"
-            hx-target="#approve_{{.UUID}}"
+            <p hx-get="/approve?user_uuid={{ .ProgramStruct.Student_UUID}}&program={{ .ProgramStruct.Program_Name}}"
+            hx-target="#approve_{{.ProgramStruct.UUID}}"
             hx-swap="innerHTML">Approve Program</p>
 
         </div>
@@ -441,8 +445,8 @@
 
 {{ define "approvecompletion"}}
         <div class="complete_btn" style="cursor: pointer;">
-            <p hx-get="/completed?user_uuid={{ .Student_UUID}}&program={{ .Program_Name}}"
-            hx-target="#completed_{{.UUID}}"
+            <p hx-get="/completed?user_uuid={{ .ProgramStruct.Student_UUID}}&program={{ .ProgramStruct.Program_Name}}"
+            hx-target="#completed_{{.ProgramStruct.UUID}}"
             hx-swap="innerHTML">Approve Completion</p>
 
         </div>

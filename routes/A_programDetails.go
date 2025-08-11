@@ -270,7 +270,7 @@ func CreateCourseMaterial(program_code, course_name, course_code string) error {
 
 	dbread := dbcode.SqlRead().DB
 
-	stmt, err := dbread.Prepare("INSERT INTO CourseMaterial(courseCode,courseCode, programCode) values(?,?,?)")
+	stmt, err := dbread.Prepare("INSERT INTO CourseNames(courseName,courseCode, programCode) values(?,?,?)")
 
 	if err != nil {
 		fmt.Println("Failed to get the email and password", err)
@@ -315,6 +315,8 @@ func CheckCourseInDataBase(program_code, course_name, course_code string) error 
 
 	return nil
 }
+
+
 
 func GetProgramCourses(program_code string) ([]Course_Name, error) {
 
@@ -376,7 +378,7 @@ func CreateNewCourseTable(course_code string) error{
 	defer dbread.DB.Close()
 
 	stmt_str := fmt.Sprintf(`
-		create table if not exists %s(uuid blob not null, 
+		create table if not exists %s (uuid blob not null, 
 			student_uuid text,
 			cource_name text,
 			course_code text,
@@ -389,6 +391,7 @@ func CreateNewCourseTable(course_code string) error{
 			examined bool,
 			completed bool,
 			date text);`, course_code)
+	fmt.Println("the course code",course_code)
 
 	_, err := dbread.DB.Exec(stmt_str)
 

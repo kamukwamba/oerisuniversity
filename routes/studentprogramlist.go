@@ -24,7 +24,7 @@ func AddStudentPrograms(studentuuid, program_code string) {
 	stmt, err := program_name_list.Prepare("insert into studentprogramlist(uuid, student_uuid, program_list) values(?,?,?)")
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to add student to studentprogramlist :AddStudentPrograms",err)
 	}
 
 	defer stmt.Close()
@@ -139,7 +139,7 @@ func GetStudentProgramData(programlist []string, students_uuid string) ([]AllCou
 		is_present, dataout, _ := GetProgramsStudents(students_uuid, "one", program)
 
 		if is_present {
-			fmt.Println("IS PRESENT", dataout)
+		
 
 			var programdataacams StudentProgramData = dataout
 

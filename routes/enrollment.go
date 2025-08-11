@@ -110,16 +110,13 @@ func CreateStudentCridentials(uuid, email string) bool {
 }
 
 func CreateStudent(data StudentInfo) bool {
-	dbread := dbcode.SqlRead()
-	entry, err := dbread.DB.Begin()
-	var result bool = true
-	if err != nil {
-		log.Fatal(err)
-	}
-	stmt, err := entry.Prepare("insert into studentdata(uuid, first_name, last_name, phone, email, date_of_birth,gender,marital_status,country,eduction_background,program,high_scholl_confirmation,grammer_comprihention,waiver,number_of_children,school_atteneded,major_studied,degree_obtained,current_occupetion,field_interested_in,mps_techqnique_Practiced,previouse_experince,purpose_of_enrollment,use_of_degree,reason_for_choice,method_of_incounter, student_id) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?,?,?)")
+	dbread := dbcode.SqlRead().DB
+	result := true
+	
+	stmt, err := dbread.Prepare("insert into studentdata(uuid, first_name, last_name, phone, email, date_of_birth,gender,marital_status,country,eduction_background,program,high_scholl_confirmation,grammer_comprihention,waiver,number_of_children,school_atteneded,major_studied,degree_obtained,current_occupetion,field_interested_in,mps_techqnique_Practiced,previouse_experince,purpose_of_enrollment,use_of_degree,reason_for_choice,method_of_incounter, student_id) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?,?,?)")
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed CreateStudent",err)
 	}
 	defer stmt.Close()
 
@@ -130,11 +127,7 @@ func CreateStudent(data StudentInfo) bool {
 		result = false
 	}
 
-	err = entry.Commit()
-	if err != nil {
-		log.Fatal(err)
-		result = false
-	}
+
 
 	return result
 
@@ -174,6 +167,9 @@ func (stringSlice StringSlice) Value() (driver.Value, error) {
 func Enrollment(w http.ResponseWriter, r *http.Request) {
 
 	programs_available := ProgramsAvailabel()
+
+
+	fmt.Println(programs_available)
 
 	r.ParseForm()
 	if r.Method == "POST" {
@@ -358,6 +354,7 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 				log.Printf("Failed to add student to program: %s", err)
 			} else {
 				AddStudentPrograms(uuid, program_name)
+				RecordeInProgramCources(uuid, program_name, date_applied)
 				MakeStudentExamTable(uuid)
 				CreateStudentCridentials(uuid, email)
 			}
@@ -371,6 +368,38 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
+	}
+
+}
+
+
+func RecordeInProgramCources(student_uuid, program_code, date string){
+
+
+	dbread := dbcode.SqlRead().DB
+
+	defer dbread.Close()
+
+	//Get Program Cources
+
+	cource_list, err := GetProgramCourses(program_code)
+
+	if err != nil {
+		fmt.Println("Faild to get GetProgramCourses")
+	}
+
+
+	for _, cource :=  range cource_list{
+		uuid := encription.Generateuudi()
+
+		prepare_stmt := fmt.Sprintf("insert into %s(uuid, student_uuid, cource_name, course_code, applied, approved, examined, completed, date) values(?,?,?,?,?,?,?,?,?)", cource.Code)
+
+		_, err := dbread.Exec(prepare_stmt, uuid, student_uuid, cource.Name, cource.Code, false, false, false, false, date)
+
+		if err != nil{
+			fmt.Printf("Failed to add to programcources for %s, error out %s", program_code, err)
+		}
+
 	}
 
 }

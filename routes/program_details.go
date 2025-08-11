@@ -15,7 +15,7 @@ type CourceDataStruct struct {
 	UUID             string
 	Program_Name     string
 	Cource_Name      string
-	Course_Code      string
+	Cource_Code      string
 	Cource_Aseesment string
 	Video_List       string
 	Module           string
@@ -190,7 +190,7 @@ func GetProgramDetails(program_name string) ([]CourceDataStruct, bool) {
 
 	for statement.Next() {
 		err := statement.Scan(
-			&cource_data_out.UUID, &cource_data_out.Program_Name, &cource_data_out.Cource_Name, &cource_data_out.Cource_Aseesment, &cource_data_out.Video_List, &cource_data_out.Module, &cource_data_out.Book, &cource_data_out.Exam,
+			&cource_data_out.UUID, &cource_data_out.Program_Name, &cource_data_out.Cource_Name,&cource_data_out.Cource_Code, &cource_data_out.Cource_Aseesment, &cource_data_out.Video_List, &cource_data_out.Module, &cource_data_out.Book, &cource_data_out.Exam,
 		)
 		if err != nil {
 			log.Fatal(err)
@@ -388,13 +388,20 @@ func AddCourceData(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
+	var course_code string
+	var cource_name string
+	var book_link string
+	var module_link string 
+	var video_link string 
+	var assesment_link string 
+	
 	program_name := r.FormValue("program_name")
-	cource_name := r.FormValue("cource_name")
-	course_code := SanitizeCookieValue(r.FormValue("cource_code"))
-	book_link := r.FormValue("book_link")
-	module_link := r.FormValue("module_link")
-	video_link := r.FormValue("video_link")
-	assesment_link := r.FormValue("assesment_link")
+	cource_name = r.FormValue("cource_name")
+	course_code = SanitizeCookieValue(r.FormValue("course_code"))
+	book_link = r.FormValue("book_link")
+	module_link = r.FormValue("module_link")
+	video_link = r.FormValue("video_link")
+	assesment_link = r.FormValue("assesment_link")
 
 	create_uuid := encription.Generateuudi()
 	exam := "false"
@@ -420,6 +427,7 @@ func AddCourceData(w http.ResponseWriter, r *http.Request) {
 		UUID:             create_uuid,
 		Program_Name:     program_name,
 		Cource_Name:      cource_name,
+		Cource_Code:      course_code,
 		Book:             book_link,
 		Module:           module_link,
 		Video_List:       video_link,
@@ -428,9 +436,16 @@ func AddCourceData(w http.ResponseWriter, r *http.Request) {
 
 	err = CreateNewCourseTable(course_code)
 
+
 	if err != nil {
 		fmt.Println("Failed to create new course table")
 
+	}
+
+	err = CreateCourseMaterial(program_name, cource_name, course_code)
+
+	if err != nil {
+		fmt.Println("Failed to add course primary data to CourseNames: ", err)
 	}
 
 	err = tpl.ExecuteTemplate(w, "cource_data_tr_two", data_out)

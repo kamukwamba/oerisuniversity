@@ -23,7 +23,7 @@ func main() {
 	//LOAD DATA TABLES
 	dbcode.LoadDB()
 
-	
+
 	routes.LoadAssesments()
 	routes.LoadCource()
 	routes.LoadExamTable()
@@ -130,13 +130,13 @@ func main() {
 	router.HandleFunc("/completed", routes.ProgramCompleted)
 	router.HandleFunc("/studentsettings", routes.StudentSettings)
 	router.HandleFunc("/studentlogoout/{id}", routes.StudentLogOut)
-	router.HandleFunc("/proceed/{id}", routes.StudentProcced)
+	router.HandleFunc("/proceed", routes.StudentProcced)
 	router.HandleFunc("/contactinstitution/{id}", routes.ContactInstitution)
 	router.HandleFunc("/watchvideo", routes.WatcVideo)
 	router.HandleFunc("/sendmessage", routes.SendMsg)
 	router.HandleFunc("/studentprofileportal/{id}", routes.StudentProfilePortal)
 	router.HandleFunc("/close_assesment_div", routes.CloseAssesmentDiv)
-	router.HandleFunc("/close_admin_div", routes.CloseAdmintDiv)
+	// router.HandleFunc("/close_admin_div", routes.CloseAdmintDiv)
 	router.HandleFunc("/error", routes.ErrorPage)
 	router.HandleFunc("/assesmentsubmit", routes.UploadAssesment)
 	router.HandleFunc("/forgotpassword", routes.PasswordResetPage)

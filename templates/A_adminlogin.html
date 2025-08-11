@@ -145,7 +145,7 @@
     <div class="login-container">
         <h1>Admin Login</h1>
         
-        <form  action="/admindashboard" method="POST" hx-indicator="#loading-indicator">
+        <form  action="/admindashboard" method="POST" hx-indicator="#loading-indicator"   hx-on::after-request="this.reset">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="email" required>

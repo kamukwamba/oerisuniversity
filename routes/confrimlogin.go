@@ -14,81 +14,20 @@ type ProgramAvailable struct {
 	Available bool
 }
 
-type ADMS struct {
-	UUID                                    string
-	Student_UUID                            string
-	First_Name                              string
-	Last_Name                               string
-	Email                                   string
-	Payment_Method                          string
-	Paid                                    string
-	Accepted                                string
-	Student_Results                         string
-	Complete                                string
-	Creative_Writing                        string
-	Understanding_Miracles                  string
-	Channeling_skills                       string
-	Enneagram                               string
-	Mythology_on_Gods_and_Goddess           string
-	Herbs                                   string
-	Meditation_skills                       string
-	Mantras_and_Mudras                      string
-	Divinations                             string
-	Archetypes                              string
-	Basics_in_Research                      string
-	Understanding_Propaganda                string
-	Great_Spiritual_Teachers                string
-	Reprogramming                           string
-	Shamanism                               string
-	Mystery_Schools_in_the_world            string
-	Law_and_Ethics_in_Metaphysical_Sciences string
-	Non_Violet_Communication                string
-}
 
-type ABDMS struct {
-	UUID                             string
-	Student_UUID                     string
-	First_Name                       string
-	Last_Name                        string
-	Email                            string
-	Payment_Method                   string
-	Paid                             string
-	Accepted                         string
-	Student_Results                  string
-	Complete                         string
-	Cause_and_Core_Issues_in_Beliefs string
-	Emotional_Well_Being             string
-	The_Art_of_Breathing             string
-	Spiritual_symbols_and_colours    string
-	Psychic_Skills                   string
-	Shadow_Work                      string
-	The_Craft                        string
-	Hypnosis_and_Beyond              string
-	Mysterious_experiences           string
-	Manifestation_skills             string
-	Unlocking_Creativity             string
-	Transpersonal_counselling        string
-	African_Healing_Arts             string
-	Ceremonies_of_the_World          string
-	Mother_Earth                     string
-	The_Art_of_Placement             string
-	Chakras_and_Auras                string
-	Transforming_personalities       string
-	Mayan_Calendar                   string
-	Polarity_Therapy                 string
-	Introduction_To_Meditation       string
-	Health_and_Nutrition             string
-	Setting_up_a_business            string
-}
+
 type AllStudentCources struct {
 	Student_dat StudentInfo
 	All         []AllCourceData
 }
 
 type AllCourceData struct {
-	ProgramStruct
+	ProgramStruct ProgramStruct
 	Cource_Struct []CourceStruct
 }
+
+
+
 
 type ProgramStruct struct {
 	UUID           string
@@ -170,13 +109,7 @@ func ValidateSudent(email_in, password_in string) (bool, string) {
 
 }
 
-func GetFromADMS(student_uuid string) {
 
-}
-
-func GetFromABDMS(student_uuid string) {
-
-}
 
 func UpdateProgram(student_uuid, table_name string) bool {
 	var programcompleted bool
@@ -231,21 +164,7 @@ func Update(student_uuid, table_name string) bool {
 
 }
 
-func GetFromADMSOne(student_uuid string) (bool, ADMS) {
-	var result bool
 
-	var dataout ADMS
-
-	return result, dataout
-}
-
-func GetFromADBMSOne(student_uuid string) (bool, ABDMS) {
-	var result bool
-
-	var dataout ABDMS
-
-	return result, dataout
-}
 
 func GetStudentPrograms(student_uuid string) []string {
 	dbread := dbcode.SqlRead()
@@ -282,7 +201,7 @@ func GetStudentPrograms(student_uuid string) []string {
 		fmt.Println("FAILED TO GET STUDENT PROGRAM LIST")
 	}
 
-	fmt.Println("listout", listout)
+
 
 	return listout
 }
@@ -295,9 +214,10 @@ func StudentPortal(w http.ResponseWriter, r *http.Request) {
 	var programdataout []AllCourceData
 	var studentinfo StudentInfo
 
-	studentprogramlist := GetStudentPrograms(studentuuid)
+	studentprogramlist := GetStudentPrograms(studentuuid)//Get The list of programs applied for 
 
 	programdataout, present := GetStudentProgramData(studentprogramlist, studentuuid)
+	
 	studentinfo = GetStudentAllDetails(studentuuid)
 
 	students_data := StudentCourse{
@@ -309,8 +229,10 @@ func StudentPortal(w http.ResponseWriter, r *http.Request) {
 	err := tpl.ExecuteTemplate(w, "studentportal.html", students_data)
 
 	if err != nil {
-		http.Redirect(w, r, "/error", http.StatusSeeOther)
-		return
+		// http.Redirect(w, r, "/error", http.StatusSeeOther)
+		// return
+
+		fmt.Println("Failed to load the student material", err)
 	}
 
 }
@@ -361,11 +283,76 @@ func ConfirmStudentLogin(w http.ResponseWriter, r *http.Request) {
 
 }
 
+
+func checkUserProgramPrepared(student_uuid, program_code string) (bool, error) {
+	dbread := dbcode.SqlRead().DB
+
+	defer dbread.Close()
+
+	var exists bool
+	query_stmt  := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s WHERE username = ?)", program_code)
+	stmt, err := dbread.Prepare(query_stmt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	err = stmt.QueryRow(student_uuid).Scan(&exists)
+
+	if err != nil {
+		fmt.Println("Failed failed to get user")
+	}
+
+	return exists, err
+}
+
+func checlIfApplied(student_uuid string) []ProgramDataEntry{
+
+	programs, err := GetAllProgramData()
+	var programs_not_studing []ProgramDataEntry 
+	var present bool
+	
+
+	if err != nil {
+		fmt.Println("No Programs Exist")
+	}
+
+	
+
+	
+	for _, program := range programs{
+		present, err = checkUserProgramPrepared(student_uuid, program.Code)
+
+		if err != nil{
+			fmt.Println("Failed to get user from checkUserExistsPrepared")
+		}else{
+			if !present{
+				programs_not_studing = append(programs_not_studing, program)
+			}
+		}
+		
+	}
+
+	return programs_not_studing
+
+}
+
 func StudentProcced(w http.ResponseWriter, r *http.Request) {
 
 	
-	
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+	student_uuid := r.URL.Query().Get("student_uuid")
 
-	fmt.Println("Applying for new program pending")
+	programs_available := checlIfApplied(student_uuid)
 
+	fmt.Println("Programs Available: ",programs_available)
+
+
+	err := tpl.ExecuteTemplate(w, "st_apply_for_more.html", programs_available)
+
+	if err != nil {
+		// http.Redirect(w, r, "/error", http.StatusSeeOther)
+		// return
+
+		fmt.Println("Failed to load the student material", err)
+	}
 }

@@ -8,6 +8,12 @@ import (
 
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 )
+type StudentDataPage struct {
+	Admin_Name string
+	ProgramData []ProgramStruct
+}
+
+
 
 type AdminLogData struct {
 	Email    string
@@ -204,10 +210,11 @@ func GetAllStudentsData() []ProgramStruct {
 	}
 
 
-	for item, _ := range getallprograms{
+	for _, item := range getallprograms{
+		fmt.Println(item.Code)
 		var cource_data ProgramStruct
 
-		query_str := fmt.Sprintf("select * from %s", item)
+		query_str := fmt.Sprintf("select * from %s", item.Code)
 		rows, err := dbread.DB.Query(query_str)
 		if err != nil {
 			fmt.Printf("Failed to get student data from %s ", query_str)
@@ -399,52 +406,87 @@ func ApproveCourceUpdate(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func GetStudentProgramDataAdmin(programlist []string, students_uuid string) ([]AllCourceData, bool) {
+
+type AllStudentProgramData struct{
+	Program_Name string
+	Course_List string
+}
+
+func GetStudentProgramDataAdmin(programlist []string, students_uuid string) ([]AllCourceData, bool){
+
+	//Get information 
+
+
+	//GET ALL THE COURCES NAME ASSOCIATED WITH  THE PROGRAM
+	//RUN THE LOOP TO GET THE DATA FROM THE PROGRAM TABLE
+	//WITHIN THE PROGRAM LOOP RUN A LOOP TO WITH THE COURCE ASSOCIATED WITH THE PROGRAM
+
 
 	var programdata ProgramStruct
 	var courcedata []CourceStruct
 	var allcourcedataout AllCourceData
 	var allcourcedataoutlist []AllCourceData
+	
 
 	var programsavailable ProgramAvailable
 	var available []bool
 
+	
+
 	for _, program := range programlist {
 		is_present, dataout, _ := GetProgramAdmin(students_uuid, "one", program)
 
+		fmt.Println("The Program: ", program)
+		fmt.Println("The dataout: ", dataout)
+
+		fmt.Println("IS Present: ", is_present)
+
+
 		if is_present {
 
-			var programdataacams StudentProgramData = dataout
+			programdata = ProgramStruct{
+				UUID: dataout.UUID,
+				Student_UUID: dataout.Student_UUID,
+				Program_Name: dataout.Program_Name,
+				First_Name: dataout.First_Name,
+				Last_Name: dataout.Last_Name,
+				Email: dataout.Email,
+				Payment_Method: dataout.Payment_Method,
+				Paid: dataout.Paid,
+				Approved: dataout.Approved,
+				Applied: dataout.Applied,
+				Completed: dataout.Completed,
+				Date: dataout.Date,
+			}
 
-			programdata.UUID = programdataacams.UUID
-			programdata.Student_UUID = programdataacams.Student_UUID
-			programdata.Program_Name = programdataacams.Program_Name
-			programdata.First_Name = programdataacams.First_Name
-			programdata.Last_Name = programdataacams.Last_Name
-			programdata.Email = programdataacams.Email
-			programdata.Payment_Method = programdataacams.Payment_Method
-			programdata.Paid = programdataacams.Paid
-			programdata.Approved = programdataacams.Approved
-			programdata.Applied = programdataacams.Applied
-			programdata.Completed = programdataacams.Completed
-			programdata.Date = programdataacams.Date
+			
 
-			courcedata = GetFromProgramCources(students_uuid, program)
+			courcedata = GetFromProgramCourcesAdmin(students_uuid, program)
 
-			allcourcedataout.ProgramStruct = programdata
-			allcourcedataout.Cource_Struct = courcedata
+			allcourcedataout = AllCourceData{
+				ProgramStruct: programdata,
+				Cource_Struct: courcedata,
+			}
+
 
 			allcourcedataoutlist = append(allcourcedataoutlist, allcourcedataout)
 
 			available = append(available, true)
+
+			
+
+
+		
 		} else {
 			available = append(available, false)
 		}
 
 	}
 
+
 	programsavailable.Available = available[0]
 
+	
 	return allcourcedataoutlist, programsavailable.Available
 
 }
@@ -484,11 +526,13 @@ func StudentProfileData(w http.ResponseWriter, r *http.Request) {
 	programdataout, present := GetStudentProgramDataAdmin(listout, studentuuid)
 
 	studentdataoutadmin := StudentCourse{
-		Available:        present,
-		StInfo:           studentdataout,
-		AllCourceDataOut: programdataout,
-		Admin_Name: user_name,
+		Available:        	present,
+		StInfo:           	studentdataout,
+		AllCourceDataOut: 	programdataout,
+		Admin_Name: 		user_name,
 	}
+
+	
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
 	err = tpl.ExecuteTemplate(w, "studentdetailstemplate.html", studentdataoutadmin)
@@ -499,20 +543,20 @@ func StudentProfileData(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func CloseAdmintDiv(w http.ResponseWriter, r *http.Request) {
-	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err := tpl.ExecuteTemplate(w, "student_cource_assesment", nil)
+// func CloseAdmintDiv(w http.ResponseWriter, r *http.Request) {
+// 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	if err != nil {
-		log.Fatal(err)
-	}
-}
+// 	err := tpl.ExecuteTemplate(w, "student_cource_assesment", nil)
+
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
 func StudentData(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	acamsstudents := GetAllStudentsData()
+	student_data := GetAllStudentsData()
 
 	user_name, err := GetUserName(r)
 
@@ -520,9 +564,8 @@ func StudentData(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Failed to get cookie")
 	}
 
-	data_out := AdminPage{
-
-		AcamsData:  acamsstudents,
+	data_out := StudentDataPage{
+		ProgramData:  student_data,
 		Admin_Name: user_name,
 	}
 

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/assets/css/studentportal.css?v=3.5">
+    <link rel="stylesheet" href="/assets/css/video.css?v=1.6">
+    <link rel="stylesheet" href="/assets/css/messages.css?v=1.0">
+    <link rel="stylesheet" href="/assets/css/studentdata.css?v=1.0">
+    <link rel="stylesheet" href="/assets/css/cource_assesment.css?v=1.0">
+
+    {{ template "sitelogimage" }}
+    
+
+   
+
+    <title>Student Dash Board</title>
+    <script src="/assets/htmx.js"></script>
+    <style>
+        .hiddenAssesments{
+            position: fixed;
+            top: 100px;
+            width: 50vw;
+            height: 50vh;
+            border: solid 1px darkgray;
+            border-radius: 5px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .closeBtn1{
+            width: 30px;
+            height: 30px;
+            color: white;
+            background-color: rgb(32, 0, 62);
+            border: solid 1px rgb(32, 0, 62);
+        }
+        .closeBtn1:hover{
+            color: rgb(32, 0, 62);
+        }
+
+      .truncate {
+        width: 200px; /* Adjust width as needed */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    </style>
+</head>
+<body>
+    {{template "HeaderStudent" .}}
+    
+    <main id="mainpage" class="main_div">
+        {{ if .Available}}
+            {{ template "programs" .}}
+        {{else}}
+            {{ template "oops" .}}
+        {{ end}}
+        
+
+       
+
+    </main>
+
+    <script >
+   
+    const myDiv = document.getElementById('hidden');
+    const hideDivBtn = document.getElementById('closeBTN');
+
+    
+    hideDivBtn.addEventListener('click', () => {
+      myDiv.style.display = 'none'; // Set display to none
+    });
+  
+
+  
+    </script>
+    
+   
+</body>
+
+<footer>
+    {{ template "footer"}}
+</footer>
+</div>
+</html>
+
+

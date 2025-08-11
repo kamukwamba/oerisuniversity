@@ -84,7 +84,7 @@ func AddToProgramCources(student_uuid, date_in, payment_type, program_code strin
 			uuid,
 			student_uuid,
 			cource_name,
-			cource_code,
+			course_code,
 			book,
 			module,
 			video,
@@ -157,7 +157,7 @@ func AddToProgramCources(student_uuid, date_in, payment_type, program_code strin
 	return added_to_cource_table
 }
 
-func GetFromProgramCources(student_uuid, program_code string) []CourceStruct {
+func GetFromProgramCourcesAdmin(student_uuid, program_code string) []CourceStruct{
 	var cource_data_out CourceStruct
 
 	var cource_data_out_list []CourceStruct
@@ -171,14 +171,13 @@ func GetFromProgramCources(student_uuid, program_code string) []CourceStruct {
 	for _, item := range course_tables {
 		dbread := dbcode.SqlRead().DB
 
-		data_query_string := fmt.Sprintf("select uuid, student_uuid, cource_name,course_code, book, module,video, applied, approved, examined, continuorse_assesment,completed, date from %s  where student_uuid = ?", item.Code)
+		data_query_string := fmt.Sprintf("select uuid, student_uuid, cource_name,course_code, applied, approved, examined, completed, date from %s  where student_uuid = ?", item.Code)
 
 		stmt, err := dbread.Prepare(data_query_string)
 
 		if err != nil {
-			error_out := fmt.Sprintf("getting from cource data: %s", err)
-			ErrorPrintOut("acamsfile", "GetFromACAMSCource", error_out)
-			log.Fatal(err)
+			fmt.Println(err)
+		
 		}
 
 		defer stmt.Close()
@@ -187,13 +186,9 @@ func GetFromProgramCources(student_uuid, program_code string) []CourceStruct {
 			&cource_data_out.Student_UUID,
 			&cource_data_out.Cource_Name,
 			&cource_data_out.Course_Code,
-			&cource_data_out.Book,
-			&cource_data_out.Module,
-			&cource_data_out.Video,
 			&cource_data_out.Applied,
 			&cource_data_out.Approved,
 			&cource_data_out.Examined,
-			&cource_data_out.Continuorse_Assesment,
 			&cource_data_out.Completed,
 			&cource_data_out.Date,
 		)
@@ -210,7 +205,133 @@ func GetFromProgramCources(student_uuid, program_code string) []CourceStruct {
 
 	return cource_data_out_list
 }
+//
+//
 
+
+///IF NOT IN USE TO BE DELETED
+
+func GetCourseMaterialOne(courseCode string)(string, string, string){
+
+	dbread := dbcode.SqlRead().DB
+
+	var assesment_out string
+	var video_list string
+	var module string
+
+	defer dbread.Close()
+
+	stmt, err := dbread.Prepare("select  cource_assesment, video_list, module from cource_table where cource_code = ?")
+
+	if err != nil {
+		fmt.Println("Failed to get cource material")
+	}
+
+	err = stmt.QueryRow(courseCode).Scan(&assesment_out, &video_list, &module)
+
+
+	if err != nil{
+		fmt.Println("Failed to get courses")
+	}
+
+
+	return assesment_out, video_list, module
+
+
+
+}
+
+func GetFromProgramCources(student_uuid_in, program_code string) []CourceStruct {
+	var cource_data_out CourceStruct
+
+	var cource_data_out_list []CourceStruct
+
+	course_tables, err := GetProgramCourses(program_code)
+
+	if err != nil {
+		fmt.Println("Failed program courses: ", err)
+	}
+
+	dbread := dbcode.SqlRead().DB
+
+	defer dbread.Close()
+
+	var uuid string
+	var student_uuid string
+	var cource_name string
+	var cource_code string
+	var applied bool
+	var approved bool
+	var examind bool
+	var completed bool
+	var date string 
+
+
+
+	for _, item := range course_tables {
+		
+
+		data_query_string := fmt.Sprintf("select uuid, student_uuid, cource_name,course_code, applied, approved, examined,completed, date from %s  where student_uuid = ?", item.Code)
+
+		stmt, err := dbread.Prepare(data_query_string)
+
+		if err != nil {
+			fmt.Println(err)
+		
+		}
+		defer stmt.Close()
+
+		err = stmt.QueryRow(student_uuid_in).Scan(
+			&uuid,
+			&student_uuid,
+			&cource_name,
+			&cource_code,
+			&applied,
+			&approved,
+			&examind,
+			&completed,
+			&date,
+		)
+
+
+
+		//SET THE COURCE MATERIAL INTO STRUCT
+
+		ass, video, module := GetCourseMaterialOne(item.Code)
+
+		cource_data_out = CourceStruct{
+			UUID: uuid,
+			Student_UUID: student_uuid,
+			Cource_Name: cource_name,
+			Course_Code: cource_code,
+			Applied: applied,
+			Approved: approved,
+			Examined: examind,
+			Continuorse_Assesment: ass,
+			Completed: completed,
+			Date: date,
+			Module: module,
+			Video: video,
+		}
+
+		if err != nil {
+			error_out := fmt.Sprintf("falied to query row: %s", err)
+			ErrorPrintOut("programcoursecreate", "GetProgramCources", error_out)
+			log.Fatal(err)
+		}
+
+		cource_data_out_list = append(cource_data_out_list, cource_data_out)
+
+	}
+
+	return cource_data_out_list
+}
+
+
+//TO BE DELETED
+
+
+//
 //1. add student data to the table of the program applied for 
 //2. get list of cources that are associated with that program
 //3. add the student data to the tables of said cources
@@ -258,7 +379,7 @@ func CreateProgamData(data_in StudentProgramData, payment_type, program_code str
 	_, err = statment.Exec(
 		uuid,
 		data_in.Student_UUID,
-		data_in.Program_Name,
+		program_code,
 		data_in.First_Name,
 		data_in.Last_Name,
 		data_in.Email,
@@ -324,7 +445,7 @@ func GetProgramAdmin(students_uuid_in, promt, program_code string) (bool, Studen
 
 		if err != nil {
 			error_out := fmt.Sprintf("%s assigning", err)
-			ErrorPrintOut("acams", "GetACAMS", error_out)
+			ErrorPrintOut("programcoursecreate", "GetPogramAdmin", error_out)
 		}
 
 		fmt.Println("the approved tag", acams_data_out.Approved)
@@ -424,6 +545,7 @@ func GetProgramsStudents(students_uuid_in, promt, program_name string) (bool, St
 		if err != nil {
 			error_out := fmt.Sprintf("getting multiple acams data: %s", err)
 			ErrorPrintOut("acams 422", "GetACAMS", error_out)
+			log.Fatal(err)
 		}
 
 		defer rows.Close()

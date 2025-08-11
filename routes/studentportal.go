@@ -13,7 +13,7 @@ func ApproveCource(w http.ResponseWriter, r *http.Request) {
 	cource_name := r.URL.Query().Get("cource_name")
 	var setresult_out string
 
-	fmt.Println(uuid, cource_name)
+
 
 	result := ApplyForCource(uuid, cource_name)
 
