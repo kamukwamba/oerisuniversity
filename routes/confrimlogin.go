@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 )
@@ -290,7 +291,7 @@ func checkUserProgramPrepared(student_uuid, program_code string) (bool, error) {
 	defer dbread.Close()
 
 	var exists bool
-	query_stmt  := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s WHERE username = ?)", program_code)
+	query_stmt  := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s WHERE student_uuid = ?)", program_code)
 	stmt, err := dbread.Prepare(query_stmt)
 	if err != nil {
 		log.Fatal(err)
@@ -299,7 +300,7 @@ func checkUserProgramPrepared(student_uuid, program_code string) (bool, error) {
 	err = stmt.QueryRow(student_uuid).Scan(&exists)
 
 	if err != nil {
-		fmt.Println("Failed failed to get user")
+		exists = false
 	}
 
 	return exists, err
@@ -325,6 +326,7 @@ func checlIfApplied(student_uuid string) []ProgramDataEntry{
 		if err != nil{
 			fmt.Println("Failed to get user from checkUserExistsPrepared")
 		}else{
+			fmt.Println("Is present: ",present)
 			if !present{
 				programs_not_studing = append(programs_not_studing, program)
 			}
@@ -336,6 +338,12 @@ func checlIfApplied(student_uuid string) []ProgramDataEntry{
 
 }
 
+
+type ProceedStruct struct{
+	Programs_Av []ProgramDataEntry
+	StInfo  StudentInfo
+}
+
 func StudentProcced(w http.ResponseWriter, r *http.Request) {
 
 	
@@ -343,11 +351,18 @@ func StudentProcced(w http.ResponseWriter, r *http.Request) {
 	student_uuid := r.URL.Query().Get("student_uuid")
 
 	programs_available := checlIfApplied(student_uuid)
+	studentdata := GetStudentAllDetails(student_uuid)
 
-	fmt.Println("Programs Available: ",programs_available)
+	dataout := ProceedStruct{
+		Programs_Av: programs_available,
+		StInfo: studentdata,
+	}
 
 
-	err := tpl.ExecuteTemplate(w, "st_apply_for_more.html", programs_available)
+	
+
+
+	err := tpl.ExecuteTemplate(w, "st_apply_for_more.html", dataout)
 
 	if err != nil {
 		// http.Redirect(w, r, "/error", http.StatusSeeOther)
@@ -356,3 +371,61 @@ func StudentProcced(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Failed to load the student material", err)
 	}
 }
+
+
+func ApplyProceed(w http.ResponseWriter, r *http.Request){
+
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	student_uuid := r.URL.Query().Get("student_uuid")
+	program_code := r.URL.Query().Get("program")
+
+	var setteltemplate string 
+
+	programs := GetStudentPrograms(student_uuid)
+
+
+	complete := AppendProgramList(program_code, student_uuid,programs)
+
+	getSD := GetStudentAllDetails(student_uuid)
+	payment_type = "Lump"
+	date_applied := time.Now()
+	
+	program_data := StudentProgramData{
+		Student_UUID:   student_uuid,
+		First_Name:     getSD.First_Name,
+		Last_Name:      getSD.Last_Name,
+		Email:          getSD.Email,
+		Applied:        true,
+		Approved:       false,
+		Payment_Method: payment_type,
+		Paid:           "pending",
+		Completed:      false,
+		Date:           date_applied,
+	}
+	if complete{
+		err := CreateProgamData(program_data, payment_type, program_name)
+		if err != nil {
+			fmt.Println("Failed to apply to new program")
+		}else{
+			setteltemplate = "progragramapplied"
+
+		}
+	}else{
+		setteltemplate = "programapplicationfailed"
+	}	
+
+	err := tpl.ExecuteTemplate(w, setteltemplate, nil)
+	
+
+	if err != nil {
+		log.Fatal(err)
+	}
+			
+
+}
+
+
+	
+	
+	

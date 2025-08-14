@@ -136,6 +136,7 @@ func main() {
 	router.HandleFunc("/sendmessage", routes.SendMsg)
 	router.HandleFunc("/studentprofileportal/{id}", routes.StudentProfilePortal)
 	router.HandleFunc("/close_assesment_div", routes.CloseAssesmentDiv)
+	router.HandleFunc("/applytpproceed", routes.ApplyProceed)
 	// router.HandleFunc("/close_admin_div", routes.CloseAdmintDiv)
 	router.HandleFunc("/error", routes.ErrorPage)
 	router.HandleFunc("/assesmentsubmit", routes.UploadAssesment)
