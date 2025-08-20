@@ -175,10 +175,10 @@
             hx-target="#newsamplelist"
             hx-swap="beforeend"
              hx-encoding="multipart/form-data">
-                <input type="text" placeholder="News Title" name="title" class="articletitle">
-				<textarea name="story"  cols="90" rows="15" style="margin-top: 20px; padding-bottom: 10px;"></textarea>
-                <input type="textarea" placeholder="Enter image link" name="image" class="articleinagelink">
-                <input type="textarea" placeholder="Enter Auther Name" name="auther" class="articleinagelink">
+                <input type="text" placeholder="News Title" name="title" class="articletitle" required>
+				<textarea name="story"  cols="90" rows="15" style="margin-top: 20px; padding-bottom: 10px;" required></textarea>
+                <input type="textarea" placeholder="Enter image link" name="image" class="articleinagelink" required>
+                <input type="textarea" placeholder="Enter Auther Name" name="auther" class="articleinagelink" required>
                 <label for="file">Choose file to upload:</label>
                 <input type="file" id="file" name="file" required><br><br>
 

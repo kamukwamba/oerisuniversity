@@ -414,7 +414,7 @@
 {{define "cource_approve_admin"}}
 
     <button
-    hx-post="/courceupdateadmin?user_uuid={{ .ProgramStruct.Student_UUID }}&cource_name={{ .Cource_Name}}"
+    hx-post="/courceupdateadmin?user_uuid={{ .Student_UUID }}&cource_name={{ .Course_Code}}"
     hx-swap="outerHTML"
     class="cource_approve">
     Approve 

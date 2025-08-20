@@ -10,9 +10,9 @@ func Programs(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	//debug failure to laod templates
+	programs := GetAllProgramData()
 
-	err := tpl.ExecuteTemplate(w, "programs.html", nil)
+	err := tpl.ExecuteTemplate(w, "programs.html", programs)
 
 	if err != nil {
 		log.Fatal(err)

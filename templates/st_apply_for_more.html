@@ -159,9 +159,11 @@
 </head>
 <body>
     {{template "HeaderStudent" .}}
-    
-    <main id="cards-container" class="main_div" style="padding: 20px;">
+    <main>
+    <h2>Programs Available To You</h2>
+    <div id="cards-container" class="main_div" style="padding: 20px;">
         {{ $studentuuid := .StInfo.UUID}}
+
         {{ range .Programs_Av }}
         <div class="card">
         <div class="program-header">
@@ -198,7 +200,7 @@
         </div>
     </div>
         {{ end }}
-    
+    </div>
     </main>
 
     <script >

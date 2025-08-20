@@ -47,9 +47,8 @@ func UpdateCourceData(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	stmt, err := dbconn.Prepare("select uuid, program_name, cource_name,cource_assesment, video_list, module,recomended_book from cource_table where uuid = ?")
+	stmt, err := dbconn.Prepare("select uuid, program_name, cource_name, cource_code,cource_assesment, video_list, module,recomended_book from cource_table where uuid = ?")
 
-	fmt.Println("Cource UUID:::::: ", uuid)
 
 	if err != nil {
 		err_out := fmt.Errorf("Failed to read from DB, error out ONE: %w", err)
@@ -58,7 +57,7 @@ func UpdateCourceData(w http.ResponseWriter, r *http.Request) {
 
 	defer stmt.Close()
 
-	err = stmt.QueryRow(uuid).Scan(&cource_data.UUID, &cource_data.Program_Name, &cource_data.Cource_Name, &cource_data.Cource_Aseesment, &cource_data.Video_List, &cource_data.Module, &cource_data.Book)
+	err = stmt.QueryRow(uuid).Scan(&cource_data.UUID, &cource_data.Program_Name, &cource_data.Cource_Name,  &cource_data.Cource_Code,&cource_data.Cource_Aseesment, &cource_data.Video_List, &cource_data.Module, &cource_data.Book)
 
 	if err != nil {
 		err_out := fmt.Errorf("Failed to read from DB, error out TWO: %w", err)
@@ -66,11 +65,15 @@ func UpdateCourceData(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err_out)
 	}
 
+
+	fmt.Println("Cource UUID:::::: ", uuid)
+	fmt.Println("Cource Data:::::: ", cource_data)
+
+
 	err_out := tpl.ExecuteTemplate(w, "updatecoursedatanew", cource_data)
 
 	if err_out != nil {
-		http.Redirect(w, r, "/error", http.StatusSeeOther)
-		return
+		fmt.Println("Failed to get data for update: ", err_out)
 	}
 
 }

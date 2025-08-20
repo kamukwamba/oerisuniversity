@@ -388,8 +388,8 @@ func ApplyProceed(w http.ResponseWriter, r *http.Request){
 	complete := AppendProgramList(program_code, student_uuid,programs)
 
 	getSD := GetStudentAllDetails(student_uuid)
-	payment_type = "Lump"
-	date_applied := time.Now()
+	payment_type := ""
+	date_applied :=fmt.Sprintf("%s",time.Now())
 	
 	program_data := StudentProgramData{
 		Student_UUID:   student_uuid,
@@ -404,7 +404,7 @@ func ApplyProceed(w http.ResponseWriter, r *http.Request){
 		Date:           date_applied,
 	}
 	if complete{
-		err := CreateProgamData(program_data, payment_type, program_name)
+		err := CreateProgamData(program_data, payment_type, program_code)
 		if err != nil {
 			fmt.Println("Failed to apply to new program")
 		}else{

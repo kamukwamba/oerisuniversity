@@ -172,15 +172,14 @@ func ReadNewsRoute(w http.ResponseWriter, r *http.Request) {
 
 func CleanNewsImages(uuid string) string {
 
-	new_uuid := strings.Split(uuid, "-")
 
-	new_file := "nI"
+	return strings.NewReplacer(
+        "\r", "",
+        "\n", "",
+        ";", "",
+        " ", "_",
 
-	for _, item := range new_uuid {
-		new_file = new_file + item
-	}
-
-	return new_file
+    ).Replace(uuid)
 }
 func Create_News(w http.ResponseWriter, r *http.Request) {
 

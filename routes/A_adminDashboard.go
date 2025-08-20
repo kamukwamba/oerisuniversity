@@ -532,6 +532,7 @@ func StudentProfileData(w http.ResponseWriter, r *http.Request) {
 		Admin_Name: 		user_name,
 	}
 
+
 	
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 

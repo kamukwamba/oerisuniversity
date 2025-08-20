@@ -388,7 +388,7 @@
                 </div>
                 <div class="form-group">
                     <label for="project-description">Module</label>
-                    <textarea id="project-description" placeholder="Enter Module Link" name="modole_link"></textarea>
+                    <textarea id="project-description" placeholder="Enter Module Link" name="module_link"></textarea>
                 </div>
                   <div class="form-group">
                     <label for="project-description">Assesments</label>
@@ -475,32 +475,32 @@
 
                 <div class="form-group" >
                     <label for="project-name">Program Code</label>
-                    <input type="text" id="project-name" name="program_name" value="{{.Program_Name}}" placeholder="{{ .Program_Name}}" required>
+                    <input type="text" id="project-name" name="program_name" value="{{.Program_Name}}" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="project-description">Course Name</label>
-                    <textarea id="project-description" placeholder="Enter program code" name="cource_name" value="{{ .Course_Name}}" required ></textarea>
+                    <textarea id="project-description" placeholder="Enter program code" name="cource_name"  required >{{ .Cource_Name}}</textarea>
                 </div>
                 <div class="form-group">
                     <label for="project-description">Course Code</label>
-                    <textarea id="project-description" placeholder="Enter program code" name="course_code" value = "" required ></textarea>
+                    <textarea id="project-description" placeholder="Enter program code" name="course_code" required >{{ .Cource_Code}}</textarea>
                 </div>
                 <div class="form-group">
                     <label for="project-description">Recommended Book</label>
-                    <textarea id="project-description" placeholder="Enter program code" name="book_link" value="{{ .Book}}"></textarea>
+                    <textarea id="project-description" placeholder="Enter program code" name="book_link" >{{ .Book}}</textarea>
                 </div>
                 <div class="form-group">
                     <label for="project-description">Module</label>
-                    <textarea id="project-description" placeholder="Enter program code" name="modole_link" value="{{ .Module }}"></textarea>
+                    <textarea id="project-description" placeholder="Enter program code" name="modole_link" >{{ .Module }}</textarea>
                 </div>
                   <div class="form-group">
                     <label for="project-description">Assesments</label>
-                    <textarea id="project-description" placeholder="Enter program code" name="assesment_link" value="{{ .Assesments}}"></textarea>
+                    <textarea id="project-description" placeholder="Enter program code" name="assesment_link" >{{ .Cource_Aseesment}}</textarea>
                 </div>
                    <div class="form-group">
                     <label for="project-description">Video List</label>
-                    <textarea id="project-description" placeholder="Enter program code" name="video_link" value="{{ .Video_List }}"></textarea>
+                    <textarea id="project-description" placeholder="Enter program code" name="video_link" >{{ .Video_List }}</textarea>
                 </div>
 
 
