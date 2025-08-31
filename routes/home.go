@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
+	"encoding/json"
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 	"github.com/kamukwamba/oerisuniversity/encription"
 
@@ -27,6 +27,11 @@ type NewsStruct struct {
 	Story      string
 	Date       string
 	Title      string
+}
+
+type Response struct {
+	Message string `json:"message"`
+	Error   string `json:"error,omitempty"`
 }
 
 type NewsHomePage struct {
@@ -66,18 +71,19 @@ func ReadNews(uuid_in, number string) (NewsStruct, []NewsStruct) {
 
 		err = stmt.QueryRow(uuid_in).Scan(&uuid, &title, &auther, &image_link, &story, &date)
 
-		image_link_out := CleanNewsImages(uuid)
+		
 
-		file_link := fmt.Sprintf("/news/%s/%s", image_link_out, image_link)
+		
 
 		news_one = NewsStruct{
 			UUID:       uuid,
 			Title:      title,
 			Auther:     auther,
-			Image_Link: file_link,
+			Image_Link: image_link,
 			Story:      story,
 			Date:       date,
 		}
+
 
 		if err != nil {
 			fmt.Println("Failed to execute News One")
@@ -97,18 +103,18 @@ func ReadNews(uuid_in, number string) (NewsStruct, []NewsStruct) {
 		for rows.Next() {
 			err := rows.Scan(&uuid, &title, &auther, &image_link, &story, &date)
 
-			image_link_out := CleanNewsImages(uuid)
-
-			file_link := fmt.Sprintf("/news/%s/%s", image_link_out, image_link)
 
 			news_one = NewsStruct{
 				UUID:       uuid,
 				Title:      title,
 				Auther:     auther,
-				Image_Link: file_link,
+				Image_Link: image_link,
 				Story:      story,
 				Date:       date,
 			}
+
+			fmt.Println("The Image Link: ", image_link)
+
 			if err != nil {
 				fmt.Println("FAILED TO LOAD", err)
 			}
@@ -160,6 +166,26 @@ func ReadNewsRoute(w http.ResponseWriter, r *http.Request) {
 
 	//debug failure to laod templates
 
+
+
+	uuid := r.URL.Query().Get("uuid")
+	news_out, _ := ReadNews(uuid, "one")
+
+	fmt.Println(uuid)
+
+	err := tpl.ExecuteTemplate(w, "news_one", news_out)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+
+func ViewAdminNews(w http.ResponseWriter, r *http.Request) {
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+
+	//debug failure to laod templates
+
 	uuid := r.URL.Query().Get("uuid")
 	news_out, _ := ReadNews(uuid, "one")
 
@@ -181,77 +207,146 @@ func CleanNewsImages(uuid string) string {
 
     ).Replace(uuid)
 }
+
+
+
+type NewsCreateStruct struct{
+	UUID string
+	Auther string
+	Title string
+	Story string
+	ImagePath string
+	Date string
+}
+
+
+func SaveNewsInDB(newsIn NewsCreateStruct) error{
+
+	dbread := dbcode.SqlRead().DB
+
+	defer dbread.Close()
+
+	stmt, err := dbread.Prepare("insert into news (uuid, title,auther, image, story, date) values (?,?,?,?,?,?)") 
+
+	if err != nil {
+		fmt.Println("Failed to create to insert news")
+		return err
+	}
+
+	_, err = stmt.Exec(newsIn.UUID, newsIn.Title, newsIn.Auther, newsIn.ImagePath, newsIn.Story, newsIn.Date)
+
+	if err != nil {
+		fmt.Println("Failed to save news input")
+		return err
+	}
+
+	return nil
+
+}
+
+
+func generateUniqueFilename(originalName, uuid string) string {
+	
+	ext := filepath.Ext(originalName)
+	
+	return fmt.Sprintf("%s%s", uuid, ext)
+}
+
+
 func Create_News(w http.ResponseWriter, r *http.Request) {
 
-	create_news := dbcode.SqlRead().DB
+	w.Header().Set("Content-Type", "text/html")
 
-	r.ParseForm()
+	err_parse := r.ParseMultipartForm(15<<20)
+
+	if err_parse != nil {
+		fmt.Println("Failed to parse form", err_parse)
+	}
+
+
 
 	auther := r.FormValue("auther")
 	title := r.FormValue("title")
 	story := r.FormValue("story")
 
-	fmt.Println("Story: ", story)
-
+	fmt.Println("Auther: ", auther, "\nTitle: ", title, "\nStory: ", story)
 	uuid := encription.Generateuudi()
-
 	date := fmt.Sprintf("%s", time.Now().Local())
+	cleanedUuid := CleanNewsImages(uuid)
+	
+	//NEW NEWS CODE
 
-	new_file_dir := CleanNewsImages(uuid)
-
-	file, handler, err := r.FormFile("file")
+	file, header, err := r.FormFile("image")
 
 	if err != nil {
-		http.Error(w, "Error retrieving the file", http.StatusBadRequest)
-		return
+		fmt.Println("Failed to get uploaded file", err.Error())
+
 	}
+
 	defer file.Close()
 
-	file_name := handler.Filename
+	buffer := make([]byte, 512)
+	if _, err = file.Read(buffer);err != nil {
+		fmt.Println("Failed to read file", err.Error())
+	}
 
-	data_out := NewsStruct{
+	file.Seek(0, 0)
+
+	contentType := http.DetectContentType(buffer)
+	if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" {
+		sendError(w, "Only JPEG, PNG and GIF images are allowed", http.StatusBadRequest)
+		return
+	}
+
+	uniqueName := generateUniqueFilename(header.Filename, cleanedUuid)
+
+	filePath := filepath.Join("./news", uniqueName)
+
+	dst, err := os.Create(filePath)
+	if err != nil {
+		sendError(w, "Failed to create file: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer dst.Close()
+
+	// Copy file content
+	if _, err := io.Copy(dst, file); err != nil {
+		sendError(w, "Failed to save file: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//END
+
+
+	data_out := NewsCreateStruct{
 		UUID:       uuid,
 		Auther:     auther,
 		Title:      title,
-		Image_Link: file_name,
+		ImagePath: uniqueName,
 		Story:      story,
+		Date: date,
 	}
 
-	stmt, err := create_news.Prepare("insert into news (uuid, title,auther, image, story, date) values (?,?,?,?,?,?)")
+
+	err = SaveNewsInDB(data_out)
 
 	if err != nil {
-		fmt.Println("failed to insert", err)
-	}
-
-	defer stmt.Close()
-
-	_, err = stmt.Exec(uuid, title, auther, file_name, story, date)
-	if err != nil {
-		fmt.Println("failed to create")
-	}
-
-	filePath := filepath.Join("./news", new_file_dir, file_name)
-
-	dst, err := os.Create(filePath)
-
-	if err != nil {
-		fmt.Println("FAILED TO UPLOAD FILE", err)
-	}
-
-	defer dst.Close()
-
-	_, err = io.Copy(dst, file)
-	if err != nil {
-		fmt.Println("FAILED TO UPLOAD TO SERVER", err)
+		fmt.Println("Failed to save news bulleting in data base")
 	}
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	err = tpl.ExecuteTemplate(w, "newssamples", data_out)
+	err = tpl.ExecuteTemplate(w, "newssamples2", data_out)
 
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+
+func sendError(w http.ResponseWriter, message string, statusCode int) {
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(Response{Error: message})
 }
 
 func CreateVisitorTable() {
@@ -500,16 +595,45 @@ func NewsPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+
+
+type ProgramData struct {
+	Name string
+	Program string
+	Cources []Course_Name
+
+}
+
+
 func Curiculum(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	//debug failure to laod templates
+	var program_data ProgramData
+	var all_program_data []ProgramData
+	programs, _ := GetAllProgramData()
 
-	page_name := PageName{
-		Name: "curriculum",
+	fmt.Println("Program list: ", programs)
+	for _, program := range programs{
+		program_cources,err := GetProgramCourses(program.Code)
+		if err != nil {
+			fmt.Println("Failed to get program cources")
+
+		}else{
+
+			program_data = ProgramData{
+				Program: program.Name,
+				Cources: program_cources,
+			}
+
+			all_program_data = append(all_program_data, program_data)
+		}
+
 	}
 
-	err := tpl.ExecuteTemplate(w, "curriculum.html", page_name)
+
+
+	err := tpl.ExecuteTemplate(w, "curriculum.html", all_program_data)
 
 	if err != nil {
 		log.Fatal(err)

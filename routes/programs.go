@@ -4,15 +4,20 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"fmt"
 )
 
 func Programs(w http.ResponseWriter, r *http.Request) {
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 
-	programs := GetAllProgramData()
+	programs, err := GetAllProgramData()
 
-	err := tpl.ExecuteTemplate(w, "programs.html", programs)
+	if err != nil {
+		fmt.Println("Failed to get programs available")
+	}
+
+	err = tpl.ExecuteTemplate(w, "programs.html", programs)
 
 	if err != nil {
 		log.Fatal(err)

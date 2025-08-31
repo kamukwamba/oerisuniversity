@@ -532,7 +532,7 @@ func DeleteAllQuestions(cource_name string) bool {
 
 	deleted := true
 	dbconn := dbcode.SqlRead().DB
-	stmt, err := dbconn.Prepare("DELETE FROM exam_questions WHERE  cource_name = ?")
+	stmt, err := dbconn.Prepare("DELETE FROM exam_questions WHERE  cource_uuid = ?")
 
 	if err != nil {
 		deleted = false

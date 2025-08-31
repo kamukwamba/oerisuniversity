@@ -345,9 +345,53 @@ func UpdateCource(uuid, cource_name string) bool {
 
 }
 
+func DropTable(cource_code string) error{
+	dbread := dbcode.SqlRead().DB
+
+    defer dbread.Close()
+
+
+    fmt.Println("THE TABLE TO DROP: ", cource_code)
+    
+    dropTableSQL := fmt.Sprintf("DROP TABLE IF EXISTS %s", cource_code)
+    
+    _, err := dbread.Exec(dropTableSQL)
+    if err != nil {
+        log.Fatal(err)
+        return err
+    }
+
+    return nil
+    
+
+}
+
+
+
+func DeleteCourceNames(cource_code string) error{
+	dbconn := dbcode.SqlRead().DB
+
+	stmt, err := dbconn.Prepare("Delete from CourseNames where courseCode = ?")
+
+	if err != nil {
+		fmt.Println("Failed to delete from cource names error: ", err)
+		return err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(cource_code)
+	if err != nil {
+		fmt.Println("Failed to delete from cource names error: ", err)
+		return err
+	}
+
+	return nil
+}
+
 func DeleteCource(w http.ResponseWriter, r *http.Request) {
 
-	cource_name := r.URL.Query().Get("cource_name")
+	cource_code := r.URL.Query().Get("cource_name")
 	cource_uuid := r.URL.Query().Get("cource_uuid")
 
 	dbconn := dbcode.SqlRead().DB
@@ -366,10 +410,19 @@ func DeleteCource(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	if !DeleteAllQuestions(cource_name) {
+	if !DeleteAllQuestions(cource_uuid) {
 		http.Redirect(w, r, "/error", http.StatusSeeOther)
 		fmt.Println("Failed to delete questions")
 	}
+
+	if DropTable(cource_code) != nil {
+		fmt.Println("Failed to drop cource tables")
+	}
+
+	if DeleteCourceNames(cource_code) != nil{
+		fmt.Println("Failed to delete cource names")
+	}
+
 
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
 

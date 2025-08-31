@@ -20,6 +20,9 @@ func Enviroment(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
+
+	//Email Configaration
+
 	//LOAD DATA TABLES
 	dbcode.LoadDB()
 
@@ -89,6 +92,12 @@ func main() {
 	router.HandleFunc("/getupdate", routes.GetUpateAdmin)
 	router.HandleFunc("/loadform", routes.LoadAdminForm)
 	router.HandleFunc("/saveucdaata", routes.UpdateProgramDetails)
+
+	///
+	router.HandleFunc("/updateprogramdetails", routes.UpdateAllProgramDetailsR)
+	router.HandleFunc("/updateprogramdata", routes.UpdateAllProgramDetails)
+
+	///
 	router.HandleFunc("/gradeca", routes.GradeCA)
 	router.HandleFunc("/delete_cource_data", routes.DeleteCource)
 	router.HandleFunc("/get_matrics", routes.Matrics)
@@ -147,11 +156,18 @@ func main() {
 	router.HandleFunc("/handinassesment", routes.HandInAssesment)
 	router.HandleFunc("/grade_assesment", routes.GradeAssesment)
 	router.HandleFunc("/deleteassesmentresults", routes.DeleteAssesmentAdmin)
+	router.HandleFunc("/deletenews", routes.DeleteNewsRoute)
+	router.HandleFunc("/viewadminnews", routes.ViewAdminNews)
+
+
 
 	//LOAD ASSETS
 
 	fs := http.FileServer(http.Dir("assets"))
 	router.Handle("/assets/", http.StripPrefix("/assets/", fs))
+
+	ns := http.FileServer(http.Dir("news"))
+	router.Handle("/news/", http.StripPrefix("/news/", ns))
 
 	//RUN SERVER
 	port := os.Getenv("PORT")

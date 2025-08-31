@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/assets/css/newsAdmin.css?v=1.0">
+    <script src="/assets/js/color-modes.js"></script>
+
     <title>News</title>
     {{ template "sitelogimage" }}
     
@@ -30,6 +32,9 @@
             margin-right: 10px;
             border: solid 1px white;
             border-radius: 3px;
+            position: absolute;
+            top: 10vh;
+            right: 0px;
 
         }
 
@@ -39,7 +44,7 @@
     {{ template "Header"}}
     <div class="mainnewsdiv" style="margin-top: 30px; margin-bottom: 20px;">
 
-        <div class="leftside" >
+        <div class="leftside" id="newsarticle">
 
             {{ if .Present}}
                 {{ template "newsmain" .}}
@@ -72,10 +77,10 @@
 
 
     <div class="newsimagediv" style="border: none;">
-        <img src="{{ .NewsMain.Image_Link}}" alt="{{ .NewsMain.Title}}" class="newsimage" style="border: none;">
+        <img src="news/{{.NewsMain.Image_Link}}" alt="{{.NewsMain.Title}}" class="newsimage" style="border: none;">
     </div>
 
-    <div class="newsarticle">
+    <div class="newsarticle" >
     
         <div class="newsheader">
             <h2 class="newsheadertext">{{ .NewsMain.Title}}</h2>
@@ -95,6 +100,34 @@
 {{ end }}
 
 
+
+{{ define "news_one"}}
+
+
+    <div class="newsimagediv" style="border: none;">
+        <img src="news/{{.Image_Link}}" alt="{{.Title}}" class="newsimage" style="border: none;">
+    </div>
+
+    <div class="newsarticle" >
+    
+        <div class="newsheader">
+            <h2 class="newsheadertext">{{ .Title}}</h2>
+            <h5 class="authername">{{ .Auther}}</h5>
+        </div>
+
+        <div class="newscontent">
+            <p class="newsparagraphs">
+
+            {{ .Story }}
+            </p>
+
+            
+        </div>
+    </div>
+
+{{ end }}
+
+
 {{ define "newsdemo"}}
 
 
@@ -104,9 +137,13 @@
             hx-get="/readnewsstory?uuid={{ .UUID}}"
             hx-target="#newsarticle"
             hx-swap="innerHTML"
-            style="background-image: url({{.Image_Link}}); 
-            background-repeat:no-repeat;
-            background-size: 100%, 100%;">
+            style="background-color: white; 
+            border: solid 1px black; 
+            border-radius: 5px; 
+            background-image: url('news/{{.Image_Link}}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;">
     
     <div class="spacefiller">
 

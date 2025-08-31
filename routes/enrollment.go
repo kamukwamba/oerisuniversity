@@ -241,6 +241,7 @@ func CreateID() string {
 
 func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
+	EmailService := LoadConfigFromEnv()
 
 	r.ParseForm()
 
@@ -357,6 +358,13 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 				RecordeInProgramCources(uuid, program_name, date_applied)
 				MakeStudentExamTable(uuid)
 				CreateStudentCridentials(uuid, email)
+
+				user_identifiacation := fmt.Sprintf("%s %s", first_name, last_name)
+				err := EmailService.SendWelcomeEmail(email, user_identifiacation)
+			    if err != nil {
+			        log.Fatalf("Failed to send welcome email: %v", err)
+			    }
+			    log.Println("Welcome email sent successfully!")
 			}
 
 		} else {

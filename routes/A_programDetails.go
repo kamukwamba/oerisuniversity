@@ -29,6 +29,8 @@ type ProgramsAvailabelSt struct {
 	EmailPresent bool
 	ProgramList  []ProgramDataEntry
 }
+
+
 func CreateProgramDB() {
 	dbread := dbcode.SqlRead().DB
 
@@ -48,6 +50,8 @@ func CreateProgramDB() {
 	}
 
 }
+
+
 
 func CreateNewProgramR(w http.ResponseWriter, r *http.Request) {
 
@@ -253,7 +257,7 @@ func CreateProgramCourseR(w http.ResponseWriter, r *http.Request) {
 	_, err = stmt.Exec(course_name, course_code, program_code)
 
 	if err != nil {
-		fmt.Printf("Failed to execute db command create:: %s", err)
+		fmt.Printf("Failed to execute db command create HOW:: %s", err)
 		setTemplatName = "failedToCreateCourse"
 
 	}
@@ -282,7 +286,7 @@ func CreateCourseMaterial(program_code, course_name, course_code string) error {
 	_, err = stmt.Exec(course_name, course_code, program_code)
 
 	if err != nil {
-		fmt.Printf("Failed to execute db command create:: %s", err)
+		fmt.Printf("Failed to execute db command create NOW:: %s", err)
 
 	}
 
@@ -352,6 +356,13 @@ func GetProgramCourses(program_code string) ([]Course_Name, error) {
 	return courseDataListOut, nil
 }
 
+func CreateCourseAssignmentFolder(cource_namme string) error{
+
+
+	return nil
+	
+}
+
 func CreateCourseDB() {
 	db := dbcode.SqlRead().DB
 
@@ -359,7 +370,7 @@ func CreateCourseDB() {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		courseName TEXT UNIQUE,
 		courseCode TEXT UNIQUE,
-		programCode TEXT UNIQUE
+		programCode TEXT
 	)`)
 
 	if err != nil {
