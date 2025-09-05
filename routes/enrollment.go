@@ -12,7 +12,11 @@ import (
 	"time"
 
 	"github.com/kamukwamba/oerisuniversity/dbcode"
+	
+
 	"github.com/kamukwamba/oerisuniversity/encription"
+	"github.com/kamukwamba/oerisuniversity/services"
+
 )
 
 type StudentInfo struct {
@@ -169,7 +173,7 @@ func Enrollment(w http.ResponseWriter, r *http.Request) {
 	programs_available := ProgramsAvailabel()
 
 
-	fmt.Println(programs_available)
+
 
 	r.ParseForm()
 	if r.Method == "POST" {
@@ -241,7 +245,6 @@ func CreateID() string {
 
 func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))
-	EmailService := LoadConfigFromEnv()
 
 	r.ParseForm()
 
@@ -360,10 +363,13 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 				CreateStudentCridentials(uuid, email)
 
 				user_identifiacation := fmt.Sprintf("%s %s", first_name, last_name)
-				err := EmailService.SendWelcomeEmail(email, user_identifiacation)
+				
+			    err := services.SendSuccessEmail(email, user_identifiacation)
+
 			    if err != nil {
-			        log.Fatalf("Failed to send welcome email: %v", err)
-			    }
+				http.Error(w, "Test email failed: "+err.Error(), http.StatusInternalServerError)
+				return
+	}
 			    log.Println("Welcome email sent successfully!")
 			}
 

@@ -296,7 +296,12 @@
                     {{ range .ProgramD}}
                         <div class="card" id="{{ .Code }}">
                             <div class="card-header">
-                                <button class="card-btn update"><a class="btn2" style="display:block; text-decoration: none;" href="/updateprogramdetails?programCode={{.Code}}?programName{{.Name}}">Update</a></button>
+                                <button class="card-btn update"><a class="btn2" 
+										hx-get = "/updateprogramdetails?programCode={{.Code}}&programName={{.Name}}"
+										hx-target = "#sidebarC"
+										hx-swap="innerHTML"
+										style="display:block; text-decoration: none;"
+										>Update</a></button>
                                 
                             </div>
                             <div class="card-body">

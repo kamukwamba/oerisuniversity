@@ -5,8 +5,10 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/kamukwamba/oerisuniversity/dbcode"
+	"github.com/kamukwamba/oerisuniversity/encription"
 )
 
 type MessageAdmin struct {
@@ -24,6 +26,8 @@ type MessageOut struct {
 	Seen_Admin   bool
 	Date         string
 }
+
+
 
 func DeleteMessage(message_uuid string) bool {
 
@@ -236,6 +240,84 @@ func AdminMessagesPage(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 }
+
+
+
+
+func GetUUIDList()[]StudentInfo{
+
+	var data StudentInfo
+	var data_list []StudentInfo
+
+	dbread := dbcode.SqlRead().DB
+
+	query := `SELECT uuid, first_name, last_name FROM studentdata`
+	stmt, err := dbread.Query(query)
+
+
+	if err != nil {
+	    fmt.Println("Failed to prepare statement:", err)
+	}
+	defer stmt.Close()
+
+
+	if err != nil {
+	    fmt.Println("Failed to execute query:", err)
+	}
+
+	for stmt.Next(){
+        err = stmt.Scan(&data.UUID, &data.First_Name, &data.Last_Name) 
+        if err != nil{
+        	fmt.Println("Failed to scan stmt")
+        }
+
+        data_list = append(data_list, data)
+    }
+
+
+    return data_list
+
+
+}
+
+func SendBulleting(w http.ResponseWriter, r *http.Request){
+
+	r.ParseForm()
+
+	dbread := dbcode.SqlRead().DB
+
+	defer dbread.Close()
+
+	message := r.FormValue("message_bulleting")
+
+	data_list := GetUUIDList()
+	uuid := encription.Generateuudi()
+	dateout := fmt.Sprintf("%s", time.Now())
+
+	for _, data := range data_list{
+
+		sender_name := fmt.Sprintf("%s %s", data.First_Name, data.Last_Name)
+		student_uuid := data.UUID
+		sender := "admin"
+
+
+		stmt, err := dbread.Prepare("insert into messages (uuid, sender_uuid,sender_name, sender,message,seen_student,seen_admin,date) values(?,?,?,?,?,?,?,?)")
+
+		if err != nil {
+			fmt.Println("Faild to call prepare statement")
+		}
+
+		defer stmt.Close()
+
+		_, err = stmt.Exec(uuid, student_uuid,sender_name, sender, message, false, true, dateout)
+		if err != nil {
+			fmt.Println("Failed to send bulleting")
+		}
+	}
+	
+}
+
+
 
 func GetAllStudentMsg(w http.ResponseWriter, r *http.Request) {
 	tpl = template.Must(template.ParseGlob("templates/*.html"))

@@ -25,6 +25,7 @@ func UpdateAllProgramDetailsR(w http.ResponseWriter, r *http.Request){
 		Code: program_code,
 	}
 
+	fmt.Println("Name: ", program_name, "\n Code:", program_code)
 	
 	err := tpl.ExecuteTemplate(w, "updateprgogramcard", programData)
 

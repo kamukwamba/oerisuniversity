@@ -9,6 +9,8 @@ import (
 	"github.com/kamukwamba/oerisuniversity/dbcode"
 	"github.com/kamukwamba/oerisuniversity/routes"
 
+
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -75,6 +77,7 @@ func main() {
 	//NEW ROUTES END
 
 	router.HandleFunc("/studentcenter", routes.StudentCenter)
+	router.HandleFunc("/sendbulleting", routes.SendBulleting)
 
 	router.HandleFunc("/adminNews", routes.AdminNews)
 	router.HandleFunc("/getstudent", routes.GetAllStudentMsg)

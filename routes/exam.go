@@ -1428,10 +1428,6 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 	question_section := r.URL.Query().Get("section")
 	var is_present bool
 	var number string
-
-	
-
-	
 	
 	var exam_responce Questions_Construct
 
@@ -1440,6 +1436,7 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 	
 	cource_name := r.URL.Query().Get("cource_name")
 	cource_uuid := r.URL.Query().Get("uuid")
+	
 	exam_time := r.FormValue("questionType")
 	
 

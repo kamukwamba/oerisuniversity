@@ -40,6 +40,8 @@ type ApplicationApprovedSender struct {
 
 }
 
+
+
 func GetEmailData() (ApplicationApprovedSender, bool){
 
 	dbcone := dbcode.SqlRead().DB

@@ -3,6 +3,72 @@
     <head>
 	 {{ template "head_temp"}}
      {{ template "adminhearstyle"}}
+     <style>
+        .standalone-form {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(106, 13, 173, 0.2);
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            border: 2px solid #8a2be2;
+        }
+        
+        .form-title {
+            color: #6a0dad;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #d8bfd8;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 16px;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #9370db;
+            box-shadow: 0 0 0 3px rgba(147, 112, 219, 0.2);
+        }
+        
+        .submit-btn {
+            background-color: #6a0dad;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        
+        .submit-btn:hover {
+            background-color: #5c0a9e;
+            transform: translateY(-2px);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        </style>
     </head>
 
 
@@ -100,14 +166,19 @@
 
         <div class="adminright" style="border: solid 1px black; margin-right: 20px; border-radius: 5px;">
             <div class="search">
-                <form hx-get="/getstudent"
+                 <div class="standalone-form">
+                    
+                    <form hx-post="/sendbulleting"
                     hx-target="#messagelog"
                     hx-swap="innerHTML">
-                    <input class="input_st" type="text" placeholder="Student Email Address">
-                    <button class="btn_st" style="margin-top: 5px;">
-                        Search
-                    </button>
-                </form>
+                        <div class="form-group">
+                            <textarea placeholder="Send a system wide bulleting type your message here..." name="message_bulleting" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">Submit</button>
+                    </form>
+               
+                </div>
+               
             </div>
             <div id="messagelog">
                 {{ template "messageslog" .}}
