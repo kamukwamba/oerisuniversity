@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"net/http"
 	"github.com/kamukwamba/oerisuniversity/dbcode"
+	"strings"
 
 )
 
@@ -69,8 +70,131 @@ func UpdateAllProgramDetails(w http.ResponseWriter, r *http.Request){
 	}
 
 
+	err = UpdateStudentProgram(old_program_code, new_program_code)
+
+	if err != nil{
+		fmt.Println("Failed to update student program list")
+	}
 
 
+
+
+}
+
+
+func UpdateItOut(uuid, old_code, new_code string,index int, program_list []string)error{
+
+	new_list := program_list
+	new_list[index] = new_code
+
+
+	dbread := dbcode.SqlRead().DB
+
+	stmt, err := dbread.Prepare("UPDATE studentprogramlist SET program_list = ? WHERE uuid = ?")
+
+	if err != nil {
+		fmt.Println("Failed to prepare query for studentprogramlist")
+	}
+
+	defer stmt.Close()
+
+	_, err_out := stmt.Exec(new_list, uuid) 
+
+	if err_out != nil {
+		fmt.Println("Failed to update student program list")
+	}
+
+	return nil
+
+}
+
+func UpdateStudentProgram(old_program_code, new_program_code string) error{
+
+	student_data_out := GetStudentProgramsAll()
+	var uuid string
+
+	for _, item := range student_data_out{
+		uuid = item.UUID
+		student_programs := item.Program_List
+
+		for i, item_p := range student_programs{
+			if item_p == old_program_code{
+				index := i
+				err := UpdateItOut(uuid, old_program_code, new_program_code, index, student_programs)
+				if err != nil {
+					fmt.Println("Failed to update the student program data")
+				}
+
+			}else{
+				continue
+			}
+		}
+	}
+
+	return nil
+
+}
+
+
+type StudentPList struct{
+	UUID string
+	Program_List []string
+}
+
+func GetStudentProgramsAll() []StudentPList {
+	dbread := dbcode.SqlRead().DB
+
+	var uuid string
+	var program_list string
+
+	var listout []string
+	var update_list []StudentPList
+
+	var student_p_data StudentPList
+
+	stmt, err := dbread.Query("select uuid, program_list from studentprogramlist")
+
+	if err != nil {
+		fmt.Println("Failed to get from studentprogramlist")
+	}
+
+	defer stmt.Close()
+
+	for stmt.Next(){
+		err = stmt.Scan(&uuid, &program_list)
+		trimedlist := strings.Trim(program_list, "[]")
+
+		list_out := strings.Split(trimedlist, ",")
+
+		for _, item := range list_out {
+			trimedlistone := strings.Trim(item, "\"")
+			trimedlisttwo := strings.Trim(trimedlistone, " \"")
+
+			if len(trimedlisttwo) > 1 {
+				listout = append(listout, trimedlisttwo)
+
+				student_p_data = StudentPList{
+					UUID: uuid,
+					Program_List: listout,
+				}
+
+				update_list = append(update_list, student_p_data )
+
+
+			} else {
+				continue
+			}
+		}
+
+		if err != nil {
+		fmt.Println("FAILED TO GET STUDENT PROGRAM LIST")
+		}
+	}
+
+	
+
+
+	return update_list
 }
 
 

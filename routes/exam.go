@@ -393,53 +393,43 @@ func Read_Exam(cource_name string) ([]Question_Structure, string, bool) {
 
 }
 
-func Update_Exam_Details(details Exam_Details) (bool) {
+func Update_Exam_Details(details Exam_Details) error{
 	
 	
-	saved_succesfully := true
 	
 	
-
-
-	
-
 	dbupdate := dbcode.SqlRead().DB
-	stmt, err := dbupdate.Prepare("UPDATE exam_details SET  program_name = ?, cource_name = ?, cource_code = ?, duration = ?, total_marks = ? where cource_uuid = ?")
+	stmt, err := dbupdate.Prepare("UPDATE exam_details SET duration = ?, total_marks = ? where cource_uuid = ?")
 
 	if err != nil {
 		fmt.Println("Failed to Execute Update Query: ", err)
-		saved_succesfully = false
+		return err
 	}
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(details.Program_Name, details.Cource_Name, details.Cource_Code, details.Duration, details.Total_Marks,details.Cource_UUID)
+	_, err = stmt.Exec(details.Duration, details.Total_Marks,details.Cource_UUID)
 
 	if err != nil {
 		fmt.Println("Failed To Update Exam Details: ", err)
-		saved_succesfully = false
+		return err
 	}
 
 
 
-	return saved_succesfully
+	return nil
 
 }
 
-func Create_Exam_Details(details Exam_Details) (bool, string) {
-	present := true
-	message_out := "Exam details saved succesfully"
-
-	// THE RESULT WILL TELL THE INSTRUCT THAT THE DETAILS ARE ALRED PRESENT
-	saved_succesfully := false
+func Create_Exam_Details(details Exam_Details) error {
+	
 	uuid := encription.Generateuudi()
 	var details_out string
 	dbcon := dbcode.SqlRead().DB
 	stmt, err := dbcon.Prepare("select cource_uuid from exam_details where cource_uuid = ?")
 	fmt.Println("The Cource_UUID:",details.Cource_UUID)
 	if err != nil {
-		present = false
-		fmt.Println("Program Details Not Present: ", err)
+		return err
 	}
 
 	defer stmt.Close()
@@ -447,12 +437,9 @@ func Create_Exam_Details(details Exam_Details) (bool, string) {
 	err = stmt.QueryRow(details.Cource_UUID).Scan(&details_out)
 
 	if err != nil {
-		fmt.Println("Failed to get details out: ", err)
-		present = false
+		return err
 
-	}
-
-	if !present {
+	}else{
 		dbcreate := dbcode.SqlRead().DB
 		stmt, err := dbcreate.Prepare("insert into exam_details(uuid,cource_uuid,program_name,cource_name,cource_code,duration, total_marks) values(?,?,?,?,?,?,?)")
 
@@ -464,17 +451,17 @@ func Create_Exam_Details(details Exam_Details) (bool, string) {
 
 		_, err = stmt.Exec(uuid, details.Cource_UUID, details.Program_Name, details.Cource_Name, details.Cource_Code, details.Duration, details.Total_Marks)
 
-		saved_succesfully = true
 
 		if err != nil {
-			fmt.Println("Failed to create details entry: ", err)
-			saved_succesfully = false
+			return err
 		}
-	} else if present {
-		message_out = "Exam details present in database. If you wuld like to make changes please select the 'Update Details'."
 	}
+	return nil
+}
 
-	return saved_succesfully, message_out
+
+func UpdateDurationTotalMarks(){
+
 }
 
 func Create_Exam(question_in Questions_Construct) (bool, string) {
@@ -729,6 +716,7 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 	user_name, err := GetUserName(r)
 
 	program_data := r.URL.Query().Get("uuid")
+
 	var exam_value string
 	
 	get_exam_details := GetExamDetails(program_data)
@@ -754,7 +742,7 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 	var to_show ExamOut
 
 	cource_name_out := get_program_data.Cource_Name
-	fmt.Println("The Program Name: ", cource_name_out)
+
 	formatCourceName := Clean(cource_name_out)
 	
 	
@@ -995,7 +983,7 @@ func GetExamDetails(courceuuid string) ExamDetails {
 	fmt.Println("The Cource Code Search: ", courceuuid, ":")
 	dbconn := dbcode.SqlRead().DB
 
-	stmt, err := dbconn.Prepare("select  program_name, cource_name, cource_code, duration, total_marks from exam_details where cource_uuid = ?")
+	stmt, err := dbconn.Prepare("select program_name, cource_name, cource_code, duration, total_marks from exam_details where cource_uuid = ?")
 
 	if err != nil {
 		fmt.Println("Prepare Statement failed  in 'GetExamDetails' error out : ", err)
@@ -1282,53 +1270,38 @@ func UpdateExamEntered(uuid string){
 
 func AddExamDetails(w http.ResponseWriter, r *http.Request) {
 
-	section_out := r.URL.Query().Get("section")
-	var save_details bool
+	
+	
 	var exam_responce CreateExamResponse
 	var template_name string
 	var details_message string
+
+
 	cource_uuid := r.URL.Query().Get("uuid")
-	pr_name := r.FormValue("program_name")
-	c_name := r.FormValue("cource_name")
-	cource_code := r.FormValue("cource_code")
 	exam_time := r.FormValue("exam_time")
 	total_marks := r.FormValue("total_marks")
 
 
 
 	create_exam_detaile := Exam_Details{
-		Cource_UUID:  cource_uuid,
-		Program_Name: pr_name,
-		Cource_Name:  c_name,
-		Cource_Code:  cource_code,
+		Cource_UUID: cource_uuid,
 		Duration:     exam_time,
 		Total_Marks:  total_marks,
 	}
 
 
-	switch section_out{
-		case "save":
-			save_details, details_message = Create_Exam_Details(create_exam_detaile)
-		case "update":
-			save_details = Update_Exam_Details(create_exam_detaile)
+	
+	err := Update_Exam_Details(create_exam_detaile)
 
+	if err != nil{
+		fmt.Println("Failed to update exam details")
 	}
+	exam_responce = CreateExamResponse{
+		Details_Messages: details_message}
 
+	template_name = "details_saved_temp false"
 
-
-	if save_details {
-		exam_responce = CreateExamResponse{
-			Details_Messages: details_message}
-
-		template_name = "details_saved_temp"
-
-	} else {
-		exam_responce = CreateExamResponse{
-			Details_Messages: details_message}
-
-		template_name = "details_saved_temp false"
-
-	}
+	
 
 	fmt.Println("The Responce",exam_responce)
 	
@@ -1336,7 +1309,7 @@ func AddExamDetails(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(template_name)
 
-	err := tpl.ExecuteTemplate(w,  "examdetailsC", create_exam_detaile)
+	err = tpl.ExecuteTemplate(w,  "examdetailsC", create_exam_detaile)
 
 	if err != nil {
 		log.Fatal(err)
@@ -1425,7 +1398,6 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
 
-	question_section := r.URL.Query().Get("section")
 	var is_present bool
 	var number string
 	
@@ -1433,7 +1405,7 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 
 	var template_name string
 
-	
+	question_section := r.URL.Query().Get("section")
 	cource_name := r.URL.Query().Get("cource_name")
 	cource_uuid := r.URL.Query().Get("uuid")
 	

@@ -154,7 +154,7 @@ func GetProgramDetailsSingle(uuid_out string) CourceDataStruct {
 	var cource_data_out CourceDataStruct
 	get_one := dbcode.SqlRead().DB
 
-	stmt, err := get_one.Prepare("select uuid, program_name, cource_name, cource_assesment, video_list,module,recomended_book, exam_file from cource_table where uuid = ?")
+	stmt, err := get_one.Prepare("select uuid, program_name, cource_name,cource_code, cource_assesment, video_list,module,recomended_book, exam_file from cource_table where uuid = ?")
 
 	if err != nil {
 		fmt.Println("Error One", err)
@@ -162,7 +162,7 @@ func GetProgramDetailsSingle(uuid_out string) CourceDataStruct {
 
 	defer stmt.Close()
 
-	err = stmt.QueryRow(uuid_out).Scan(&cource_data_out.UUID, &cource_data_out.Program_Name, &cource_data_out.Cource_Name, &cource_data_out.Cource_Aseesment, &cource_data_out.Video_List, &cource_data_out.Module, &cource_data_out.Book, &cource_data_out.Exam)
+	err = stmt.QueryRow(uuid_out).Scan(&cource_data_out.UUID, &cource_data_out.Program_Name, &cource_data_out.Cource_Name, &cource_data_out.Cource_Code,&cource_data_out.Cource_Aseesment, &cource_data_out.Video_List, &cource_data_out.Module, &cource_data_out.Book, &cource_data_out.Exam)
 
 	if err != nil {
 		fmt.Println("UUID: ", uuid_out)
@@ -451,6 +451,23 @@ func AddCourceData(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Failed to add course primary data to CourseNames: ", err)
 	}
 
+	new_uuid := encription.Generateuudi()
+	exam_details := Exam_Details{
+		UUID: new_uuid,
+		Cource_UUID:  create_uuid,
+		Program_Name: program_name,
+		Cource_Name:  cource_name,
+		Cource_Code:  course_code,
+		Duration:     "0",
+		Total_Marks: "0",				
+	
+	}
+
+	err = Create_Exam_Details(exam_details)
+	if err != nil{
+		fmt.Println("Create Exam Details in \"program details\" returns error: ", err)
+	}
+
 	err = tpl.ExecuteTemplate(w, "cource_data_tr_two", data_out)
 
 	if err != nil {
@@ -458,3 +475,5 @@ func AddCourceData(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
+

@@ -120,7 +120,7 @@ func main() {
 	router.HandleFunc("/confirmreset", routes.ConfirmStudentId)
 
 	//EXAM
-	router.HandleFunc("/createexampage", routes.CreatePage)
+	router.HandleFunc("/createexampage", routes.CreatePage)///currntly using
 	router.HandleFunc("/addexam", routes.AddExam)
 	router.HandleFunc("/examdetails", routes.AddExamDetails)
 

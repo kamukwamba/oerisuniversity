@@ -138,7 +138,9 @@
                 </div>
                 <!-- EXAM FINE DETAILS  -->
 
-                <form>
+                <form  hx-post="/examdetails?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{.Cource_Data.UUID}}&section=update"
+                    hx-target="#details_saved"
+                    hx-swap="innerHTML" >
 
                     <input type="text" name="program_name" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Program Name">
 
@@ -152,12 +154,8 @@
 
                     <input type="text" name="total_marks" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Total Marks"><br>
 
-                    <button hx-post="/examdetails?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{.Cource_Data.UUID}}&section=save"
-                    hx-target="#details_saved"
-                    hx-swap="innerHTML" type="submit" class="create_button">Save Details</button>
-                    <button hx-post="/examdetails?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{.Cource_Data.UUID}}&section=update"
-                    hx-target="#details_saved"
-                    hx-swap="innerHTML" type="submit" class="create_button">Update Details</button>
+                    
+                    <button type="submit" class="create_button">Update Details</button>
 
 
                 </form>
@@ -341,9 +339,9 @@
             hx-target="#question_list"
             hx-swap="beforeend">
                 <div style="background-color: rgb(32, 0, 62); padding: 5px; margin-bottom:5px;">
-                    <label for="answer"  class="compose" style=" color: white;">Section B</label><br>
+                <label for="answer"  class="compose" style=" color: white;">Section B</label><br>
                 </div>
-                <textarea name="question_b" id="questionSectionB" class="question_div_one" style="font-size: 1em; padding:5px;">Enter section B qustion here  one at a time.
+                <textarea name="questionText" id="questionSectionB" class="question_div_one" style="font-size: 1em; padding:5px;">Enter section B qustion here  one at a time.
                 </textarea>
 
                 <button type="submit" class="create_button">Save</button>
