@@ -250,6 +250,8 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 
 	var studentsdatain StudentInfo
 
+	//var result_template string
+
 	program_name := r.FormValue("program")
 	uuid := encription.Generateuudi()
 	first_name := r.FormValue("first_name")
@@ -367,7 +369,9 @@ func ConfirmEnrollment(w http.ResponseWriter, r *http.Request) {
 			    err := services.SendSuccessEmail(email, user_identifiacation)
 
 			    if err != nil {
-				http.Error(w, "Test email failed: "+err.Error(), http.StatusInternalServerError)
+				 http.Error(w, "Test email failed: "+err.Error(), http.StatusInternalServerError)
+
+
 				return
 	}
 			    log.Println("Welcome email sent successfully!")
