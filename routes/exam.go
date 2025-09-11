@@ -424,38 +424,25 @@ func Update_Exam_Details(details Exam_Details) error{
 func Create_Exam_Details(details Exam_Details) error {
 	
 	uuid := encription.Generateuudi()
-	var details_out string
-	dbcon := dbcode.SqlRead().DB
-	stmt, err := dbcon.Prepare("select cource_uuid from exam_details where cource_uuid = ?")
-	fmt.Println("The Cource_UUID:",details.Cource_UUID)
+
+
+	dbcreate := dbcode.SqlRead().DB
+	stmt, err := dbcreate.Prepare("insert into exam_details(uuid,cource_uuid,program_name,cource_name,cource_code,duration, total_marks) values(?,?,?,?,?,?,?)")
+
 	if err != nil {
+		fmt.Println("PREPARE STATEMENT FAILED: ", err)
 		return err
 	}
 
 	defer stmt.Close()
 
-	err = stmt.QueryRow(details.Cource_UUID).Scan(&details_out)
+	_, err = stmt.Exec(uuid, details.Cource_UUID, details.Program_Name, details.Cource_Name, details.Cource_Code, details.Duration, details.Total_Marks)
+
 
 	if err != nil {
 		return err
-
-	}else{
-		dbcreate := dbcode.SqlRead().DB
-		stmt, err := dbcreate.Prepare("insert into exam_details(uuid,cource_uuid,program_name,cource_name,cource_code,duration, total_marks) values(?,?,?,?,?,?,?)")
-
-		if err != nil {
-			fmt.Println("PREPARE STATEMENT FAILED: ", err)
-		}
-
-		defer stmt.Close()
-
-		_, err = stmt.Exec(uuid, details.Cource_UUID, details.Program_Name, details.Cource_Name, details.Cource_Code, details.Duration, details.Total_Marks)
-
-
-		if err != nil {
-			return err
-		}
 	}
+
 	return nil
 }
 
@@ -717,12 +704,13 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 
 	program_data := r.URL.Query().Get("uuid")
 
+	fmt.Println("Cource UUID: ", program_data)
 	var exam_value string
 	
 	get_exam_details := GetExamDetails(program_data)
 
 	get_program_data := GetProgramDetailsSingle(program_data)
-	fmt.Println("Program UUID: ", program_data)
+	
 	
 	dbread := dbcode.SqlRead().DB
 
@@ -766,6 +754,7 @@ func CreatePage(w http.ResponseWriter, r *http.Request) {
 			Present:     false,
 			Cource_Data: get_program_data,
 			CourceNameFm: formatCourceName,
+			ExamDetails: get_exam_details,
 			Admin_Name: user_name,
 
 		}
@@ -980,8 +969,10 @@ func GetExamDetails(courceuuid string) ExamDetails {
 
 	var exam_details ExamDetails
 
-	fmt.Println("The Cource Code Search: ", courceuuid, ":")
+	
 	dbconn := dbcode.SqlRead().DB
+
+	defer dbconn.Close()
 
 	stmt, err := dbconn.Prepare("select program_name, cource_name, cource_code, duration, total_marks from exam_details where cource_uuid = ?")
 
@@ -995,7 +986,11 @@ func GetExamDetails(courceuuid string) ExamDetails {
 
 	if err != nil {
 		fmt.Println("Failed to get program details: ", err)
+
+
 	}
+
+	
 
 	return exam_details
 
@@ -1309,7 +1304,7 @@ func AddExamDetails(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(template_name)
 
-	err = tpl.ExecuteTemplate(w,  "examdetailsC", create_exam_detaile)
+	err = tpl.ExecuteTemplate(w,  "durationTime", create_exam_detaile)
 
 	if err != nil {
 		log.Fatal(err)
@@ -1453,7 +1448,7 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 			_, quuid := Create_Exam(question_content)
 
 			UpdateExamEntered(cource_uuid)
-			fmt.Println("Fuck")
+			
 			question_content.UUID = quuid
 
 			exam_responce = question_content
@@ -1493,6 +1488,7 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 		
 
 		question_b := r.FormValue("questionText")
+
 		var question_content Questions_Construct
 
 		if is_present {
@@ -1508,6 +1504,7 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 			}
 
 			_, quuid := Create_Exam(question_content)
+
 			UpdateExamEntered(cource_uuid)
 			
 
@@ -1515,7 +1512,7 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 
 			exam_responce = question_content
 
-			template_name = "examquestion"
+			template_name = "question_section_b"
 			
 
 		} else {
@@ -1536,7 +1533,7 @@ func AddExam(w http.ResponseWriter, r *http.Request) {
 
 			exam_responce = question_content
 
-			template_name = "examquestion"
+			template_name = "question_section_b"
 
 			
 		}

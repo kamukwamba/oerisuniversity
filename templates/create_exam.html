@@ -16,7 +16,7 @@
         
         .question_div_one{
             width: 100%;
-            height: 250px;
+            height: 200px;
             border: solid 1px rgb(32, 0, 62);
             
         }
@@ -139,14 +139,10 @@
                 <!-- EXAM FINE DETAILS  -->
 
                 <form  hx-post="/examdetails?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{.Cource_Data.UUID}}&section=update"
-                    hx-target="#details_saved"
+                    hx-target="#durationTime"
                     hx-swap="innerHTML" >
 
-                    <input type="text" name="program_name" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Program Name">
-
-                    <input type="text" name="cource_name" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Cource Name">
-
-                    <input type="text" name="cource_code" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Cource Code">
+               
 
                     <input type="text" name="exam_time" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Enter time in minutes">
 
@@ -184,21 +180,19 @@
                     {{ template "sectionACreate" .}}
                 </div>
             <!-- SECTION B QUESTIONS --> 
+
                 <div id="sectionBID">
                     {{ template "sectionBCreate" .}}
                 </div>
 
             <!-- EXAM FINE DETAILS  -->
 
-           
+        
+            <form hx-post="/examdetails?program_name={{.Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{.Cource_Data.UUID}}&section=update"
+                hx-target="#details_saved"
+                hx-swap="innerHTML">
 
-            <form>
-
-                <input type="text" name="program_name" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Program Name">
-
-                <input type="text" name="cource_name" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Cource Name">
-
-                <input type="text" name="cource_code" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Cource Code">
+            
 
                 <input type="text" name="exam_time" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Enter time in minutes">
 
@@ -206,13 +200,9 @@
 
                 <input type="text" name="total_marks" id="" style="padding: 5px; width: 100%; height: 30px; border:solid 1px rgb(32, 0, 62); padding-inline: 5px; margin: 5px;" placeholder="Total Marks"><br>
 
-                <button hx-post="/examdetails?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{.Cource_Data.UUID}}&section=save"
-                hx-target="#details_saved"
-                hx-swap="innerHTML" type="submit" class="create_button">Save Details</button>
+               
                 
-                <button hx-post="/examdetails?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{.Cource_Data.UUID}}&section=update"
-                hx-target="#details_saved"
-                hx-swap="innerHTML" type="submit" class="create_button">Update Details</button>
+                <button  type="submit" class="create_button">Update Details</button>
 
 
             </form>
@@ -251,20 +241,35 @@
                         <th class="title">Cource Code</th>
                         <td>{{ .Cource_Code }}</td>
                     </tr>
-                    <tr>
-                        <th class="title">Duration</th>
-                        <td id="duration">{{ .Duration}}min</td>
-                    </tr>
-                
-                    <tr>
-                        <th class="title">Total  Marks</th>
-                        <td>{{ .Total_Marks}}</td>
-                    </tr>
+                    <div id="durationTime">
+                        <tr>
+                            <th class="title">Duration</th>
+                            <td id="duration">{{ .Duration}}min</td>
+                        </tr>
+                    
+                        <tr>
+                            <th class="title">Total  Marks</th>
+                            <td>{{ .Total_Marks}}</td>
+                        </tr>
+                    </div>
                 </tbody>
             </table>
     
         </div>
 
+{{ end }}
+
+{{ define "durationTime" }}
+
+    <tr>
+        <th class="title">Duration</th>
+        <td id="duration">{{ .Duration}}min</td>
+    </tr>
+
+    <tr>
+        <th class="title">Total  Marks</th>
+        <td>{{ .Total_Marks}}</td>
+    </tr>
 {{ end }}
 
 
@@ -335,9 +340,10 @@
 
 {{ define  "sectionBCreate"}}
 
-    <form hx-post="/addexam?program_name={{ .Cource_Data.Program_Name}}&cource_name={{ .Cource_Data.Cource_Name}}&uuid={{ .Cource_Data.UUID}}&section=B"
+    <form hx-post="/addexam?program_name={{.Cource_Data.Program_Name}}&cource_name={{.Cource_Data.Cource_Name}}&uuid={{.Cource_Data.UUID}}&section=B"
             hx-target="#question_list"
             hx-swap="beforeend">
+
                 <div style="background-color: rgb(32, 0, 62); padding: 5px; margin-bottom:5px;">
                 <label for="answer"  class="compose" style=" color: white;">Section B</label><br>
                 </div>

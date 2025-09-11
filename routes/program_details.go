@@ -451,9 +451,7 @@ func AddCourceData(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Failed to add course primary data to CourseNames: ", err)
 	}
 
-	new_uuid := encription.Generateuudi()
 	exam_details := Exam_Details{
-		UUID: new_uuid,
 		Cource_UUID:  create_uuid,
 		Program_Name: program_name,
 		Cource_Name:  cource_name,
